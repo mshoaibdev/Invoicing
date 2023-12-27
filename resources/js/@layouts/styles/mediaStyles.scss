@@ -1,0 +1,477 @@
+@media (min-width: 310px) and (max-width: 768px) {
+    .offset-2 {
+        margin-left: 0% !important;
+    }
+}
+
+@media (min-width: 380px) and (max-width: 475px) {
+    .forMobileSizeinput {
+        width: 18rem
+    }
+
+    .forMobileSizeEditQuote {
+        width: 18rem;
+    }
+}
+
+@media (min-width: 315px) and (max-width: 380px) {
+    .forMobileSizeinput {
+        width: 14rem
+    }
+
+    .forMobileSizeSearchinput {
+        width: 14rem;
+    }
+
+    .forMobileSizeEditQuote {
+        width: 14rem;
+    }
+}
+
+@media (min-width: 600px) and (max-width: 770px) {
+
+    .forMobileSizeSearchinput {
+        width: 14rem !important
+    }
+
+}
+
+@media (min-width: 320px) and (max-width: 425px) {
+
+    .forMobileSizeButtons {
+        flex-wrap: nowrap !important;
+    }
+
+    .forMobileSizeSearchinput {
+        width: 10rem !important
+    }
+
+    .forMobileSizeButton {
+        margin-left: 1rem !important;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 768px) {
+
+    .spacerWidth {
+        width: 20px !important;
+    }
+
+    .taskField {
+        width: 160px !important;
+    }
+
+    .cardpadding {
+        padding: 0;
+    }
+
+}
+
+@media (min-width: 320px) and (max-width: 380px) {
+    .mobileSizeButton {
+        width: 15rem;
+    }
+
+    .mobileSizeSearchAsset {
+        width: 14rem !important;    
+    }
+
+}
+
+@media (min-width: 300px) and (max-width: 340px) {
+    .mobileSizeSearchField {
+        width: 14rem !important;
+    }
+
+    .mobileFontSize {
+        font-size: 12px !important;
+    }
+
+    .mobileLogo {
+        width: 50px !important;
+        height: 50px !important;
+    }
+
+    .companyTitle {
+        font-size: 16px !important;
+    }
+
+    .btnSize {
+        width: 14rem;
+        font-size: 12px;
+    }
+
+    .mobilesearchinputFiled {
+        width: 14rem;
+    }
+
+    .viewOrder {
+        font-size: 13px !important;
+    }
+
+    .overviewSize {
+        font-size: 17px !important;
+        word-break: break-word;
+    }
+
+    .taskField {
+        width: 170px !important;
+    }
+}
+
+
+    // for color picker in Projects-Tasks
+
+@media (min-width: 300px) and (max-width: 319px) {
+
+    .forMobileSizeColorPicker {
+        width: 190px !important;
+    }
+
+    .forMobileSizeAddBtn {
+        width: 100px !important
+    }
+    
+    .forMobileSizeCancelBtn {
+        width: 80px !important
+    }
+}
+
+@media (min-width: 320px) and (max-width: 355px) {
+        
+    .forMobileSizeColorPicker {
+            width: 210px !important;
+    }
+
+    .forMobileSizeAddBtn {
+        width: 100px !important
+    }
+
+    .forMobileSizeCancelBtn {
+        width: 80px !important
+    }
+        
+}
+
+@media (min-width: 375px) and (max-width: 390px) {
+
+    .forMobileSizeColorPicker {
+        width: 270px !important;
+    }
+
+}
+
+
+    // for active, archive quotes and add, edit invoice
+
+@media (min-width: 315px) and (max-width: 345px) {
+
+    .scrollable-table {
+        overflow-x: auto;
+        width: 222px
+    }
+
+}
+
+@media (min-width: 365px) and (max-width: 390px) {
+
+    .scrollable-table {
+        overflow-x: auto;
+        width: 270px
+    }
+
+}
+
+@media (min-width: 400px) and (max-width: 424px) {
+
+    .scrollable-table {
+        overflow-x: auto;
+        width: 300px
+    }
+
+}
+
+@media (min-width: 425px) and (max-width: 440px) {
+
+    .scrollable-table {
+        overflow-x: auto;
+        width: 320px
+    }
+
+}
+
+    // for search input field in Customers component, Suppliers component, Employees component
+
+@media (min-width: 315px) and (max-width: 330px) {
+    .searchFieldForMobileSize {
+        width: 6rem !important
+    }
+ 
+    .projectSearchFieldForMobileSize {
+        width: 7rem !important;
+    }
+
+    .invoiceSearchFieldForMobileSize{
+        width: 6rem !important;    
+    }
+    .forMobileSize {
+        display: none;
+    }
+
+      // for add asset button
+    .mobileSize {
+        width: 6rem !important
+    }
+
+    // for viewQuote
+    .viewQuoteMobileSize {
+        width: 220px !important;
+    }
+
+    .fontForQuoteData {
+        font-size: 14px !important;
+        word-wrap: break-word !important;
+    }
+
+    // for Most Recent Tasks table in Projects
+    .projectTasksTableWidth {
+        width: 280px !important;
+    }
+}
+
+@media (min-width: 365px) and (max-width: 385px) {
+    .searchFieldForMobileSize {
+        width: 9rem !important
+    }
+
+    .invoiceSearchFieldForMobileSize {
+        width: 10rem !important;
+    }
+
+    // for viewQuote
+    .viewQuoteMobileSize {
+        width: 270px !important;
+    }
+
+    // for Most Recent Tasks table in Projects
+    .projectTasksTableWidth {
+        width: 320px !important;
+    }
+}
+
+@media (min-width: 410px) and (max-width: 440px) {
+    .searchFieldForMobileSize {
+        width: 12rem !important
+    }
+
+    .invoiceSearchFieldForMobileSize {
+        width: 12rem !important;
+    } 
+
+    // for viewQuote
+    .viewQuoteMobileSize {
+        width: 320px !important;
+    }
+
+    // for Most Recent Tasks table in Projects
+    .projectTasksTableWidth {
+        width: 370px !important;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 768px) {
+    .searchFieldForMobileSize {
+        width: 10rem !important
+    }
+
+    // for digital asset register
+    .forMobileSize {
+        display: none;
+    }
+
+    .mobileSizeButton {
+        width: 15rem !important;
+    }
+}
+
+@media (min-width: 300px) and (max-width: 350px) {
+
+    // for filter button in Project's component
+    .btnForMobileSize {
+        width: 18px !important;
+        padding-right: 2px !important;
+    }
+
+}
+
+    // for create and edit Invoice
+
+@media (min-width: 375px) and (max-width: 375px) {
+    
+    .forMobileSizeData {
+        max-width: 44% !important;
+        font-size: 14px !important;
+    }
+
+}
+
+@media (min-width: 320px) and (max-width: 320px) {
+
+    .forMobileSizeData {
+        max-width: 35% !important;
+        font-size: 14px !important;
+    }
+
+}
+
+    // for add and edit employee card
+
+@media (min-width: 310px) and (max-width: 768px) {
+    .marginForMobileSize {
+        margin-top: 0px !important;
+    }
+}
+
+    // for donut chart
+
+@media (min-width: 425px) and (max-width: 425px) {
+    .forMobiledonutchart {
+        width: 36.5rem;
+    }
+
+    .overviewSize {
+        font-size: 19px !important;
+        word-break: break-word;
+    }
+}
+
+@media (min-width: 375px) and (max-width: 375px) {
+    .forMobiledonutchart {
+        width: 33.5rem;
+    }
+
+    .overviewSize {
+        font-size: 18px !important;
+        word-break: break-word;
+    }
+}
+
+@media (min-width: 310px) and (max-width: 320px) {
+    .forMobiledonutchart {
+        width: 30rem;
+    }
+}
+
+@media (min-width: 300px) and (max-width: 309px) {
+    .forMobiledonutchart {
+        width: 29rem;
+    }
+}
+
+@media (min-width: 321px) and (max-width: 356px) {
+    .forMobiledonutchart {
+        width: 32rem;
+    }
+}
+
+@media (min-width: 357px) and (max-width: 374px) {
+    .forMobiledonutchart {
+        width: 34rem;
+    }
+}
+
+@media (min-width: 376px) and (max-width: 388px) {
+    .forMobiledonutchart {
+        width: 34rem;
+    }
+}
+
+@media (min-width: 389px) and (max-width: 424px) {
+    .forMobiledonutchart {
+        width: 35rem;
+    }
+}
+
+    // Most Recent Task Table
+
+@media (min-width: 425px) and (max-width: 425px) {
+    .avatarSize {
+        width: 1px !important;
+    }
+
+    .titleSize {
+        width: 100px !important;
+    }   .avatarSize {
+           width: 1px !important;
+       }
+
+    .descriptionSize {
+        width: 450px !important
+    }
+}
+
+
+@media (min-width: 1440px) and (max-width: 1440px) {
+
+    .titleSize {
+        width: 60px !important;
+    }
+
+    .descriptionSize {
+        width: 160px !important
+    }
+}
+
+@media (min-width: 1024px) and (max-width: 1024px) {
+    .avatarSize {
+         width: 10px !important;
+    }
+            
+    .titleSize {
+        width: 80px !important;
+    }
+            
+    .descriptionSize {
+        width: 200px !important
+    }
+}
+
+    // for Users folder containing Account, Security, Users, Roles, Companies, Notifications
+
+@media (min-width: 310px) and (max-width: 330px) {
+        .userbtnForMobileSize {
+            width: 115px !important;
+        }
+
+        .fontForMobileSize{
+            font-size: 11px !important;
+        }
+
+        .usersSearchField {
+            width: 6rem !important;
+        }
+
+}
+
+@media (min-width: 370px) and (max-width: 390px) {
+    .securitybtnForMobileSize {
+        width: 11rem !important;
+    }
+
+    .securityfontForMobileSize {
+        font-size: 11px !important;
+        overflow-x: auto !important;
+    }
+    
+    .usersSearchField {
+        width: 9rem !important;
+    }
+
+}
+
+@media (min-width: 410px) and (max-width: 440px) {
+
+    .usersSearchField {
+        width: 12rem !important;
+    }
+}
