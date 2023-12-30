@@ -20,25 +20,22 @@ class UserController extends Controller
         // $this->middleware(['permission:settings-users-list|settings-users-create|settings-users-edit|settings-users-delete']);
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+ 
     public function index(Request $request)
     {
+
+        $user = $request->user();
+        $limit = $request->has('perPage') ? $request->perPage : 10;
 
         $users = User::query()
             ->with(['roles'])
             ->when($request->q, function ($query, $string) use ($request) {
                 $query->search($request->q);
             })
+            ->where('id', '<>', $user->id)
             ->applyFilters($request)
-            ->when($request->perPage, function ($query, $perPage) {
-                return $query->paginate($perPage);
-            }, function ($query) {
-                return $query->get();
-            });
+            ->latest()
+            ->paginate($limit);
 
         return UserResource::collection($users);
     }
@@ -51,66 +48,45 @@ class UserController extends Controller
      */
     public function store(Store $request)
     {
-        $data = $request->validated();
-        $user = User::create($data);
+        $user = User::create($request->getUserPayload());
 
         if ($request->hasFile('avatar')) {
-
-            $path = 'users/' . $user->id;
-
-            $fileName = $this->uploadAvatarAndResize($request->avatar, $path);
-            $data['avatar'] = $fileName;
+            $this->uploadAvatar($request, $user);
         }
-
 
         if ($request->role_id) {
             $user->assignRole($request->role_id);
         }
 
+        $user->companies()->sync($request->companies);
+
         return response()->json([
-            'data' => $user,
             'message' => 'User successfully added.',
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\User  $users
-     * @return \Illuminate\Http\Response
-     */
+  
     public function show(User $user)
     {
-        return new UserResource($user->load('roles'));
+        return new UserResource($user->load('roles', 'companies:id'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Users  $users
-     * @return \Illuminate\Http\Response
-     */
+    
     public function update(Update $request, User $user)
     {
-        $data = $request->validated();
-        if ($request->hasFile('avatar_new')) {
-
-            $path = 'users/' . $user->id;
-
-            Storage::delete($path . '/' . $user->avatar_new);
-            $fileName = $this->uploadAvatarAndResize($request->avatar_new, $path);
-            $data['avatar'] = $fileName;
+        if ($request->hasFile('avatar')) {
+            $this->uploadAvatar($request, $user);
         }
 
-        $user->update($data);
+        $user->update($request->getUserPayload());
 
         if ($request->role_id) {
             $user->syncRoles($request->role_id);
         }
 
+        $user->companies()->sync($request->companies);
+
         return response()->json([
-            'data' => $user,
             'message' => 'User successfully updated.',
         ]);
     }
@@ -139,5 +115,21 @@ class UserController extends Controller
         return response()->json([
             'message' => 'User successfully deleted.',
         ]);
+    }
+
+    public function uploadAvatar(Request $request, $user)
+    {
+
+        if (isset($request->is_avatar_removed) && (bool) $request->is_avatar_removed) {
+            $user->clearMediaCollection('avatar');
+        }
+
+        if ($user) {
+            $user->clearMediaCollection('avatar');
+
+            $user->addMediaFromRequest('avatar')
+                ->usingFileName($user->id . '-' . $request->avatar->getClientOriginalExtension())
+                ->toMediaCollection('avatar');
+        }
     }
 }

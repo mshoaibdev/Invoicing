@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Customer;
 
+use Illuminate\Support\Arr;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class Store extends FormRequest
@@ -23,17 +25,48 @@ class Store extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:150'],
-            'email' => ['required', 'string', 'max:150'],
+            'email' => ['email', 'required', Rule::unique('customers')->where('company_id', $this->header('company'))],
             'phone' => ['nullable', 'string', 'max:150'],
-            'address' => ['required', 'string', 'max:150'],
-            'lead_type' => ['required', 'string', 'max:50'],
-            'status' => ['nullable', 'string', 'max:50'],
-            'in_progress' => ['nullable', 'integer'],
-            'last_service' => ['nullable', 'date'],
-            'user_id' => ['nullable', 'integer'],
-            'is_free' => ['nullable', 'integer'],
-            'date' => ['nullable', 'date'],
-            'notes' => ['nullable', 'string'],
+            'billing.name' => ['nullable'],
+            'billing.address_street_1' => ['nullable'],
+            'billing.city' => ['nullable'],
+            'billing.state' => ['nullable'],
+            'billing.country_id' => ['nullable'],
+            'billing.zip' => ['nullable'],
+            'currency_id' => ['required'],
+            'company_name' => ['nullable'],
+            'website' => ['nullable'],
         ];
     }
+
+    public function getCustomerPayload()
+    {
+        return collect($this->validated())
+            ->merge([
+                'creator_id' => $this->user()->id,
+                'company_id' => $this->header('company'),
+            ])
+            ->toArray();
+    }
+
+    public function getBillingAddress()
+    {
+        return collect($this->billing)
+            ->merge([
+                'user_id' => $this->user()->id,
+                'company_id' => $this->header('company'),
+                'type' => 'billing',
+            ])
+            ->toArray();
+    }
+
+    public function hasAddress(array $address)
+    {
+        $data = Arr::where($address, function ($value, $key) {
+            return isset($value);
+        });
+
+        return $data;
+    }
+
 }

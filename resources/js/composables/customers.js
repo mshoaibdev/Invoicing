@@ -21,33 +21,8 @@ export default function useCustomers() {
       visible: true,
     },
     {
-      title: 'Email',
-      key: 'email',
-      sortable: false,
-      visible: true,
-    },
-    {
       title: 'Phone',
       key: 'phone',
-      sortable: false,
-      visible: true,
-    },
-    {
-      title: 'Address',
-      key: 'address',
-      sortable: false,
-      visible: true,
-    },
-    {
-      title: 'Lead Type',
-      key: 'lead_type',
-      sortable: false,
-      visible: true,
-    },
-   
-    {
-      title: 'Status',
-      key: 'status',
       sortable: false,
       visible: true,
     },
@@ -77,17 +52,6 @@ export default function useCustomers() {
   const customerId = ref(null)
   const customerData = ref({})
   const errors = ref({})
-
-  const paginationData = computed(() => {
-    const firstIndex = customers.value.length ? (currentPage.value - 1) * itemsPerPage.value + 1 : 0
-    const lastIndex = customers.value.length + (currentPage.value - 1) * itemsPerPage.value
-  
-    return `Showing ${ firstIndex } to ${ lastIndex } of ${ totalRecords.value } entries`
-  })
-
-  const refetchData = () => {
-    refListTable.value.refresh()
-  }
 
 
   const deleteCustomer = async id => {
@@ -137,7 +101,7 @@ export default function useCustomers() {
     try {
       isLoading.value = true
 
-      const response = await axios.put(route('customers.update', id), formData)
+      const response = await axios.post(route('customers.update', id), formData)
 
       respResult.value = response
       toast.success(response.data.message)
@@ -169,7 +133,6 @@ export default function useCustomers() {
       isLoading.value = false
     }
   }
-
 
 
   const storeCustomer = async formData => {
@@ -233,7 +196,7 @@ export default function useCustomers() {
   const fetchCustomersList = async role => {
     isLoading.value = true
     try {
-      const response = await axios.get(route('customers.index'), {
+      const response = await axios.get(route('fetch-customers'), {
         params: {
           ...filters,
         },
@@ -271,7 +234,6 @@ export default function useCustomers() {
     itemsPerPage,
     totalPages,
     filters,
-    paginationData,
     respResult,
     fetchCustomersByStatus,
     customers,
@@ -279,11 +241,9 @@ export default function useCustomers() {
     fetchCustomers,
     deleteMultipleCustomer,
     deleteCustomer,
-    refetchData,
     updateCustomer,
     currentPage,
     searchQuery,
-    refListTable,
     totalRecords,
     headers,
     isSortDirDesc,

@@ -22,23 +22,17 @@ class InvoiceController extends Controller
      */
     public function index(Request $request)
     {
-
+        $limit = $request->has('perPage') ? $request->perPage : 10;
 
         $invoices = Invoice::query()
-            ->with(['customer', 'user'])
+            ->with(['customer'])
             ->when($request->q, function ($query) use ($request) {
                 $query->search($request->q);
             })
-            ->when(!auth()->user()->hasRole('Admin'), function ($query) {
-                $query->where('user_id', auth()->id());
-            })
+            ->whereCompany()
             ->applyFilters($request)
             ->latest()
-            ->when($request->perPage, function ($query, $perPage) {
-                return $query->paginate($perPage);
-            }, function ($query) {
-                return $query->get();
-            });
+            ->paginate($limit);
 
         return InvoiceResource::collection($invoices);
     }
@@ -49,12 +43,10 @@ class InvoiceController extends Controller
     public function store(Store $request)
     {
 
-        $invoice = Invoice::create(array_merge($request->validated(), [
-            'user_id' => auth()->id(),
-        ]));
+        $invoice = Invoice::create($request->getInvoicePayload());
 
 
-        $this->createPaypalInvoice($invoice);
+        // $this->createPaypalInvoice($invoice);
 
         // Mail::to($invoice->customer->email)->send(new NewInvoice($invoice));
 
@@ -69,7 +61,7 @@ class InvoiceController extends Controller
      */
     public function show(Invoice $invoice)
     {
-        $invoice->load(['customer']);
+        $invoice->load(['customer' => ['billing','currency']]);
 
         return new InvoiceResource($invoice);
     }

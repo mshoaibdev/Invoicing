@@ -1,8 +1,7 @@
 <script setup>
 import useCustomers from '@/composables/customers'
 import { emailValidator, requiredValidator } from '@validators'
-import leadTypes from '@/data/leadTypes'
-import leadStatus from '@/data/leadStatus'
+import axios from '@axios'
 
 const props = defineProps({
   isDialogVisible: {
@@ -24,16 +23,38 @@ const { updateCustomer, respResult, isLoading, getCustomer, customerData } = use
 
 const formData = ref({})
 const refForm = ref()
-const users = ref([])
+const countries = ref([])
+const currencies = ref([])
+
+
+const fetchCountries = async () => {
+  try {
+    const resp = await axios.get('/countries')
+
+    countries.value = resp.data.data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const fetchCurrencies = async () => {
+  try {
+    const resp = await axios.get('/currencies')
+
+    currencies.value = resp.data.data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 
 onMounted(async () => {
   if(props.isDialogVisible){
     await getCustomer(props.customerId)
+    await fetchCountries()
+    await fetchCurrencies()
     formData.value = customerData.value
 
-    if(!customerData.value.date) {
-      formData.value.date = moment().format('YYYY-MM-DD')
-    }
   }
 })
 
@@ -49,8 +70,21 @@ const resetFormData = () => {
 const onSubmit = async() => {
   refForm.value?.validate().then(async ({ valid: isValid }) => {
     if (isValid){
-      
-      await updateCustomer(props.customerId, formData.value)
+      const formNewData = new FormData()
+
+      Object.keys(formData.value).forEach(key => {
+        if (key === 'billing') {
+          Object.keys(formData.value.billing).forEach(billingKey => {
+            formNewData.append(`billing[${billingKey}]`, formData.value.billing[billingKey])
+          })
+        } else {
+          formNewData.append(key, formData.value[key])
+        }
+      })
+
+      formNewData.append('_method', 'PUT')
+
+      await updateCustomer(props.customerId, formNewData)
       if (respResult.value.status === 200) {
         emit('refetchData')
         emit('update:isDialogVisible', false)
@@ -75,8 +109,7 @@ const dialogModelValueUpdate = val => {
     <!-- Dialog close btn -->
     <DialogCloseBtn @click="dialogModelValueUpdate(false)" />
     <VCard title="Update Customer">
-      <VCardText>
-        <!-- 👉 Form -->
+      <VCardText v-if="formData.billing">
         <VForm
           ref="refForm"
           @submit.prevent="onSubmit"
@@ -86,7 +119,7 @@ const dialogModelValueUpdate = val => {
               cols="12"
               md="6"
             >
-              <AppTextField
+              <VTextField
                 v-model="formData.name"
                 label="Customer Name"
                 :rules="[requiredValidator]"
@@ -97,9 +130,9 @@ const dialogModelValueUpdate = val => {
               cols="12"
               md="6"
             >
-              <AppTextField
+              <VTextField
                 v-model="formData.email"
-                label="Email"
+                label=" Email"
                 :rules="[requiredValidator, emailValidator]"
               />
             </VCol>
@@ -107,35 +140,52 @@ const dialogModelValueUpdate = val => {
               cols="12"
               md="6"
             >
-              <AppTextField
+              <VTextField
                 v-model="formData.phone"
                 label="Phone"
                 :rules="[requiredValidator]"
               />
             </VCol>
-            <VCol
-              cols="12"
-              md="6"
-            >
-              <AppTextField
-                v-model="formData.address"
-                label="Address"
-                :rules="[requiredValidator]"
-              />
-            </VCol>
-
 
             <VCol
               cols="12"
               md="6"
             >
               <VSelect
-                v-model="formData.lead_type"
-                label="Lead Type"
+                v-model="formData.currency_id"
+                label="Currency"
                 :rules="[requiredValidator]"
-                item-title="name"
+                :items="currencies"
+                :item-title="item => `${item.code} - ${item.name} `"
                 item-value="id"
-                :items="leadTypes"
+              />
+            </VCol>
+            <VCol
+              cols="12"
+              md="12"
+            >
+              <span class="text-h6 font-weight-bold">Billing Address</span>
+              <VDivider />
+            </VCol>
+
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VTextField
+                v-model="formData.billing.name"
+                label="Name"
+              />
+            </VCol>
+            
+
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VTextField
+                v-model="formData.billing.address_street_1"
+                label="Street 1"
               />
             </VCol>
 
@@ -143,13 +193,9 @@ const dialogModelValueUpdate = val => {
               cols="12"
               md="6"
             >
-              <VSelect
-                v-model="formData.status"
-                label="Lead Status"
-                :rules="[requiredValidator]"
-                item-title="name"
-                item-value="id"
-                :items="leadStatus"
+              <VTextField
+                v-model="formData.billing.city"
+                label="City"
               />
             </VCol>
 
@@ -157,17 +203,64 @@ const dialogModelValueUpdate = val => {
               cols="12"
               md="6"
             >
-              <AppDateTimePicker
-                v-model="formData.date"
-                :rules="[requiredValidator]"
-                density="compact"
-                placeholder="Select Date"
-                :config="{
-                  altInput: true,
-                  altFormat: 'F j, Y',
-                  dateFormat: 'Y-m-d',
-                  disableMobile: true,
-                }"
+              <VTextField
+                v-model="formData.billing.state"
+                label="State"
+              />
+            </VCol>
+
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VTextField
+                v-model="formData.billing.zip"
+                label="Zip"
+              />
+            </VCol>
+
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VAutocomplete
+                v-model="formData.billing.country_id"
+                label="Country"
+                item-title="name"
+                item-value="id"
+                :items="countries"
+              />
+            </VCol>
+
+         
+
+            <VCol
+              cols="12"
+              md="12"
+            >
+              <span class="text-h6 font-weight-bold">Company Details</span>
+              <VDivider />
+            </VCol>
+
+            
+
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VTextField
+                v-model="formData.company_name"
+                label="Company Name"
+              />
+            </VCol>
+
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VTextField
+                v-model="formData.website"
+                label="Website"
               />
             </VCol>
 

@@ -19,20 +19,17 @@ class CustomersController extends Controller
     public function index(Request $request)
     {
         $isAdmin = auth()->user()->hasRole('Admin');
+
+        $limit = $request->has('perPage') ? $request->perPage : 10;
+
         $customers = Customer::query()
             ->when($request->q, function ($query) use ($request) {
                 $query->search($request->q);
             })
-            ->when(!auth()->user()->hasRole('Admin'), function ($query) {
-                $query->where('user_id', auth()->id());
-            })
+            ->whereCompany()
             ->applyFilters($request)
             ->latest()
-            ->when($request->perPage, function ($query, $perPage) {
-                return $query->paginate($perPage);
-            }, function ($query) {
-                return $query->get();
-            });
+            ->paginate($limit);
 
         return CustomerResource::collection($customers);
     }
@@ -43,9 +40,13 @@ class CustomersController extends Controller
     public function store(Store $request)
     {
 
-        Customer::create(array_merge($request->validated(), [
-            'user_id' => auth()->id(),
-        ]));
+        $customer = Customer::create($request->getCustomerPayload());
+
+        if ($request->billing) {
+            if ($request->hasAddress($request->billing)) {
+                $customer->addresses()->create($request->getBillingAddress());
+            }
+        }
 
         return response()->json([
             'message' => 'Customer created successfully.',
@@ -59,7 +60,7 @@ class CustomersController extends Controller
     public function show(Customer $customer)
     {
 
-        return new CustomerResource($customer);
+        return new CustomerResource($customer->load(['billing', 'currency']));
     }
 
     /**
@@ -67,8 +68,17 @@ class CustomersController extends Controller
      */
     public function update(Update $request, Customer $customer)
     {
-        
-        $customer->update($request->validated());
+
+        $customer->update($request->getCustomerPayload());
+
+        if ($request->billing) {
+            if ($request->hasAddress($request->billing)) {
+                $customer->addresses()->updateOrCreate(
+                    ['type' => 'billing'],
+                    $request->getBillingAddress()
+                );
+            }
+        }
 
         return response()->json([
             'message' => 'Customer updated successfully.',
@@ -132,4 +142,19 @@ class CustomersController extends Controller
             'message' => 'Customers deleted successfully.',
         ]);
     }
+
+    // getCustomers
+
+    public function getCustomers(Request $request)
+    {
+        $customers = Customer::query()
+            ->with(['billing', 'currency'])
+            ->whereCompany()
+            ->latest()
+            ->get();
+
+        return CustomerResource::collection($customers);
+    }
+
+  
 }

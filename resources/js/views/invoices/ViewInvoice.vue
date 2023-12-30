@@ -88,8 +88,15 @@ const dialogModelValueUpdate = val => {
                   <th>
                     Address:
                   </th>
-                  <td>
-                    {{ invoiceData.customer.address }}
+                  <td v-if="invoiceData.customer.billing">
+                    {{ invoiceData.customer.billing.address_street_1 }}  ,
+                    {{ invoiceData.customer.billing.city }}
+                    ,
+                    {{ invoiceData.customer.billing.state }}
+                    ,
+                    {{ invoiceData.customer.billing.country }}
+                    ,
+                    {{ invoiceData.customer.billing.zip }}
                   </td>
                 </tr>
 
@@ -170,8 +177,8 @@ const dialogModelValueUpdate = val => {
                 >
                   <td>{{ item.description }}</td>
                   <td>{{ item.quantity }}</td>
-                  <td>{{ formatCurrency(item.cost) }}</td>
-                  <td>{{ formatCurrency(item.total) }}</td>
+                  <td>{{ formatCurrency(item.cost, invoiceData.customer.currency.code ?? "USD") }}</td>
+                  <td>{{ formatCurrency(item.total, invoiceData.customer.currency.code ?? "USD") }}</td>
                 </tr>
               </tbody>
             </VTable>
@@ -191,7 +198,10 @@ const dialogModelValueUpdate = val => {
                     Invoice link:
                   </th>
                   <td>
-                    <a :href="invoiceData.invoice_link" target="_blank">{{ invoiceData.invoice_link }}</a>
+                    <a
+                      :href="invoiceData.invoice_link"
+                      target="_blank"
+                    >{{ invoiceData.invoice_link }}</a>
                   </td>
                 </tr>
                 <tr>
@@ -199,7 +209,7 @@ const dialogModelValueUpdate = val => {
                     Subtotal:
                   </th>
                   <td>
-                    {{ formatCurrency(invoiceData.subtotal) }}
+                    {{ formatCurrency(invoiceData.subtotal, invoiceData.customer.currency.code ?? "USD") }}
                   </td>
                 </tr>
 
@@ -209,7 +219,16 @@ const dialogModelValueUpdate = val => {
                     Tax:
                   </th>
                   <td>
-                    {{ formatCurrency(invoiceData.tax_amount ?? 0) }}
+                    {{ formatCurrency(invoiceData.tax_amount ?? 0 , invoiceData.customer.currency.code ?? "USD") }}
+                  </td>
+                </tr>
+
+                <tr>
+                  <th>
+                    Vat:
+                  </th>
+                  <td>
+                    {{ formatCurrency(invoiceData.vat_amount ?? 0 , invoiceData.customer.currency.code ?? "USD") }}
                   </td>
                 </tr>
 
@@ -218,7 +237,7 @@ const dialogModelValueUpdate = val => {
                     Total:
                   </th>
                   <td>
-                    {{ formatCurrency(invoiceData.total) }}
+                    {{ formatCurrency(invoiceData.total , invoiceData.customer.currency.code ?? "USD") }}
                   </td>
                 </tr>
               </tbody>

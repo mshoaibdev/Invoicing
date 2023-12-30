@@ -35,6 +35,16 @@ class Store extends FormRequest
             'state' => ['nullable', 'string', 'max:50'],
             'city' => ['nullable', 'string', 'max:50'],
             'zip' => ['nullable', 'string', 'max:50'],
+            'companies' => ['required', 'array'],
         ];
+    }
+
+    public function getUserPayload()
+    {
+        return collect($this->validated())
+            ->merge([
+                'creator_id' => $this->user()->id,
+            ])
+            ->toArray();
     }
 }

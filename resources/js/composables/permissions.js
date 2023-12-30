@@ -7,7 +7,7 @@ import route from 'ziggy-js'
 export default function usePermissions() {
 
   // Use toast
-  const isBusy = ref(false)
+  const isLoading = ref(false)
 
   const busy = ref(false)
   const respResult = ref(null)

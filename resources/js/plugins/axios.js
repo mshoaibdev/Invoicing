@@ -5,7 +5,11 @@ import useJwtService from "@/composables/jwtService"
 const { removeToken, removeUserData, removeUserAbilities, getUser } = useJwtService()
 
 const axiosIns = axios.create({
-  // baseURL: process.env.VITE_LIVE_APP_URL
+  baseURL: window.location.origin + '/api',
+  headers: {
+    'Accept': 'application/json',
+    'Company': localStorage.getItem('companyId'),
+  },
 })
 
 const unsetStorage = () => {
@@ -43,7 +47,7 @@ axiosIns.interceptors.response.use(response => {
 
     unsetStorage()
 
-    router.push('/login')
+    router.push('/')
 
     return Promise.reject(error)
   }

@@ -34,10 +34,10 @@ class PermissionSeeder extends Seeder
             // 'projects-edit',
             // 'projects-view',
             // 'projects-delete',
-            'settings-users-list',
-            'settings-users-create',
-            'settings-users-edit',
-            'settings-users-delete',
+            'users-list',
+            'users-create',
+            'users-edit',
+            'users-delete',
             'settings-roles-list',
             'settings-roles-create',
             'settings-roles-edit',
@@ -55,8 +55,7 @@ class PermissionSeeder extends Seeder
         $roles = [
             'Admin',
             'Manager',
-            'Employee',
-            'SalesMan'
+            'Sales Person',
         ];
 
         foreach ($roles as $role) {

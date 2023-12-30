@@ -3,18 +3,21 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Http\Request;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\MediaLibrary\HasMedia;
+use Illuminate\Support\Facades\Schema;
+use Spatie\Permission\Traits\HasRoles;
 use App\Notifications\UserPasswordReset;
+use Illuminate\Notifications\Notifiable;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Http\Request;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
-use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasMedia
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, InteractsWithMedia;
 
     /**
      * The attributes that are mass assignable.
@@ -32,14 +35,17 @@ class User extends Authenticatable
         'country',
         'timezone',
         'currency',
-        'avatar',
         'email',
         'password',
-        'role',
         'status',
+        'creator_id',
     ];
 
-    protected $appends = ['name', 'avatar_url'];
+    protected $appends = [
+        'name',
+        'avatar_url',
+        'is_super_admin',
+    ];
 
     protected $guard_name = 'sanctum';
 
@@ -67,8 +73,7 @@ class User extends Authenticatable
         return $query
             ->where('first_name', 'like', '%'.$queryString.'%')
             ->OrWhere('last_name', 'like', '%'.$queryString.'%')
-            ->OrWhere('email', 'like', '%'.$queryString.'%')
-            ->OrWhere('organization', 'like', '%'.$queryString.'%');
+            ->OrWhere('email', 'like', '%'.$queryString.'%');
     }
 
    // created at
@@ -87,13 +92,20 @@ class User extends Authenticatable
         );
     }
 
+    public function getIsSuperAdminAttribute()
+    {
+        return ($this->role == 'super admin') || ($this->role == 'admin');
+    }
+
     /**
      * Get the user's full name.
      */
     protected function avatarUrl(): Attribute
     {
+        $avatar = $this->getMedia('avatar')->first();
+
         return Attribute::make(
-            get: fn () => $this->avatar ? asset('storage/avatars/'.$this->id.'/'.$this->avatar) : 'https://www.gravatar.com/avatar/'.md5($this->email).'?s=200&d=mm',
+            get: fn() => $avatar ? $avatar->getFullUrl() : 'https://www.gravatar.com/avatar/' . md5($this->email) . '?s=200&d=mm',
         );
     }
 
@@ -119,6 +131,30 @@ class User extends Authenticatable
         $this->attributes['password'] = bcrypt($value);
     }
 
+    public function scopeInvoicesBetween($query, $start, $end)
+    {
+        $query->whereHas('invoices', function ($query) use ($start, $end) {
+            $query->whereBetween(
+                'invoice_date',
+                [$start->format('Y-m-d'), $end->format('Y-m-d')]
+            );
+        });
+    }
+
+    public function hasCompany($company_id)
+    {
+        $companies = $this->companies()->pluck('company_id')->toArray();
+
+        return in_array($company_id, $companies);
+    }
+
+    public function getAllSettings()
+    {
+        return $this->settings()->get()->mapWithKeys(function ($item) {
+            return [$item['key'] => $item['value']];
+        });
+    }
+
     /**
      * Send the password reset notification.
      *
@@ -129,5 +165,39 @@ class User extends Authenticatable
         $this->notify(new UserPasswordReset($token));
     }
 
+    public function isOwner()
+    {
+        if (Schema::hasColumn('companies', 'owner_id')) {
+            $company = Company::find(request()->header('company'));
+
+            if ($company && $this->id == $company->owner_id) {
+                return true;
+            }
+        } else {
+            return $this->role == 'super admin' || $this->role == 'admin';
+        }
+
+        return false;
+    }
+
+
+    // currentCompany
+
+
+    public function companies()
+    {
+        return $this->belongsToMany(Company::class, 'user_company', 'user_id', 'company_id');
+    }
+
+    public function customers()
+    {
+        return $this->hasMany(Customer::class, 'creator_id');
+    }
+
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
     
 }

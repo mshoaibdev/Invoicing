@@ -6,7 +6,7 @@ import route from 'ziggy-js'
 
 export default function useRoles() {
   // Use toast
-  const isBusy = ref(false)
+  const isLoading = ref(false)
 
   const respResult = ref(null)
   const refListTable = ref(null)
@@ -48,7 +48,7 @@ export default function useRoles() {
 
   const deleteRole = async id => {
     try {
-      isBusy.value = true
+      isLoading.value = true
 
       const res = await axios.delete(route('roles.destroy', id))
 
@@ -59,7 +59,7 @@ export default function useRoles() {
       console.log(error)
       toast.error('Error! Deleting role')
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
@@ -72,7 +72,7 @@ export default function useRoles() {
 
   const updateRole = async (formData, id) => {
     try {
-      isBusy.value = true
+      isLoading.value = true
 
       const response = await axios.post(route('roles.update', id), formData)
 
@@ -84,7 +84,7 @@ export default function useRoles() {
       }
       toast.error(error.response.data.message)
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
@@ -92,7 +92,7 @@ export default function useRoles() {
 
 
   const storeRole = async formData => {
-    isBusy.value = true
+    isLoading.value = true
     await axios
       .post(route('roles.store'), formData)
       .then(resp => {
@@ -105,12 +105,12 @@ export default function useRoles() {
           toast.error(err.response.data.message)
         }
       }).finally(() => {
-        isBusy.value = false
+        isLoading.value = false
       })
   }
 
   const fetchRoles = async () => {
-    isBusy.value = true
+    isLoading.value = true
     try {
       const response = await axios.get(route('roles.index'), {
         params: {
@@ -131,12 +131,12 @@ export default function useRoles() {
     } catch (e) {
       toast.error(e.response.data.message)
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
   const fetchRolesList = async role => {
-    isBusy.value = true
+    isLoading.value = true
     try {
       const response = await axios.get(route('roles.index'), {
         params: {
@@ -148,7 +148,7 @@ export default function useRoles() {
     } catch (e) {
       toast.error(e.response.data.message)
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
@@ -177,7 +177,7 @@ export default function useRoles() {
 
   return {
     role,
-    isBusy,
+    isLoading,
     errors,
     getRole,
     roleId,

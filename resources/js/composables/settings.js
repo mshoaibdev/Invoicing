@@ -4,7 +4,7 @@ import 'vue3-toastify/dist/index.css';
 import route from 'ziggy-js'
 
 export default function useSettings() {
-  const isBusy = ref(false)
+  const isLoading = ref(false)
   const respResult = ref(null)
   const settings = ref({})
   const errors = ref({})
@@ -13,7 +13,7 @@ export default function useSettings() {
 
   const fetchSettings = async () => {
     try {
-      isBusy.value = true
+      isLoading.value = true
 
       const response = await axios.get(route('settings.index'))
 
@@ -26,14 +26,14 @@ export default function useSettings() {
         toast.error(error.response.data.message)
       }
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
   // fetchSettings by key
   const fetchSettingsByKey = async key => {
     try {
-      isBusy.value = true
+      isLoading.value = true
 
       const response = await axios.get(route('settings.get', key))
 
@@ -47,7 +47,7 @@ export default function useSettings() {
 
       }
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
@@ -55,7 +55,7 @@ export default function useSettings() {
   const storeSettings = async data => {
     errors.value = ''
     try {
-      isBusy.value = true
+      isLoading.value = true
 
       const response = await axios.post(route('settings.store'), data)
 
@@ -72,14 +72,14 @@ export default function useSettings() {
         toast.error(error.response.data.message)
       }
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
   const updateSettings = async data => {
     errors.value = ''
     try {
-      isBusy.value = true
+      isLoading.value = true
 
       const response = await axios.put(route('settings.update', 1), data)
 
@@ -97,13 +97,13 @@ export default function useSettings() {
         toast.error(error.response.data.message)
       }
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
 
   return {
-    isBusy,
+    isLoading,
     errors,
     settings,
     respResult,

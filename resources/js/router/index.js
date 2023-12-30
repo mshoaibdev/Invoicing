@@ -3,12 +3,13 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import { isUserLoggedIn } from './utils'
 
-import accountSettingsRoutes from './account-settings'
+import accountSettingsRoutes from './settings'
 import authRoutes from './auth'
 import customersRoutes from './customers'
 
 // import estimatesRoutes from './estimates'
 import invoicesRoutes from './invoices'
+import usersRoutes from './users'
 
 // import calendarRoutes from './calendar'
 // import projectsRoutes from './projects'
@@ -29,6 +30,7 @@ const routes = [
   // ...projectsRoutes,
   // ...calendarRoutes,
   // ...estimatesRoutes,
+  ...usersRoutes,
   ...customersRoutes,
   ...invoicesRoutes,
   ...accountSettingsRoutes,

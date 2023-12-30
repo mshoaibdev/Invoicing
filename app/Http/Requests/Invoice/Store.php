@@ -31,7 +31,24 @@ class Store extends FormRequest
             'customer_id' => ['required'],
             'note' => ['nullable', 'string'],
             'status' => ['required', 'string'],
-            'currency' => ['required', 'string'],
+            'vat_amount' => ['nullable', 'numeric'],
+            'vat_percentage' => ['nullable', 'numeric'],
+            'tax_amount' => ['nullable', 'numeric'],
+            'tax_percentage' => ['nullable', 'numeric'],
         ];
+    }
+
+    /**
+     * Get the customer payload.
+     */
+
+    public function getInvoicePayload(): array
+    {
+        return collect($this->validated())
+            ->merge([
+                'creator_id' => $this->user()->id,
+                'company_id' => $this->header('company'),
+            ])
+            ->toArray();
     }
 }

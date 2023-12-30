@@ -10,6 +10,8 @@ import NavbarShortcuts from '@/layouts/components/NavbarShortcuts.vue'
 import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
 import NavSearchBar from '@/layouts/components/NavSearchBar.vue'
 import UserProfile from '@/layouts/components/UserProfile.vue'
+import Companies from '@/layouts/components/Companies.vue'
+
 
 // @layouts plugin
 import { VerticalNavLayout } from '@layouts'
@@ -38,6 +40,7 @@ const { width: windowWidth } = useWindowSize()
         <!--  <NavSearchBar class="ms-lg-n3" /> -->
 
         <VSpacer />
+        <Companies />
 
         <!-- <NavBarI18n class="me-1" /> -->
         <NavbarThemeSwitcher class="me-1" />

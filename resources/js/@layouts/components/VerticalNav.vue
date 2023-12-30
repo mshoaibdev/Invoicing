@@ -1,6 +1,7 @@
 <script setup>
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 import { themeConfig } from '@themeConfig'
+import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 
 import {
   injectionKeyIsVerticalNavHovered,
@@ -95,19 +96,19 @@ const handleNavScroll = evt => {
           to="/"
           class="app-logo d-flex align-center gap-x-3 app-title-wrapper"
         >
-          <VImg
-            :src="themeConfig.app.logo"
-            height="60"
-            width="60"
-          />
+          <template #prepend>
+            <div class="d-flex">
+              <VNodeRenderer :nodes="themeConfig.app.logo" />
+            </div>
+          </template>
 
           <Transition name="vertical-nav-app-title">
-            <h5
+            <h3
               v-show="!hideTitleAndIcon"
-              class="font-weight-bold text-capitalize leading-normal "
+              class="font-weight-bold text-capitalize  "
             >
               {{ config.app.title }}
-            </h5>
+            </h3>
           </Transition>
         </RouterLink>
         <!-- 👉 Vertical nav actions -->

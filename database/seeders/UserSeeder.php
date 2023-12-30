@@ -21,6 +21,7 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => 'password',
             'status' => 1,
+            'creator_id' => 1,
         ]);
 
     }

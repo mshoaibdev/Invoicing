@@ -11,7 +11,7 @@ requiredValidator,
 } from '@validators'
 
 const route = useRoute()
-const { resetPassword, errors, respData, isBusy } = useAuth()
+const { resetPassword, errors, respData, isLoading } = useAuth()
 const isLight = themeConfig.app.theme.value === 'light'
 
 onMounted(() => {
@@ -143,7 +143,7 @@ const isConfirmPasswordVisible = ref(false)
                   <VBtn
                     block
                     type="submit"
-                    :loading="isBusy"
+                    :loading="isLoading"
                   >
                     Set New Password
                   </VBtn>

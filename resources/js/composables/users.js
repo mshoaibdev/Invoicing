@@ -7,7 +7,7 @@ import { debounce } from 'lodash'
 
 export default function useUsers() {
   // Use toast
-  const isBusy = ref(false)
+  const isLoading = ref(false)
 
   const respResult = ref(null)
   const refListTable = ref(null)
@@ -84,7 +84,7 @@ export default function useUsers() {
 
   const deleteUser = async id => {
     try {
-      isBusy.value = true
+      isLoading.value = true
 
       const res = await axios.delete(route('users.destroy', id))
 
@@ -95,7 +95,7 @@ export default function useUsers() {
       console.log(error)
       toast.error('Error! Deleting user')
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
@@ -108,7 +108,7 @@ export default function useUsers() {
 
   const updateUser = async (formData, id) => {
     try {
-      isBusy.value = true
+      isLoading.value = true
 
       const response = await axios.post(route('users.update', id), formData)
 
@@ -120,14 +120,14 @@ export default function useUsers() {
       }
       toast.error(error.response.data.message)
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
 
   const updateUserStatus = async formData => {
     try {
-      isBusy.value = true
+      isLoading.value = true
 
       const response = await axios.post(route('users.status', formData.id), formData)
 
@@ -137,13 +137,13 @@ export default function useUsers() {
       console.log(e)
       toast.error(e.response.data.message)
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
 
   const storeUser = async formData => {
-    isBusy.value = true
+    isLoading.value = true
     await axios
       .post(route('users.store'), formData)
       .then(resp => {
@@ -154,12 +154,12 @@ export default function useUsers() {
         respResult.value = err
         toast.error(err.response.data.message)
       }).finally(() => {
-        isBusy.value = false
+        isLoading.value = false
       })
   }
 
   const fetchUsers = async () => {
-    isBusy.value = true
+    isLoading.value = true
     try {
       const response = await axios.get(route('users.index'), {
         params: {
@@ -180,12 +180,12 @@ export default function useUsers() {
     } catch (e) {
       toast.error(e.response.data.message)
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
   const fetchUsersList = async role => {
-    isBusy.value = true
+    isLoading.value = true
     try {
       const response = await axios.get(route('users.index'), {
         params: {
@@ -197,7 +197,7 @@ export default function useUsers() {
     } catch (e) {
       toast.error(e.response.data.message)
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
@@ -237,7 +237,7 @@ export default function useUsers() {
 
   return {
     user,
-    isBusy,
+    isLoading,
     errors,
     getUser,
     userId,

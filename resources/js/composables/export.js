@@ -6,11 +6,11 @@ import route from 'ziggy-js'
 
 export default function useExport() {
   const respResult = ref(null)
-  const isBusy = ref(false)
+  const isLoading = ref(false)
 
   const exportData = async (url, data) => {
     try {
-      isBusy.value = true
+      isLoading.value = true
       console.log(data)
 
       const response = await axios.post(route(url), data, {
@@ -26,7 +26,7 @@ export default function useExport() {
         toast.error(error.response.data.message)
       }
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
@@ -34,6 +34,6 @@ export default function useExport() {
   return {
     exportData,
     respResult,
-    isBusy,
+    isLoading,
   }
 }

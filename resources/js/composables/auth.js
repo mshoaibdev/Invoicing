@@ -6,7 +6,7 @@ import route from 'ziggy-js'
 
 export default function useAuth() {
 
-  const isBusy = ref(false)
+  const isLoading = ref(false)
   const respData = ref(null)
 
   const errors = ref({
@@ -17,7 +17,7 @@ export default function useAuth() {
 
   const login = async loginData => {
     try {
-      isBusy.value = true
+      isLoading.value = true
 
       const resp = await axios.post(route('login'), loginData)
 
@@ -37,13 +37,13 @@ export default function useAuth() {
         toast.error(e.response.data.message)
       }
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
   const logout = async () => {
     try {
-      isBusy.value = true
+      isLoading.value = true
 
       const response = await axios.post(route('logout'))
 
@@ -57,13 +57,13 @@ export default function useAuth() {
         toast.error(e.response.data.message)
       }
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
   const forgotPassword = async data => {
     try {
-      isBusy.value = true
+      isLoading.value = true
 
       const response = await axios.post(route('password.email'), data)
 
@@ -77,14 +77,14 @@ export default function useAuth() {
         toast.error(error.response.data.message)
       }
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
 
   const resetPassword = async formData => {
     try {
-      isBusy.value = true
+      isLoading.value = true
 
       const response = await axios.post(route('password.update'), formData)
       
@@ -99,13 +99,13 @@ export default function useAuth() {
         toast.error(error.response.data.message)
       }
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
   
   return {
-    isBusy,
+    isLoading,
     login,
     errors,
     logout,

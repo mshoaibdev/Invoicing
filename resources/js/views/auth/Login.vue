@@ -18,7 +18,7 @@ const isPasswordVisible = ref(false)
 const route = useRoute()
 
 const router = useRouter()
-const { login, errors, respData, isBusy } = useAuth()
+const { login, errors, respData, isLoading } = useAuth()
 
 const { setUser, setToken, setUserAbilities } = jwtService()
 
@@ -72,18 +72,17 @@ const onSubmit = () => {
           class="text-primary auth-v1-bottom-shape d-none d-sm-block"
         />
 
-        <!-- 👉 Auth Card -->
         <VCard
           class="auth-card pa-4"
           max-width="448"
         >
-          <div class="justify-center d-flex">
-            <VImg
-              :src="themeConfig.app.logo"
-              height="200"
-              width="200"
-            />
-          </div> 
+          <VCardItem class="justify-center">
+            <template #prepend>
+              <div class="d-flex">
+                <VNodeRenderer :nodes="themeConfig.app.logo" />
+              </div>
+            </template>
+          </VCardItem>
 
           <div>
             <h4 class="text-h4 font-weight-semibold mb-1 text-center">
@@ -143,7 +142,7 @@ const onSubmit = () => {
                   <VBtn
                     block
                     type="submit"
-                    :loading="isBusy"
+                    :loading="isLoading"
                   >
                     Login
                   </VBtn>

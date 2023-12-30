@@ -6,7 +6,7 @@ import route from 'ziggy-js'
 
 export default function useAccount() {
   const accountData = ref({})
-  const isBusy = ref(false)
+  const isLoading = ref(false)
   const errors = ref({})
   const respResult = ref({})
 
@@ -22,7 +22,7 @@ export default function useAccount() {
 
   const updatePassword = async formData => {
     try {
-      isBusy.value = true
+      isLoading.value = true
 
       const response = await axios.put(route('account.password'), formData)
 
@@ -34,13 +34,13 @@ export default function useAccount() {
       }
       toast.error(err.response.data.message)
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
   const updateAccount = async formData => {
     try {
-      isBusy.value = true
+      isLoading.value = true
 
       const response = await axios.post(route('account.personal'), formData)
 
@@ -59,13 +59,13 @@ export default function useAccount() {
       }
       toast.error(err.response.data.message)
     } finally {
-      isBusy.value = false
+      isLoading.value = false
     }
   }
 
   
   return {
-    isBusy,
+    isLoading,
     errors,
     respResult,
     accountData,

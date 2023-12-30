@@ -29,9 +29,12 @@ class Invoice extends Model
         'currency',
         'customer_id',
         'note',
-        'user_id',
         'payment_response',
         'invoice_link',
+        'company_id',
+        'vat_amount',
+        'vat_percentage',
+        'creator_id',
     ];
 
     protected $casts = [
@@ -41,7 +44,7 @@ class Invoice extends Model
         'tax_amount' => 'float',
         'items' => 'array',
         'payment_response' => 'array',
-        'user_id' => 'integer',
+        'creator_id' => 'integer',
     ];
 
     protected $appends = ['invoice_id'];
@@ -77,6 +80,11 @@ class Invoice extends Model
             ->whereHas('customer', function ($query) use ($queryString) {
                 return $query->where('name', 'like', $queryString.'%');
             });
+    }
+
+    public function scopeWhereCompany($query)
+    {
+        return $query->where('company_id', request()->header('company'));
     }
 
     // created at
@@ -147,9 +155,9 @@ class Invoice extends Model
      * Get the user that owns the invoice
      */
 
-    public function user(): BelongsTo
+    public function creater(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'creator_id');
     }
 
     protected static function booted()

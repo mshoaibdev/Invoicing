@@ -36,6 +36,8 @@ const initialState = {
   subtotal: 0,
   tax_percentage: 0,
   tax_amount: 0,
+  vat_percentage: 0,
+  vat_amount: 0,
   note: "",
   payment_method: "Paypal",
   currency: "USD",
@@ -54,13 +56,32 @@ const initialState = {
 
 const invoiceData = ref({ ...initialState })
 const refForm = ref()
+const currency = ref({})
+const selectedCustomer = ref({})
+
+const selectCustomer = customerId => {
+
+  const customer = customers.value.find(customer => customer.id === customerId)
+  
+  currency.value = customer.currency
+
+  console.log(currency.value);
+  selectedCustomer.value = {
+    id: customer.id,
+    name: customer.name,
+    phone: customer.phone,
+    email: customer.email,
+    billing: customer.billing,
+  }
+}
 
 
 const calculateTotal = () => {
   invoiceData.value.total = 0
   invoiceData.value.total =
     parseFloat(invoiceData.value.subtotal) +
-    parseFloat(invoiceData.value.tax_amount)
+    parseFloat(invoiceData.value.tax_amount)+
+    parseFloat(invoiceData.value.vat_amount)
 }
 
 const calculateSubTotal = () => {
@@ -74,10 +95,22 @@ const calculateSubTotal = () => {
 const calculateTax = () => {
   invoiceData.value.tax_amount = 0
 
-  const taxPercentage = invoiceData.value.tax_percentage
+  const taxPercentage = parseInt(invoiceData.value.tax_percentage)
   if (taxPercentage > 0 && invoiceData.value.subtotal > 0) {
     invoiceData.value.tax_amount = parseFloat(
       (invoiceData.value.subtotal * taxPercentage) / 100,
+    )
+  }
+  calculateTotal()
+}
+
+const calculateVatTax = () => {
+  invoiceData.value.vat_amount = 0
+
+  const vatPercentage = parseInt(invoiceData.value.vat_percentage)
+  if (vatPercentage > 0 && invoiceData.value.subtotal > 0) {
+    invoiceData.value.vat_amount = parseFloat(
+      (invoiceData.value.subtotal * vatPercentage) / 100,
     )
   }
   calculateTotal()
@@ -107,33 +140,20 @@ const onSubmit = async () => {
   refForm.value?.validate().then(async ({ valid: isValid }) => {
     if (isValid) {
       const formNewData = new FormData()
+      const items = invoiceData.value.items
 
-      const {
-        total,
-        note,
-        items,
-        customer,
-        subtotal,
-        due_date,
-        invoice_date,
-        tax_amount,
-        tax_percentage,
-        payment_method,
-        currency,
-        status,
-      } = invoiceData.value
-
-      formNewData.append("customer_id", customer.id)
-      formNewData.append("due_date", due_date)
-      formNewData.append("invoice_date", invoice_date)
-      formNewData.append("total", total)
-      formNewData.append("subtotal", subtotal)
-      formNewData.append("tax_percentage", tax_percentage)
-      formNewData.append("tax_amount", tax_amount)
-      formNewData.append("note", note)
-      formNewData.append("payment_method", payment_method)
-      formNewData.append("currency", currency)
-      formNewData.append("status", status)
+      formNewData.append("customer_id", invoiceData.value.customer_id)
+      formNewData.append("due_date", invoiceData.value.due_date)
+      formNewData.append("invoice_date", invoiceData.value.invoice_date)
+      formNewData.append("total", invoiceData.value.total)
+      formNewData.append("subtotal", invoiceData.value.subtotal)
+      formNewData.append("tax_percentage", invoiceData.value.tax_percentage)
+      formNewData.append("tax_amount", invoiceData.value.tax_amount)
+      formNewData.append("vat_amount", invoiceData.value.vat_amount)
+      formNewData.append("vat_percentage", invoiceData.value.vat_percentage)
+      formNewData.append("note", invoiceData.value.note ?? "")
+      formNewData.append("payment_method", invoiceData.value.payment_method)
+      formNewData.append("status", invoiceData.value.status)
 
       for (let index = 0; index < items.length; index++) {
         formNewData.append(`items[${index}][quantity]`, items[index].quantity)
@@ -181,17 +201,6 @@ const removeProduct = id => {
         cols="12"
         md="9"
       >
-        <VBtn
-          class="mb-4"
-          to="/invoices"
-          color="primary"
-          outlined
-        >
-          <VIcon left>
-            mdi-arrow-left
-          </VIcon>
-          Back to Invoices
-        </VBtn>
       
         <VCard>
           <h2 class="p-4 text-center pt-2">
@@ -208,54 +217,63 @@ const removeProduct = id => {
                   Select Customer:
                 </h6>
                 <VAutocomplete
-                  v-model="invoiceData.customer"
+                  v-model="invoiceData.customer_id"
                   :items="customers"
                   item-title="name"
                   item-value="id"
                   placeholder="Select Customer"
-                  lable="Select Customer"
                   :loading="isLoading"
-                  return-object
-                  class="forMobileSizeinput mb-3"
                   :rules="[requiredValidator]"
                   :menu-props="{ maxHeight: 300 }"
                   density="compact"
+                  @update:model-value="selectCustomer"
                 />
 
                 <div
-                  v-if="invoiceData.customer"
+                  v-if="selectedCustomer"
                   class="scrollable-table"
                 >
                   <h6 class="text-sm font-weight-medium mb-3">
-                    Customer Details:
+                    Billed To:
                   </h6>
                   <table class="text-sm">
                     <tbody>
                       <tr class="mobileCardSize">
                         <td class="pe-6">
-                          Customer Name:
+                          Name:
                         </td>
                         <td class="font-weight-semibold">
-                          {{ invoiceData.customer.name }}
+                          {{ selectedCustomer.name }}
                         </td>
                       </tr>
-                      <tr>
+                      {{ invoiceData.billing }}
+                      <tr v-if="selectedCustomer.billing">
                         <td class="pe-6">
                           Address:
                         </td>
-                        <td>{{ invoiceData.customer.address }}</td>
+                        <td>
+                          {{ selectedCustomer.billing.address_street_1 }}
+                          ,
+                          {{ selectedCustomer.billing.city }}
+                          ,
+                          {{ selectedCustomer.billing.state }}
+                          ,
+                          {{ selectedCustomer.billing.country }}
+                          ,
+                          {{ selectedCustomer.billing.zip }}
+                        </td>
                       </tr>
                       <tr>
                         <td class="pe-6">
                           Phone:
                         </td>
-                        <td>{{ invoiceData.customer.phone }}</td>
+                        <td>{{ selectedCustomer.phone }}</td>
                       </tr>
                       <tr>
                         <td class="pe-6">
-                          email:
+                          Email:
                         </td>
-                        <td>{{ invoiceData.customer.email }}</td>
+                        <td>{{ selectedCustomer.email }}</td>
                       </tr>
                     </tbody>
                   </table>  
@@ -399,7 +417,7 @@ const removeProduct = id => {
                         <span class="text-body-1">{{
                           formatCurrency(
                             product.total,
-                            invoiceData.currency ?? "USD"
+                            currency.code ?? "USD"
                           )
                         }}</span>
                       </p>
@@ -440,21 +458,28 @@ const removeProduct = id => {
               <VCol
                 cols="12"
                 md="6"
-                offset="6"
               >
-                <VSelect
-                  v-model="invoiceData.tax_percentage"
-                  label="Select Tax"
-                  item-title="label"
-                  item-value="value"
+                <VTextField
+                  v-model="invoiceData.vat_percentage"
+                  label="VAT Tax (%)"
                   :rules="[requiredValidator]"
-                  :items="[
-                    { label: '0%', value: 0 },
-                    { label: '5%', value: 5 },
-                    { label: '10%', value: 10 },
-                    { label: '15%', value: 15 },
-                    { label: '20%', value: 20 },
-                  ]"
+                  type="number"
+                  min="0"
+                  max="100"
+                  @update:model-value="calculateVatTax"
+                />
+              </VCol>
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <VTextField
+                  v-model="invoiceData.tax_percentage"
+                  label="Select Tax (%)"
+                  :rules="[requiredValidator]"
+                  type="number"
+                  min="0"
+                  max="100"
                   @update:model-value="calculateTax"
                 />
               </VCol>
@@ -477,6 +502,9 @@ const removeProduct = id => {
                         Tax:
                       </p>
                       <p class="mb-2">
+                        VAT:
+                      </p>
+                      <p class="mb-2">
                         Total:
                       </p>
                     </div>
@@ -486,7 +514,7 @@ const removeProduct = id => {
                       {{
                         formatCurrency(
                           invoiceData.subtotal,
-                          invoiceData.currency ?? "USD"
+                          currency.code ?? "USD"
                         )
                       }}
                     </p>
@@ -494,7 +522,15 @@ const removeProduct = id => {
                       {{
                         formatCurrency(
                           invoiceData.tax_amount,
-                          invoiceData.currency ?? "USD"
+                          currency.code ?? "USD"
+                        )
+                      }}
+                    </p>
+                    <p class="mb-2">
+                      {{
+                        formatCurrency(
+                          invoiceData.vat_amount,
+                          currency.code ?? "USD"
                         )
                       }}
                     </p>
@@ -502,7 +538,7 @@ const removeProduct = id => {
                       {{
                         formatCurrency(
                           invoiceData.total,
-                          invoiceData.currency ?? "USD"
+                          currency.code ?? "USD"
                         )
                       }}
                     </p>
@@ -539,14 +575,15 @@ const removeProduct = id => {
             class="mb-6"
           />
 
-          <VSelect
-            v-model="invoiceData.currency"
+          <!--
+            <VSelect
+            v-model="currency.code"
             label="Currency"
             :items="currencies"
             :menu-props="{ maxHeight: 500 }"
             class="mb-6"
-          />
-
+            />
+          -->
           <VSelect
             v-model="invoiceData.status"
             label="Status"

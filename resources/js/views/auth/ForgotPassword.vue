@@ -8,7 +8,7 @@ emailValidator,
 requiredValidator,
 } from '@validators'
 
-const { forgotPassword, errors, respData, isBusy } = useAuth()
+const { forgotPassword, errors, respData, isLoading } = useAuth()
 const form = ref({ email: '' })
 const refVForm = ref()
 
@@ -103,7 +103,7 @@ const onSubmit =  () => {
                   <VBtn
                     block
                     type="submit"
-                    :loading="isBusy"
+                    :loading="isLoading"
                   >
                     Send Reset Link
                   </VBtn>

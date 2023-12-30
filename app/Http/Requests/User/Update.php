@@ -27,7 +27,7 @@ class Update extends FormRequest
             'last_name' => ['required', 'string', 'max:50'],
             'phone' => ['nullable', 'string', 'max:30'],
             'address' => ['nullable', 'string', 'max:255'],
-            'avatar_new' => ['nullable', 'mimetypes:image/jpeg,image/png,image/jpg,image/gif,image/svg', 'max:6048'],
+            'avatar_new' => ['nullable', 'mimetypes:image/jpeg,image/png,image/jpg,image/gif,image/svg', 'max:10480'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$this->user->id],
             'role_id' => ['required', 'exists:roles,id'],
             'password' => ['nullable', 'string', 'confirmed', Password::defaults()],
@@ -35,6 +35,16 @@ class Update extends FormRequest
             'state' => ['nullable', 'string', 'max:50'],
             'city' => ['nullable', 'string', 'max:50'],
             'zip' => ['nullable', 'string', 'max:50'],
+            'companies' => ['required', 'array'],
         ];
+    }
+
+    public function getUserPayload()
+    {
+        return collect($this->validated())
+            ->merge([
+                'creator_id' => $this->user()->id,
+            ])
+            ->toArray();
     }
 }

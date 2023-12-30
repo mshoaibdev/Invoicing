@@ -5,7 +5,6 @@ import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import ViewCustomer from './View.vue'
 import AddCustomer from './Add.vue'
 import EditCustomer from './Edit.vue'
-import CustomerInvoices from './CustomerInvoices.vue'
 
 const { customers, totalRecords, isLoading, fetchCustomers, deleteMultipleCustomer, updateCustomerStatus, currentPage, headers, deleteCustomer, itemsPerPage, searchQuery, filters, paginationData, customersByStatus } = useCustomers()
 const selectedRows = ref([])
@@ -183,7 +182,7 @@ const confirmDelete = async ev => {
           </div>
         </VCol>
         <VCol
-          lg="4"
+          lg="6"
           md="6"
           sm="6"
         />
@@ -227,24 +226,25 @@ const confirmDelete = async ev => {
           </template>
           </AppSelect>
           </VCol>
-        -->
        
-        <VCol
+          <VCol
           lg="2"
           md="6"
           sm="6"
-        >
+          >
           <AppSelect
-            v-model="filters.lead_type"
-            label="Select Lead Type"
-            clearable
-            item-title="name"
-            item-value="id"
-            clear-icon="tabler-x"
-            :items="leadTypes"
-            @update:model-value="filterCustomers"
+          v-model="filters.lead_type"
+          label="Select Lead Type"
+          clearable
+          item-title="name"
+          item-value="id"
+          clear-icon="tabler-x"
+          :items="leadTypes"
+          @update:model-value="filterCustomers"
           />
-        </VCol>
+        
+          </VCol>
+        -->
       </VRow>
     </VCardText>
 
@@ -263,13 +263,31 @@ const confirmDelete = async ev => {
       :items="customers"
       class="text-no-wrap"
     >
-      <template #item.email="{ item }">
-        <a
-          :href="`mailto:${item.raw.email}`"
-          class="text-decoration-none"
-        >
-          {{ item.raw.email }}
-        </a>
+      <template #item.name="{ item }">
+        <div class="">
+          <a
+            href="javascript:;" 
+            class="d-block"
+              
+            @click="viewCustomer(item.raw.id)"
+          >
+            {{ item.raw.name }}
+          </a>
+
+          <a
+            :href="`mailto:${item.raw.email}`"
+            class="text-decoration-none text-sm text-secondary"
+          >
+            {{ item.raw.email }}
+          </a>
+
+          <IconBtn
+            v-if="isMobileViewPort"
+            @click="viewCustomer(item.raw.id)"
+          >
+            <VIcon icon="tabler-eye" />
+          </IconBtn>
+        </div>
       </template>
 
 
@@ -292,24 +310,6 @@ const confirmDelete = async ev => {
         />
       </template>
 
-      <template #item.name="{ item }">
-        <div class="d-flex align-center justify-space-between">
-          <a
-            href="javascript:;" 
-              
-            @click="viewCustomer(item.raw.id)"
-          >
-            {{ item.raw.name }}
-          </a>
-
-          <IconBtn
-            v-if="isMobileViewPort"
-            @click="viewCustomer(item.raw.id)"
-          >
-            <VIcon icon="tabler-eye" />
-          </IconBtn>
-        </div>
-      </template>
             
       <template #item.actions="{ item }">
         <IconBtn @click="deleteCustomerConfirm(item.raw.id)">
@@ -342,16 +342,12 @@ const confirmDelete = async ev => {
 
 
 
-
     <ViewCustomer
       v-if="isViewCustomerDialogVisible"
       v-model:isDialogVisible="isViewCustomerDialogVisible"
       :customer-id="customerId"
       @edit-customer="editCustomer"
       @delete-customer="deleteCustomerConfirm"
-      @create-estimate="createEstimate"
-      @create-invoice="createInvoice"
-      @view-estimates="viewCustomerEstimates"
       @view-invoices="viewCustomerInvoices"
     />
 
@@ -370,12 +366,6 @@ const confirmDelete = async ev => {
     />
     
 
-    <CustomerInvoices
-      v-if="isCustomerInvoicesDialogVisible"
-      v-model:isDialogVisible="isCustomerInvoicesDialogVisible"
-      :customer-id="customerId"
-    />
-    
 
     <ConfirmDialog
       v-model:isDialogVisible="isConfirmDialogVisible"

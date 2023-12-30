@@ -2,31 +2,26 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Customer extends Model
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasUuids;
 
-    protected $fillable = [
-        'name',
-        'email',
-        'phone',
-        'address',
-        'lead_type',
-        'status',
-        'user_id',
-        'date',
-        'notes'
+    protected $guarded = [
+        'id'
     ];
 
-    protected $casts = [
-        'user_id' => 'integer',
-        'in_progress' => 'boolean',
-    ];
+
+
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
 
 
     public function scopeSearch($query, $queryString)
@@ -40,6 +35,12 @@ class Customer extends Model
     {
         return \Carbon\Carbon::parse($value)->format('d-m-Y');
     }
+
+    public function scopeWhereCompany($query)
+    {
+        return $query->where('company_id', request()->header('company'));
+    }
+
 
 
     public function scopeApplyFilters($query, Request $request)
@@ -62,11 +63,38 @@ class Customer extends Model
             });
     }
 
+    public function billing()
+    {
+        return $this->hasOne(Address::class)->where('type', 'billing');
+    }
+
 
     public function invoices()
     {
         return $this->hasMany(Invoice::class);
     }
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'creator_id');
+    }
+
+    
 
    
 

@@ -16,14 +16,10 @@ const emit = defineEmits([
   'update:isDialogVisible',
   'editCustomer',
   'deleteCustomer',
-  'createEstimate',
-  'viewEstimates',
-  'viewInvoices',
-  'createInvoice',
 ])
 
 
-const { updateCustomer, errors, respResult, isLoading, getCustomer, customerData } = useCustomers()
+const { getCustomer, customerData } = useCustomers()
 
 // mount
 onMounted(async () => {
@@ -32,29 +28,6 @@ onMounted(async () => {
   }
 })
 
-// createEstimate
-
-const createEstimate = async id => {
-  emit('createEstimate', id)
-}
-
-const createInvoice = async id => {
-  emit('createInvoice', id)
-}
-
-// view estimates
-
-const viewEstimates = async id => {
-  emit('viewEstimates', id)
-}
-
-// viewInvoices
-
-const viewInvoices = async id => {
-  emit('viewInvoices', id)
-}
-
-// deleteCustomerConfirm
 
 const deleteCustomerConfirm = async id => {
   emit('deleteCustomer', id)
@@ -73,7 +46,7 @@ const dialogModelValueUpdate = val => {
 
 <template>
   <VDialog
-    :width="$vuetify.display.smAndDown ? 600 : '60%'"
+    :width="$vuetify.display.smAndDown ? 600 : '50%'"
     :model-value="isDialogVisible"
     @update:model-value="dialogModelValueUpdate"
   >
@@ -84,9 +57,9 @@ const dialogModelValueUpdate = val => {
         <VRow>
           <VCol 
             cols="12"
-            lg="3"
-            md="6"
-            sm="6"
+            lg="12"
+            md="12"
+            sm="12"
           >
             <p class="text-sm text-uppercase text-disabled">
               Customer Details
@@ -120,168 +93,66 @@ const dialogModelValueUpdate = val => {
                 </tr>
                 <tr>
                   <th>
-                    Address:
+                    Billing Address :
                   </th>
-                  <td>
-                    {{ customerData.address }}
-                  </td>
+                  <td />
                 </tr>
+
                 <tr>
                   <th>
-                    Lead Type:
+                    Name
                   </th>
                   <td>
-                    {{ customerData.lead_type }}
+                    {{ customerData?.billing?.name }}
                   </td>
                 </tr>
+
                 <tr>
                   <th>
-                    Status
+                    Address
                   </th>
                   <td>
-                    {{ customerData.status }}
+                    {{ customerData?.billing?.address_street_1 }}
                   </td>
                 </tr>
+
                 <tr>
                   <th>
-                    Lead Representative:
+                    City
                   </th>
                   <td>
-                    {{ customerData.lead_representative }}
+                    {{ customerData?.billing?.city }}
                   </td>
                 </tr>
+
                 <tr>
                   <th>
-                    In Progress:
+                    State
                   </th>
                   <td>
-                    {{ customerData.in_progress ? 'Yes' : 'No' }}
+                    {{ customerData?.billing?.state }}
                   </td>
                 </tr>
+
                 <tr>
                   <th>
-                    Last Service:
+                    Zip
                   </th>
                   <td>
-                    {{ customerData.last_service }}
+                    {{ customerData?.billing?.zip }}
                   </td>
                 </tr>
+               
                 <tr>
                   <th>
                     Date Added:
                   </th>
                   <td>
-                    {{ customerData.date }}
+                    {{ customerData.created_at }}
                   </td>
                 </tr>
               </tbody>
             </VTable>
-          </VCol>
-
-          <VCol 
-            cols="12"
-            lg="3"
-            md="6"
-            sm="6"
-          >
-            <p class="text-sm text-uppercase text-disabled text-center">
-              Email
-            </p>
-  
-            <VList class="text-left mt-2">
-              <VBtn
-                block
-                variant="text"
-                class="mt-2"
-                @click="createInvoice(customerData.id)"
-              >
-                Create Invoice
-              </VBtn> 
-
-              <VBtn
-                block
-                variant="text"
-                class="mt-2"
-                @click="createEstimate(customerData.id)"
-              >
-                Create Estimate
-              </VBtn> 
-
-              <VBtn
-                block
-                variant="text"
-                class="mt-2"
-              >
-                Download Receipt
-              </VBtn> 
-
-              <VBtn
-                block
-                variant="text"
-                class="mt-2"
-              >
-                Review
-              </VBtn> 
-            </VList>
-
-            <p class="text-sm text-uppercase text-disabled text-center mt-2">
-              Service history
-            </p>
-  
-            <VList class="text-left ">
-              <VBtn
-                block
-                variant="text"
-                @click="viewEstimates(customerData.id)"
-              >
-                Estimates
-              </VBtn> 
-             
-              <VBtn
-                block
-                variant="text"
-                class="mt-2"
-                @click="viewInvoices(customerData.id)"
-              >
-                Invoices
-              </VBtn> 
-            </VList>
-          </VCol>
-          <VCol 
-            cols="12"
-            lg="3"
-            md="6"
-            sm="6"
-          >
-            <p class="text-sm text-uppercase text-disabled text-center">
-              Schedule
-            </p>
-  
-            <VList class="text-left mt-2">
-              <VBtn
-                block
-                variant="text"
-              >
-                Estimate
-              </VBtn> 
-
-              <VBtn
-                block
-                variant="text"
-              >
-                Service
-              </VBtn>
-            </VList>
-          </VCol>
-          <VCol cols="12">
-            <div class="d-flex justify-space-between py-1">
-              <h6 class="text-h6">
-                Notes:
-              </h6>
-              <h5 class="text-body-1">
-                {{ customerData.notes }}
-              </h5>
-            </div>
           </VCol>
         </VRow>
       </VCardText>
@@ -289,17 +160,25 @@ const dialogModelValueUpdate = val => {
       <VCardActions class="d-flex justify-end">
         <VBtn
           color="primary"
-          text
+          variant="contained"
           @click="editCustomer(customerData.id)"
         >
+          <VIcon
+            icon="tabler-edit"
+            class="me-2"
+          />
           Edit
         </VBtn>
 
         <VBtn
           color="error"
-          text
+          variant="contained"
           @click="deleteCustomerConfirm(customerData.id)"
         >
+          <VIcon
+            icon="tabler-trash"
+            class="me-2"
+          />
           Delete
         </VBtn>
       </VCardActions>

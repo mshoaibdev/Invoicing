@@ -19,7 +19,7 @@ export default function useInvoices() {
       sortable: false,
     },
     {
-      title: 'Client Name',
+      title: 'Customer',
       key: 'customer.name',
       sortable: false,
     },
@@ -31,11 +31,6 @@ export default function useInvoices() {
     {
       title: 'Phone',
       key: 'customer.phone',
-      sortable: false,
-    },
-    {
-      title: 'Address',
-      key: 'customer.address',
       sortable: false,
     },
     {
