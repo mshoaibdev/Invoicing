@@ -50,6 +50,18 @@ class InvoiceController extends Controller
 
         // Mail::to($invoice->customer->email)->send(new NewInvoice($invoice));
 
+        $invoice->load([
+            'company' => [
+                'address',
+            ],
+            'customer' => [
+                'billing',
+                'currency',
+            ]
+        ]);
+
+        $this->saveInvoicePdf($invoice);
+
         return response()->json([
             'message' => 'Invoice created successfully.',
         ]);
@@ -227,5 +239,45 @@ class InvoiceController extends Controller
 
         return $paypalInvoice;
 
+    }
+
+
+    // save invoice pdf
+
+    public function saveInvoicePdf($invoice): void
+    {
+
+        $pdfView = view('pdf.invoice', ['invoice' => $invoice])->render();
+
+        $pdf = \App::make('dompdf.wrapper');
+        $pdf->loadHTML($pdfView)->setPaper('a4', 'portrait');
+
+        $fileName = $invoice->invoice_id . '.pdf';
+        \Storage::put(
+            'invoices/' . $fileName,
+            $pdf->output()
+        );
+
+    }
+
+
+
+    // sendInvoice
+
+    public function sendInvoice(Request $request, $invoiceId)
+    {
+
+        $invoice = Invoice::find($invoiceId);
+
+        $invoice->update([
+            'status' => 'SENT',
+        ]);
+
+
+        Mail::to($invoice->customer->email)->send(new NewInvoice($invoice));
+
+        return response()->json([
+            'message' => 'Invoice sent successfully.',
+        ]);
     }
 }

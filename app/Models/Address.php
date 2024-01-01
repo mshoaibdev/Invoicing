@@ -13,6 +13,8 @@ class Address extends Model
 
     protected $guarded = ['id'];
 
+    protected $appends = ['country_name'];
+
     public function getCountryNameAttribute()
     {
         $name = $this->country ? $this->country->name : null;
@@ -20,23 +22,13 @@ class Address extends Model
         return $name;
     }
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function customer()
-    {
-        return $this->belongsTo(Customer::class);
-    }
-
-    public function company()
-    {
-        return $this->belongsTo(Company::class);
-    }
-
     public function country()
     {
         return $this->belongsTo(Country::class);
+    }
+
+    public function addressable()
+    {
+        return $this->morphTo();
     }
 }

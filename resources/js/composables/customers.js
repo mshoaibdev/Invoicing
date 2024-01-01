@@ -22,7 +22,13 @@ export default function useCustomers() {
     },
     {
       title: 'Phone',
-      key: 'phone',
+      key: 'billing.phone',
+      sortable: false,
+      visible: true,
+    },
+    {
+      title: 'State',
+      key: 'billing.state',
       sortable: false,
       visible: true,
     },

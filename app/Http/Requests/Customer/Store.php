@@ -26,7 +26,7 @@ class Store extends FormRequest
         return [
             'name' => ['required', 'string', 'max:150'],
             'email' => ['email', 'required', Rule::unique('customers')->where('company_id', $this->header('company'))],
-            'phone' => ['nullable', 'string', 'max:150'],
+            'billing.phone' => ['nullable', 'string', 'max:30'],
             'billing.name' => ['nullable'],
             'billing.address_street_1' => ['nullable'],
             'billing.city' => ['nullable'],

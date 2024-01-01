@@ -14,6 +14,8 @@ import '@styles/styles.scss'
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
+import { vuetifyProTipTap } from "./tiptap"
+
 loadFonts()
 
 
@@ -22,6 +24,7 @@ const app = createApp(App)
 
 
 // Use plugins
+app.use(vuetifyProTipTap)
 app.use(vuetify)
 app.use(createPinia())
 app.use(router)

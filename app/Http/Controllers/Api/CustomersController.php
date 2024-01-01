@@ -23,6 +23,7 @@ class CustomersController extends Controller
         $limit = $request->has('perPage') ? $request->perPage : 10;
 
         $customers = Customer::query()
+            ->with(['billing', 'currency'])
             ->when($request->q, function ($query) use ($request) {
                 $query->search($request->q);
             })

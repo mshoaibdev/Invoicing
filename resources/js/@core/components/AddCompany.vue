@@ -86,7 +86,7 @@ const onSubmit = async() => {
       const obj = new FormData()
 
       obj.append('name', formData.value.name)
-      obj.append('country_id', formData.value.country_id)
+      obj.append('address[country_id]', formData.value.country_id)
       obj.append('currency_id', formData.value.currency_id)
       if(formData.value.logo){
         obj.append('logo', formData.value.logo)
@@ -114,6 +114,11 @@ const changeAvatar = file => {
   }
 }
 
+const removeLogo = () => {
+  formData.value.logo = ''
+  logoPreview.value = ''
+}
+
 
 const dialogModelValueUpdate = val => {
   emit('update:isDialogVisible', val)
@@ -139,25 +144,53 @@ const dialogModelValueUpdate = val => {
               cols="12"
               md="12"
             >
-              <VCardText class="d-flex justify-center border">
-                <VAvatar
-                  rounded
-                  size="120"
-                  class="me-6 border"
-                  :image="logoPreview"
-                />
+              <VCardText
+                class="d-flex justify-center "
+                style="border: 1px dashed #ccc; padding: 10px; text-align: center;"
+              >
+                <div>
+                  <VImg
+                    v-if="logoPreview"
+                    rounded
+                    border
+                    class="bg-white border"
+                    :aspect-ratio="1"
+                    height="100"
+                    :src="logoPreview"
+                  />
 
-                <div class="d-flex flex-column justify-center gap-2 align-center">
-                  <div class="d-flex flex-wrap gap-2">
+                  <div
+                    v-if="formData.logo"
+                    class="d-flex justify-center gap-2 align-center"
+                  >
+                    <VBtn
+                      color="error"
+                      variant="text"
+                      class="remove-logo-btn"
+                      icon="tabler-trash"
+                      @click="removeLogo"
+                    />
+                  </div>
+                 
+                  <div
+                    v-if="!formData.logo"
+                    class=""
+                  >
+                    <p class="text-body-2 mb-0">
+                      Allowed JPG, GIF or PNG. Max size of 10MB
+                    </p>
                     <VBtn
                       color="primary"
+                      variant="text"
                       @click="refInputEl?.click()"
                     >
                       <VIcon
                         icon="tabler-cloud-upload"
                         class="d-sm-none"
                       />
-                      <span class="d-none d-sm-block">Upload logo</span>
+                      <span class="d-none d-sm-block">
+                        Upload new logo  
+                      </span>
                     </VBtn>
 
                     <input
@@ -168,11 +201,9 @@ const dialogModelValueUpdate = val => {
                       @input="changeAvatar"
                     >
                   </div>
-
-                  <p class="text-body-1 mb-0">
-                    Allowed JPG, GIF or PNG. Max size of 10MB
-                  </p>
                 </div>
+
+                <div class="d-flex flex-column justify-center gap-2 align-center" />
               </VCardText>
             </VCol>
             <VCol
@@ -247,3 +278,6 @@ const dialogModelValueUpdate = val => {
     </VCard>
   </VDialog>
 </template>
+
+
+

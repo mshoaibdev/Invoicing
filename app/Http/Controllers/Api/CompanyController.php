@@ -55,7 +55,7 @@ class CompanyController extends Controller
         $user->companies()->attach($company->id);
 
         if ($request->address) {
-            $company->address()->create($request->address);
+            $company->address()->create($request->getAddressPayload());
         }
 
         if ($request->hasFile('logo')) {

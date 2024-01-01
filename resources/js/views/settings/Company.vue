@@ -9,11 +9,11 @@ const { updateCompany, errors, respResult, isLoading, currentCompany } = useComp
 
 const formData = ref({
   name: '',
-  phone: '',
   last_name: '',
   currency_id: 1,
   country_id: 231,
   address: {
+    phone: '',
     address_street_1: '',
     city: '',
     state: '',
@@ -55,6 +55,11 @@ onMounted( async () => {
   await currentCompany().then( async resp => {
     formData.value = resp.data.data
     logoPreview.value = formData.value.logo_url
+
+    // check address object
+    if(!formData.value.address){
+      formData.value.address = {}
+    }
   })
   await fetchCountries()
   await fetchCurrencies()
@@ -75,6 +80,10 @@ const changeAvatar = file => {
   }
 }
 
+const removeLogo = () => {
+  formData.value.logo = ''
+  logoPreview.value = ''
+}
 
 const onSubmit = async() => {
   refForm.value?.validate().then(async ({ valid: isValid }) => {
@@ -84,7 +93,7 @@ const onSubmit = async() => {
       Object.keys(formData.value).forEach(key => {
         if (key === 'address') {
           Object.keys(formData.value.address).forEach(addressKey => {
-            formNewData.append(`address[${addressKey}]`, formData.value.address[addressKey])
+            formNewData.append(`address[${addressKey}]`, formData.value.address[addressKey] ?? '')
           })
         } else {
           formNewData.append(key, formData.value[key])
@@ -107,40 +116,63 @@ const onSubmit = async() => {
   <VRow>
     <VCol cols="12">
       <VCard title="Company Information">
-        <VCardText class="d-flex">
-          <VAvatar
-            rounded
-            size="100"
-            class="me-6"
-            :image="logoPreview"
-          />
+        <VCardText
+          class="d-flex justify-center  mx-4 mb-4"
+          style="border: 1px dashed #ccc; padding: 10px; text-align: center;"
+        >
+          <div>
+            <VImg
+              v-if="logoPreview"
+              rounded
+              border
+              class="bg-white border"
+              :aspect-ratio="1"
+              height="150"
+              :src="logoPreview"
+            />
 
-          <div class="d-flex flex-column justify-center gap-4">
-            <div class="d-flex flex-wrap gap-2">
+            <div
+              v-if="formData.logo"
+              class="d-flex justify-center gap-2 align-center"
+            >
+              <VBtn
+                color="error"
+                variant="text"
+                class="remove-logo-btn"
+                icon="tabler-trash"
+                @click="removeLogo"
+              />
+            </div>
+                 
+            <div
+              v-if="!formData.logo"
+              class=""
+            >
+              <p class="text-body-2 mb-0">
+                Allowed JPG, GIF or PNG. Max size of 10MB
+              </p>
               <VBtn
                 color="primary"
+                variant="text"
                 @click="refInputEl?.click()"
               >
                 <VIcon
                   icon="tabler-cloud-upload"
                   class="d-sm-none"
                 />
-                <span class="d-none d-sm-block">Upload new logo</span>
+                <span class="d-none d-sm-block">
+                  Upload new logo  
+                </span>
               </VBtn>
 
               <input
                 ref="refInputEl"
                 type="file"
-                name="file"
                 accept=".jpeg,.png,.jpg,GIF"
                 hidden
                 @input="changeAvatar"
               >
             </div>
-
-            <p class="text-body-1 mb-0">
-              Allowed JPG, GIF or PNG. Max size of 10MB
-            </p>
           </div>
         </VCardText>
 
@@ -171,35 +203,17 @@ const onSubmit = async() => {
                 md="6"
               >
                 <VTextField
-                  v-model="formData.phone"
+                  v-model="formData.address.phone"
                   label="Phone Number"
                   name="phone"
                 />
               </VCol>
 
-          
-
+            
               <VCol
                 cols="12"
                 md="12"
               >
-                <label class="text-body-1">Select Country <span class="color-red">*</span></label>
-                <VAutocomplete
-                  v-model="formData.country_id"
-                  :rules="[requiredValidator]"
-                  :items="countries"
-                  item-title="name"
-                  item-value="id"
-                  :loading="isLoading"
-                />
-              </VCol>
-              <VCol
-                cols="12"
-                md="12"
-              >
-                <label class="text-body-1">Select Currency <span class="color-red">*</span></label>
-
-
                 <VAutocomplete
                   v-model="formData.currency_id"
                   :rules="[requiredValidator]"
@@ -274,7 +288,6 @@ const onSubmit = async() => {
                   type="submit"
                   :loading="isLoading"
                   :disabled="isLoading"
-                  class="userbtnForMobileSize"
                 >
                   <span class="fontForMobileSize">Save changes</span> 
                 </VBtn>

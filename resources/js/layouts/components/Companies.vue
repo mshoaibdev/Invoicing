@@ -21,6 +21,8 @@ const bootstrapApp = async () => {
 
 const setCompany = company => {
  
+  if(!company) return
+
   localStorage.setItem('companyId', company.id)
 
   selectedCompany.value = company
@@ -49,15 +51,12 @@ onMounted(async () => {
         variant="text"
         v-bind="props"
       >
-        <VAvatar
-          class="me-2"
-          size="28"
+        <img
+          v-if="selectedCompany?.logo_url"
+          :src="selectedCompany?.logo_url ?? ''"
+          alt="company logo"
+          height="24"
         >
-          <img
-            :src="selectedCompany?.logo_url ?? ''"
-            alt="company logo"
-          >
-        </VAvatar>
 
 
         <span>
@@ -78,16 +77,6 @@ onMounted(async () => {
         @click="selectCompany(company)"
       >
         <VListItemTitle>
-          <VAvatar
-            class="me-2"
-            size="28"
-            tile
-          >
-            <img
-              :src="company.logo_url"
-              alt="company logo"
-            >
-          </VAvatar>
           {{ company.name }}
         </VListItemTitle>
       </VListItem>

@@ -70,6 +70,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::get('/current-company', [CompanyController::class, 'currentCompany'])->name('current-company');
 
+    // send invoice
+    Route::post('/invoices/send/{id}', [InvoiceController::class, 'sendInvoice'])->name('invoices.send');
+    
 
 
     Route::apiResources([

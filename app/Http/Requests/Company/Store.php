@@ -34,7 +34,7 @@ class Store extends FormRequest
             'currency_id' => [
                 'required'
             ],
-            'country_id' => [
+            'address.country_id' => [
                 'required'
             ],
             'logo' => [
@@ -52,6 +52,19 @@ class Store extends FormRequest
             ->merge([
                 'creator_id' => $this->user()->id,
                 'slug' => Str::slug($this->name)
+            ])
+            ->toArray();
+    }
+
+    public function getAddressPayload()
+    {
+        return collect($this->validated()['address'])
+            ->only([
+                'country_id',
+            ])
+            ->merge([
+                
+                'type' => 'company',
             ])
             ->toArray();
     }

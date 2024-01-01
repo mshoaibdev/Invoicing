@@ -89,13 +89,13 @@ const dialogModelValueUpdate = val => {
                     Address:
                   </th>
                   <td v-if="invoiceData.customer.billing">
-                    {{ invoiceData.customer.billing.address_street_1 }}  ,
+                    {{ invoiceData.customer.billing.address_street_1 }} 
                     {{ invoiceData.customer.billing.city }}
-                    ,
+                  
                     {{ invoiceData.customer.billing.state }}
-                    ,
-                    {{ invoiceData.customer.billing.country }}
-                    ,
+                   
+                    {{ invoiceData.customer.billing.country.name }}
+                    
                     {{ invoiceData.customer.billing.zip }}
                   </td>
                 </tr>

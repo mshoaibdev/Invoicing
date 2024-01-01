@@ -86,7 +86,7 @@ const onSubmit = async() => {
       Object.keys(formData.value).forEach(key => {
         if (key === 'billing') {
           Object.keys(formData.value.billing).forEach(billingKey => {
-            formNewData.append(`billing[${billingKey}]`, formData.value.billing[billingKey])
+            formNewData.append(`billing[${billingKey}]`, formData.value.billing[billingKey] ?? '')
           })
         } else {
           formNewData.append(key, formData.value[key])
@@ -144,17 +144,7 @@ const dialogModelValueUpdate = val => {
                 :rules="[requiredValidator, emailValidator]"
               />
             </VCol>
-            <VCol
-              cols="12"
-              md="6"
-            >
-              <VTextField
-                v-model="formData.phone"
-                label="Phone"
-                :rules="[requiredValidator]"
-              />
-            </VCol>
-
+          
             <VCol
               cols="12"
               md="6"
@@ -185,7 +175,17 @@ const dialogModelValueUpdate = val => {
                 label="Name"
               />
             </VCol>
-            
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VTextField
+                v-model="formData.billing.phone"
+                label="Phone"
+                :rules="[requiredValidator]"
+              />
+            </VCol>
+
 
             <VCol
               cols="12"

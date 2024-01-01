@@ -41,7 +41,7 @@ const initialState = {
   note: "",
   payment_method: "Paypal",
   currency: "USD",
-  status: "Paid",
+  status: "Draft",
   items: [
     {
       id: 1,
@@ -65,7 +65,7 @@ const selectCustomer = customerId => {
   
   currency.value = customer.currency
 
-  console.log(currency.value);
+  console.log(currency.value)
   selectedCustomer.value = {
     id: customer.id,
     name: customer.name,
@@ -201,7 +201,6 @@ const removeProduct = id => {
         cols="12"
         md="9"
       >
-      
         <VCard>
           <h2 class="p-4 text-center pt-2">
             New Invoice
@@ -246,28 +245,23 @@ const removeProduct = id => {
                           {{ selectedCustomer.name }}
                         </td>
                       </tr>
-                      {{ invoiceData.billing }}
-                      <tr v-if="selectedCustomer.billing">
+                      <tr >
                         <td class="pe-6">
                           Address:
                         </td>
-                        <td>
+                        <td v-if="selectedCustomer.billing">
                           {{ selectedCustomer.billing.address_street_1 }}
-                          ,
                           {{ selectedCustomer.billing.city }}
-                          ,
                           {{ selectedCustomer.billing.state }}
-                          ,
-                          {{ selectedCustomer.billing.country }}
-                          ,
+                          {{ selectedCustomer.billing.country_name }}
                           {{ selectedCustomer.billing.zip }}
                         </td>
                       </tr>
-                      <tr>
+                      <tr >
                         <td class="pe-6">
                           Phone:
                         </td>
-                        <td>{{ selectedCustomer.phone }}</td>
+                        <td v-if="selectedCustomer.billing">{{ selectedCustomer.billing.phone }}</td>
                       </tr>
                       <tr>
                         <td class="pe-6">

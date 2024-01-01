@@ -57,14 +57,11 @@ class Company extends Model implements HasMedia
     }
 
 
+    // addressable 
+
     public function address()
     {
-        return $this->hasOne(Address::class);
-    }
-
-    public function addresses()
-    {
-        return $this->hasMany(Address::class);
+        return $this->morphOne(Address::class, 'addressable');
     }
 
 

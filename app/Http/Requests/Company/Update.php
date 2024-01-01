@@ -34,9 +34,6 @@ class Update extends FormRequest
             'currency_id' => [
                 'required'
             ],
-            'country_id' => [
-                'required'
-            ],
             'logo' => [
                 'nullable',
                 'image',
@@ -79,17 +76,18 @@ class Update extends FormRequest
 
     public function getAddressPayload()
     {
-        return collect($this->validated())
+        return collect($this->validated()['address'])
             ->only([
-                'address.name',
-                'address.address_street_1',
-                'address.address_street_2',
-                'address.city',
-                'address.state',
-                'address.country_id',
-                'address.zip',
-                'address.phone',
-                'address.fax',
+                'name',
+                'address_street_1',
+                'city',
+                'state',
+                'country_id',
+                'zip',
+                'phone',
+            ])
+            ->merge([
+                'type' => 'company',
             ])
             ->toArray();
     }

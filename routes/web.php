@@ -1,9 +1,8 @@
 <?php
 
-use App\Http\Controllers\PagesController;
+use App\Models\Invoice;
 use Illuminate\Support\Facades\Route;
 
-use function Spatie\LaravelPdf\Support\pdf;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,9 +21,29 @@ use function Spatie\LaravelPdf\Support\pdf;
 
 Route::get('/pdf', function () {
 
-    return pdf('pdf')
-    ->view('pdf')
-    ->name('invoice-2023-04-10.pdf');
+
+    $invoice = Invoice::with([
+        'company' => [
+            'address',
+        ],
+        'customer' => [
+            'billing',
+            'currency',
+        ]
+    ])->find(1000);
+
+
+
+    $pdfView = view('pdf.invoice', ['invoice' => $invoice])->render();
+
+    $pdf = App::make('dompdf.wrapper');
+    $pdf->loadHTML($pdfView)->setPaper('a4', 'portrait');
+
+    $fileName = $invoice->invoice_id . '.pdf';
+    Storage::put(
+        'invoices/' . $fileName,
+        $pdf->output()
+    );
 
 });
 

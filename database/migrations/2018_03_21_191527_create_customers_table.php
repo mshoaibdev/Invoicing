@@ -17,7 +17,6 @@ return new class extends Migration {
             $table->uuid('uuid');
             $table->string('name', 150);
             $table->string('email', 150);
-            $table->string('phone', 150)->nullable();
             $table->string('website', 150)->nullable();
             $table->string('company_name', 150)->nullable();
             $table->text('notes')->nullable();

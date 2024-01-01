@@ -63,21 +63,29 @@ class Customer extends Model
             });
     }
 
-    public function billing()
-    {
-        return $this->hasOne(Address::class)->where('type', 'billing');
-    }
-
+   
 
     public function invoices()
     {
         return $this->hasMany(Invoice::class);
     }
 
+  
+
+    // addressable
     public function addresses()
     {
-        return $this->hasMany(Address::class);
+        return $this->morphMany(Address::class, 'addressable');
     }
+
+    // billing address
+    public function billing()
+    {
+        return $this->morphOne(Address::class, 'addressable')->where('type', 'billing');
+    }
+
+
+
 
     public function currency()
     {

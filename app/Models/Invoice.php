@@ -47,7 +47,41 @@ class Invoice extends Model
         'creator_id' => 'integer',
     ];
 
-    protected $appends = ['invoice_id'];
+    protected $appends = [
+        'invoice_id',
+        'created_at_formatted',
+        'due_date_formatted',
+        'invoice_date_formatted',
+        'invoice_link'
+    ];
+
+
+    public function getInvoiceIdAttribute()
+    {
+        return "INV{$this->id}";
+    }
+
+    public function getInvoiceLinkAttribute()
+    {
+        return asset("storage/invoices/{$this->invoice_id}.pdf");
+    }
+
+    public function getCreatedAtFormattedAttribute()
+    {
+        return Carbon::parse($this->created_at)->format('F j, Y');
+    }
+
+    public function getDueDateFormattedAttribute()
+    {
+        return Carbon::parse($this->due_date)->format('F j, Y');
+    }
+
+    public function getInvoiceDateFormattedAttribute()
+    {
+        return Carbon::parse($this->invoice_date)->format('F j, Y');
+    }
+
+
 
 
     /**
@@ -150,6 +184,14 @@ class Invoice extends Model
     {
         return $this->belongsTo(Customer::class);
     }
+
+    // company
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+
 
     /**
      * Get the user that owns the invoice

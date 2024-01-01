@@ -3,6 +3,7 @@ import useInvoices from '@/composables/invoices'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import { formatCurrency } from '@core/utils/formatters'
 import ViewInvoiceDialog from './ViewInvoice.vue'
+import SendInvoiceDialog from './SendInvoice.vue'
 
 const props = defineProps({
   
@@ -16,8 +17,10 @@ const { invoices, totalRecords, isLoading, fetchInvoices, currentPage, headers, 
 const selectedRows = ref([])
 const isConfirmDialogVisible = ref(false)
 const isViewInvoiceDialogVisible = ref(false)
+const isSendInvoiceDialogVisible = ref(false)
 const invoiceId = ref(0)
 const customerId = ref(0)
+const invoice = ref({})
 
 
 // mount
@@ -50,6 +53,8 @@ const updateTableColumns = () => {
 }
 
 
+
+
 updateTableColumns()
 
 
@@ -64,6 +69,12 @@ const toggleTableColumns = async items => {
 
   updateTableColumns()
  
+}
+
+const sendInvoice = async item => {
+  
+  invoice.value = item
+  isSendInvoiceDialogVisible.value = true
 }
 
 
@@ -239,12 +250,35 @@ const confirmDelete = async ev => {
       </template>
             
       <template #item.actions="{ item }">
-        <IconBtn @click="deleteInvoiceConfirm(item.raw.id)">
-          <VIcon icon="tabler-trash" />
+
+        <IconBtn
+          density="compact"
+        >
+          <VIcon icon="tabler-dots-vertical" />
+
+          <VMenu activator="parent">
+            <VList>
+              <VListItem @click="sendInvoice(item.raw)">
+                <VIcon icon="tabler-send" /> Send Invoice  
+              </VListItem>
+              <VListItem
+                :href="item.raw.invoice_link"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <VIcon icon="tabler-download" /> Download Invoice  
+              </VListItem>
+              <VListItem @click="viewInvoice(item.raw.id)">
+                <VIcon icon="tabler-eye" /> View Invoice  
+              </VListItem>
+              <VListItem @click="deleteInvoiceConfirm(item.raw.id)">
+                <VIcon icon="tabler-trash" /> Delete Invoice  
+              </VListItem>
+            </VList>
+          </VMenu>
         </IconBtn>
-        <IconBtn @click="viewInvoice(item.raw.id)">
-          <VIcon icon="tabler-eye" />
-        </IconBtn>
+
+
         <!--
           <IconBtn @click="editInvoice(item.raw.id)">
           <VIcon icon="tabler-pencil" />
@@ -269,6 +303,12 @@ const confirmDelete = async ev => {
       :invoice-id="invoiceId"
       @edit-invoice="editInvoice"
       @delete-invoice="deleteInvoiceConfirm"
+    />
+
+    <SendInvoiceDialog
+      v-if="isSendInvoiceDialogVisible"
+      v-model:isDialogVisible="isSendInvoiceDialogVisible"
+      :invoice="invoice"
     />
   </VCard>
 </template>

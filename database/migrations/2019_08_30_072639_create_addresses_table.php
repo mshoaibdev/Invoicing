@@ -15,23 +15,17 @@ class CreateAddressesTable extends Migration
     {
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
+
             $table->string('name')->nullable();
             $table->string('address_street_1')->nullable();
-            $table->string('address_street_2')->nullable();
             $table->string('city')->nullable();
             $table->string('state')->nullable();
-            
             $table->string('zip')->nullable();
             $table->string('phone')->nullable();
             $table->string('fax')->nullable();
             $table->string('type')->nullable();
-
-
             $table->foreignId('country_id')->constrained()->onDelete('restrict');
-            $table->foreignId('user_id')->constrained()->onDelete('restrict');
-            $table->foreignId('company_id')->constrained()->onDelete('restrict');
-            $table->foreignId('customer_id')->constrained()->onDelete('restrict');
-
+            $table->morphs('addressable');
             $table->timestamps();
         });
     }

@@ -29,11 +29,6 @@ export default function useInvoices() {
       sortable: false,
     },
     {
-      title: 'Phone',
-      key: 'customer.phone',
-      sortable: false,
-    },
-    {
       title: 'Total',
       key: 'total',
       sortable: false,
@@ -110,6 +105,14 @@ export default function useInvoices() {
 
     invoiceData.value = response.data.data
   }
+
+  // sendInvoice
+
+  const sendInvoice = async (invoiceId, formData) => {
+    await axios.post(route('invoices.send', invoiceId), formData)
+
+  }
+
 
 
   const updateInvoice = async (id, formData) => {
@@ -298,6 +301,7 @@ export default function useInvoices() {
     deleteInvoice,
     refetchData,
     updateInvoice,
+    sendInvoice,
     currentPage,
     searchQuery,
     refListTable,

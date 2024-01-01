@@ -88,7 +88,7 @@ const dialogModelValueUpdate = val => {
                     Phone:
                   </th>
                   <td>
-                    <a :href="`tel:${customerData.phone}`">{{ customerData.phone }}</a>
+                    <a :href="`tel:${customerData?.billing?.phone}`">{{ customerData?.billing?.phone }}</a>
                   </td>
                 </tr>
                 <tr>
@@ -160,7 +160,7 @@ const dialogModelValueUpdate = val => {
       <VCardActions class="d-flex justify-end">
         <VBtn
           color="primary"
-          variant="contained"
+          variant="text"
           @click="editCustomer(customerData.id)"
         >
           <VIcon
@@ -172,7 +172,7 @@ const dialogModelValueUpdate = val => {
 
         <VBtn
           color="error"
-          variant="contained"
+          variant="text"
           @click="deleteCustomerConfirm(customerData.id)"
         >
           <VIcon

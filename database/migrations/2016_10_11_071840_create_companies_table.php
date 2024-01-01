@@ -18,7 +18,6 @@ class CreateCompaniesTable extends Migration
             $table->uuid();
             $table->string('name');
             $table->foreignId('currency_id')->constrained('currencies')->onDelete('restrict');
-            $table->foreignId('country_id')->constrained('countries')->onDelete('restrict');
             $table->foreignId('creator_id')->constrained('users')->onDelete('restrict');
             $table->timestamps();
         });
