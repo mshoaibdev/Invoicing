@@ -23,6 +23,7 @@ class Update extends FormRequest
     {
         return [
             'due_date' => ['required', 'date'],
+            'invoice_date' => ['required', 'date'],
             'items' => ['required', 'array'],
             'total' => ['required', 'numeric'],
             'subtotal' => ['required', 'numeric'],
@@ -30,7 +31,17 @@ class Update extends FormRequest
             'customer_id' => ['required'],
             'note' => ['nullable', 'string'],
             'status' => ['required', 'string'],
-            'currency' => ['required', 'string'],
+            'vat_amount' => ['nullable', 'numeric'],
+            'vat_percentage' => ['nullable', 'numeric'],
+            'tax_amount' => ['nullable', 'numeric'],
+            'tax_percentage' => ['nullable', 'numeric'],
         ];
+    }
+
+    public function getInvoicePayload(): array
+    {
+        return collect($this->validated())
+           
+            ->toArray();
     }
 }

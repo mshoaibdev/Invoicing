@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Http\Requests\User;
+namespace App\Http\Requests\Account;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\Password;
 
-class Store extends FormRequest
+class UpdateProfile extends FormRequest
 {
-    /**
+   /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
@@ -23,14 +22,10 @@ class Store extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => ['required', 'string', 'max:50'],
-            'last_name' => ['required', 'string', 'max:50'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:customers,email,'.$this->user()->id],
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:4048'],
             'phone' => ['nullable', 'string', 'max:30'],
-            'avatar' => ['nullable', 'mimetypes:image/jpeg,image/png,image/jpg,image/gif,image/svg'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'role_id' => ['required', 'exists:roles,id'],
-            'password' => ['required', 'string', 'confirmed', Password::defaults()],
-            'companies' => ['required', 'array'],
             'address.phone' => ['nullable', 'string', 'max:30'],
             'address.address_street_1' => ['nullable', 'string', 'max:255'],
             'address.city' => ['nullable', 'string', 'max:50'],
@@ -66,4 +61,5 @@ class Store extends FormRequest
 
         return $data;
     }
+
 }

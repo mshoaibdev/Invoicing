@@ -160,6 +160,7 @@ const confirmDelete = userObjId => {
             :items="users"
             class="text-no-wrap"
           >
+
             <template #item.email="{ item }">
               <a
                 :href="`mailto:${item.raw.customer.email}`"
@@ -170,13 +171,6 @@ const confirmDelete = userObjId => {
             </template>
 
             <template #item.role="{ item }">
-              <VAvatar
-                :color="resolveUserRoleVariant(item.raw.roles[0]?.name).color"
-                :icon="resolveUserRoleVariant(item.raw.roles[0]?.name).icon"
-                variant="tonal"
-                size="30"
-                class="me-4"
-              />
               <span class="text-capitalize text-base">{{ item.raw.roles[0]?.name }}</span>
             </template>
 

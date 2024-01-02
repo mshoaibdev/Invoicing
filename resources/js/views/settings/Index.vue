@@ -17,17 +17,21 @@ const tabs = [
     icon: 'tabler-users',
     tab: 'account',
   },
-  {
-    title: 'Company Information',
-    icon: 'tabler-building',
-    tab: 'company-information',
-  },
+  
   {
     title: 'Security',
     icon: 'tabler-lock',
     tab: 'security',
   },
 ]
+
+if (ability.can('Read', 'company-edit')) {
+  tabs.push( {
+    title: 'Company Information',
+    icon: 'tabler-building',
+    tab: 'company-information',
+  })
+}
 
 if (ability.can('Read', 'settings-roles-list')) {
   tabs.push( {

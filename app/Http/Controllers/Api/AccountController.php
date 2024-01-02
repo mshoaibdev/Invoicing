@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Account\PersonalProfileUpdateRequest;
-use App\Http\Resources\AccountResource;
 use App\Traits\Upload;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Resources\AccountResource;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Requests\Account\UpdateProfile;
+use App\Http\Requests\Account\PersonalProfileUpdateRequest;
 
 class AccountController extends Controller
 {
@@ -18,7 +20,7 @@ class AccountController extends Controller
 
     public function account(Request $request)
     {
-        $user = Auth::user();
+        $user = Auth::user()->load('address');
 
         return new AccountResource($user);
     }
@@ -31,9 +33,8 @@ class AccountController extends Controller
             'password' => ['string', 'confirmed', Password::defaults()],
         ]);
 
-        // password hasing is in the user model
         $user = Auth::user();
-        $user->password = Hash::make($request->password);
+        $user->password = $request->password;
         $user->save();
 
         return response()->json([
@@ -41,25 +42,22 @@ class AccountController extends Controller
         ]);
     }
 
-    public function updatePersonalProfile(PersonalProfileUpdateRequest $request)
+    public function updatePersonalProfile(UpdateProfile $request)
     {
 
         $user = Auth::user();
-        $path = 'avatars/'.$user->id;
-
-        $data = $request->validated();
-
         if ($request->hasFile('avatar')) {
-
-            if (Storage::exists($path.'/'.$user->avatar)) {
-                Storage::delete($path.'/'.$user->avatar);
-            }
-
-            $fileName = $this->uploadAvatarAndResize($request->avatar, $path);
-            $data['avatar'] = $fileName;
+            (new UserController)->uploadAvatar($request, $user);
         }
 
-        $user->update($data);
+        $user->update($request->getUserPayload());
+
+        if ($request->address) {
+            $user->address()->updateOrCreate(
+                ['type' => 'home'],
+                $request->getAddressPayload()
+            );
+    }
 
         return response()->json([
             'data' => $user,

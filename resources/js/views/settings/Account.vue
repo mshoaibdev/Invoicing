@@ -2,18 +2,46 @@
 <script setup>
 import useAccount from '@/composables/account'
 import { emailValidator, requiredValidator } from '@validators'
+import axios from '@axios'
 
 
 const { fetchAccount,  accountData, isLoading, updateAccount } = useAccount()
 
-const formData = ref({})
+const formData = ref({
+  first_name: '',
+  last_name: '',
+  email: '',
+  phone: '',
+  address: {
+    phone: '',
+    address_street_1: '',
+    city: '',
+    state: '',
+    zip: '',
+    country_id: '',
+  },
+})
+
 const refForm = ref()
 const refInputEl = ref('')
 const avatarFile = ref('')
 const avatarPreview = ref('')
+const countries = ref([])
+
+
+const fetchCountries = async () => {
+  try {
+    const resp = await axios.get('/countries')
+
+    countries.value = resp.data.data
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 onMounted( async () => {
   await fetchAccount()
+  await fetchCountries()
   formData.value = { ...accountData.value }
   avatarPreview.value = accountData.value.avatar_url
 
@@ -47,14 +75,20 @@ const onSubmit = async() => {
     if (isValid){
       const formNewData = new FormData()
 
-      for (const key in formData.value) {
-        if (Object.hasOwnProperty.call(formData.value, key)) {
+      Object.keys(formData.value).forEach(key => {
+        if (key === 'address') {
+          Object.keys(formData.value.address).forEach(addressKey => {
+            formNewData.append(`address[${addressKey}]`, formData.value.address[addressKey] ?? '')
+          })
+        } 
+        else {
           formNewData.append(key, formData.value[key])
         }
-      }
+      })
       
-      if(avatarFile.value && avatarFile.value !== null){
+      if(avatarFile.value){
         formNewData.append('avatar', avatarFile.value)
+        formNewData.append('is_avatar_removed', true)
       }
 
       formNewData.append('_method', 'PUT')
@@ -83,9 +117,7 @@ const resetAvatar = () => {
           />
 
           <!-- 👉 Upload Photo -->
-          <div
-            class="d-flex flex-column justify-center gap-4"
-          >
+          <div class="d-flex flex-column justify-center gap-4">
             <div class="d-flex flex-wrap gap-2">
               <VBtn
                 color="primary"
@@ -164,6 +196,17 @@ const resetAvatar = () => {
                 />
               </VCol>
 
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <VTextField
+                  v-model="formData.phone"
+                  label="Personal Phone Number"
+                  name="phone"
+                />
+              </VCol>
+
               <!-- 👉 Email -->
               <VCol
                 cols="12"
@@ -178,63 +221,76 @@ const resetAvatar = () => {
                 />
               </VCol>
 
-              <!-- 👉 Organization -->
+             
+              <VCol
+                cols="12"
+                md="12"
+              >
+                <span class="text-h6 font-weight-bold">Home Address</span>
+                <VDivider />
+              </VCol>
+
               <VCol
                 cols="12"
                 md="6"
               >
                 <VTextField
-                  v-model="formData.organization"
-                  label="Organization"
-                  name="organization"
+                  v-model="formData.address.phone"
+                  label="Home Phone"
+                />
+              </VCol>
+            
+
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <VTextField
+                  v-model="formData.address.address_street_1"
+                  label="Street 1"
                 />
               </VCol>
 
-              <!-- 👉 Phone -->
               <VCol
                 cols="12"
                 md="6"
               >
                 <VTextField
-                  v-model="formData.phone"
-                  label="Phone Number"
-                  name="phone"
+                  v-model="formData.address.city"
+                  label="City"
                 />
               </VCol>
 
-              <!-- 👉 Address -->
               <VCol
                 cols="12"
                 md="6"
               >
                 <VTextField
-                  v-model="formData.address"
-                  label="Address"
-                  name="address"
-                />
-              </VCol>
-
-              <!-- 👉 State -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="formData.state"
+                  v-model="formData.address.state"
                   label="State"
-                  name="state"
                 />
               </VCol>
 
-              <!-- 👉 Zip Code -->
               <VCol
                 cols="12"
                 md="6"
               >
                 <VTextField
-                  v-model="formData.zip"
-                  label="Zip Code"
-                  name="zip"
+                  v-model="formData.address.zip"
+                  label="Zip"
+                />
+              </VCol>
+
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <VAutocomplete
+                  v-model="formData.address.country_id"
+                  label="Country"
+                  item-title="name"
+                  item-value="id"
+                  :items="countries"
                 />
               </VCol>
 
@@ -248,9 +304,8 @@ const resetAvatar = () => {
                   type="submit"
                   :loading="isLoading"
                   :disabled="isLoading"
-                  class="userbtnForMobileSize"
                 >
-                  <span class="fontForMobileSize">Save changes</span> 
+                  <span class="fontForMobileSize">Save Changes</span> 
                 </VBtn>
 
                 <VBtn
@@ -259,7 +314,7 @@ const resetAvatar = () => {
                   type="reset"
                   @click.prevent="resetFormData"
                 >
-                 <span class="fontForMobileSize">Reset</span> 
+                  <span class="fontForMobileSize">Reset</span> 
                 </VBtn>
               </VCol>
             </VRow>

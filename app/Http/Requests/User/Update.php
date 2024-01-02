@@ -26,15 +26,16 @@ class Update extends FormRequest
             'first_name' => ['required', 'string', 'max:50'],
             'last_name' => ['required', 'string', 'max:50'],
             'phone' => ['nullable', 'string', 'max:30'],
-            'address' => ['nullable', 'string', 'max:255'],
             'avatar_new' => ['nullable', 'mimetypes:image/jpeg,image/png,image/jpg,image/gif,image/svg', 'max:10480'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$this->user->id],
             'role_id' => ['required', 'exists:roles,id'],
             'password' => ['nullable', 'string', 'confirmed', Password::defaults()],
-            'country' => ['nullable', 'string', 'max:50'],
-            'state' => ['nullable', 'string', 'max:50'],
-            'city' => ['nullable', 'string', 'max:50'],
-            'zip' => ['nullable', 'string', 'max:50'],
+            'address.phone' => ['nullable', 'string', 'max:30'],
+            'address.address_street_1' => ['nullable', 'string', 'max:255'],
+            'address.city' => ['nullable', 'string', 'max:50'],
+            'address.state' => ['nullable', 'string', 'max:50'],
+            'address.country_id' => ['required'],
+            'address.zip' => ['nullable', 'string', 'max:50'],
             'companies' => ['required', 'array'],
         ];
     }
@@ -46,5 +47,21 @@ class Update extends FormRequest
                 'creator_id' => $this->user()->id,
             ])
             ->toArray();
+    }
+
+    public function getAddressPayload()
+    {
+        return collect($this->validated()['address'])
+            ->toArray();
+    }
+
+
+    public function hasAddress(array $address)
+    {
+        $data = \Arr::where($address, function ($value, $key) {
+            return isset($value);
+        });
+
+        return $data;
     }
 }

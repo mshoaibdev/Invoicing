@@ -27,17 +27,10 @@ class User extends Authenticatable implements HasMedia
     protected $fillable = [
         'first_name',
         'last_name',
-        'organization',
-        'phone',
-        'address',
-        'zip',
-        'state',
-        'country',
-        'timezone',
-        'currency',
         'email',
         'password',
         'status',
+        'phone',
         'creator_id',
     ];
 
@@ -195,9 +188,27 @@ class User extends Authenticatable implements HasMedia
     }
 
 
-    public function addresses()
+    public function address()
     {
-        return $this->hasMany(Address::class);
+        return $this->morphOne(Address::class, 'addressable');
     }
+
+
+    // isAllowedTo
+
+    public function isAllowedTo($permission)
+    {
+        if ($this->hasRole('super admin') || $this->hasRole('admin') || $this->hasRole('Admin')) {
+            return true;
+        }
+
+        if ($this->hasPermissionTo($permission)) {
+            return true;
+        }
+
+        return false;
+    }
+
+
     
 }

@@ -363,9 +363,10 @@
             <div class="company-address-container company-address">
               {{ $invoice->company->name }} <br>
               {{ $invoice->company->address->address_street_1 }} <br>
-              {{ $invoice->company->address->city }} <br>
-              {{ $invoice->company->address->state }} <br>
-              {{ $invoice->company->address->zip }} 
+              {{ $invoice->company->address->city }} 
+              {{ $invoice->company->address->state }} 
+              {{ $invoice->company->address->zip }} <br>
+              {{ $invoice->company->address->country->name }} 
             </div>
 
             <div class="invoice-details-container">
@@ -395,9 +396,10 @@
 
                 <h3 style="">{{ $invoice->customer->billing->name }}</h3> <br>
                 {{ $invoice->customer->billing->address_street_1 }} <br>
-                {{ $invoice->customer->billing->city }} <br>
-                {{ $invoice->customer->billing->state }} <br>
-                {{ $invoice->customer->billing->zip }} 
+                {{ $invoice->customer->billing->city }}
+                {{ $invoice->customer->billing->state }} 
+                {{ $invoice->customer->billing->zip }} <br>
+                {{ $invoice->customer->billing->country->name }} 
         </div>
 
         {{-- <div class="shipping-address-container shipping-address" @if ($billing_address !== '</br>') style="float:left;" @else style="display:block; float:left: padding-left: 0px;" @endif>

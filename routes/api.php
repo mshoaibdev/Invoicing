@@ -83,8 +83,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         'customers' => CustomersController::class,
         'invoices' => InvoiceController::class,
         'projects' => ProjectController::class,
-        'groups' => GroupController::class,
-        'services' => ServiceController::class,
         'companies' => CompanyController::class,
     ]);
 

@@ -98,7 +98,7 @@ const logout = () => {
           </VListItem>
 
           <PerfectScrollbar :options="{ wheelPropagation: false }">
-            <VListItem :to="{name: 'account-settings-account'}">
+            <VListItem :to="{name: 'settings-account'}">
               <template #prepend>
                 <VIcon
                   class="me-2"

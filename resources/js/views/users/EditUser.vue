@@ -2,6 +2,7 @@
 import useRoles from '@/composables/roles'
 import useUsers from '@/composables/users'
 import useCompanies from '@/composables/companies'
+import axios from '@axios'
 
 
 import {
@@ -37,18 +38,33 @@ const originalData = ref({})
 const avatarFile = ref('')
 const avatarPreview = ref('')
 const isPasswordVisible = ref(false)
+const countries = ref([])
+
+
+const fetchCountries = async () => {
+  try {
+    const resp = await axios.get('/countries')
+
+    countries.value = resp.data.data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
 
 onMounted(async () => {
   if(props.isDialogVisible){
     await getUser(props.userId)
     await fetchRolesList()
     await fetchCompaniesList()
+    await fetchCountries()
     formData.value = {
       ...user.value,
       role_id: user.value.roles[0]?.id,
       companies: user.value.companies.map(company => company.id),
     }
-    avatarPreview.value = originalData.value.avatar_url
+    avatarPreview.value = user.value.avatar_url
   }
 })
 
@@ -70,22 +86,22 @@ const onSubmit = async() => {
     if (isValid){
       const formNewData = new FormData()
 
-      formNewData.append('first_name', formData.value.first_name)
-      formNewData.append('last_name', formData.value.last_name)
-      formNewData.append('email', formData.value.email)
-      formNewData.append('phone', formData.value.phone)
-      formNewData.append('address', formData.value.address)
-      formNewData.append('state', formData.value.state ?? '')
-      formNewData.append('zip', formData.value.zip ?? '')
-      formNewData.append('role_id', formData.value.role_id)
-      formNewData.append('password', formData.value.password ?? '')
-      formNewData.append('password_confirmation', formData.value.password_confirmation ?? '')
+      Object.keys(formData.value).forEach(key => {
+        if (key === 'address') {
+          Object.keys(formData.value.address).forEach(addressKey => {
+            formNewData.append(`address[${addressKey}]`, formData.value.address[addressKey] ?? '')
+          })
+        } 
+        else if (key === 'companies') {
+          formData.value.companies.forEach(company => {
+            formNewData.append('companies[]', company)
+          })
+        }
+        else {
+          formNewData.append(key, formData.value[key])
+        }
+      })
 
-      if (formData.value.companies.length) {
-        formData.value.companies.forEach(company => {
-          formNewData.append('companies[]', company)
-        })
-      }
       
       if(avatarFile.value){
         formNewData.append('avatar', avatarFile.value)
@@ -116,8 +132,8 @@ const changeAvatar = file => {
 
 // reset avatar image
 const resetAvatar = () => {
-  avatarPreview.value = ''
   avatarFile.value = ''
+  avatarPreview.value = user.value.avatar_url
 }
 
 const dialogModelValueUpdate = val => {
@@ -134,7 +150,7 @@ const dialogModelValueUpdate = val => {
     <!-- Dialog close btn -->
     <DialogCloseBtn @click="dialogModelValueUpdate(false)" />
     <VCard title="Update User">
-      <VCardText>
+      <VCardText v-if="formData.address">
         <!-- 👉 Form -->
         <VForm
           ref="refForm"
@@ -179,41 +195,81 @@ const dialogModelValueUpdate = val => {
             >
               <VTextField
                 v-model="formData.phone"
-                label="Phone"
-                :rules="[requiredValidator]"
+                label="Personal Phone Number"
+                name="phone"
               />
             </VCol>
+
+
             <VCol
               cols="12"
               md="12"
             >
-              <VTextField
-                v-model="formData.address"
-                label="Address"
-              />
+              <span class="text-h6 font-weight-bold">Home Address</span>
+              <VDivider />
             </VCol>
 
-            <!-- 👉 State -->
             <VCol
               cols="12"
               md="6"
             >
               <VTextField
-                v-model="formData.state"
+                v-model="formData.address.phone"
+                label="Home Phone"
+              />
+            </VCol>
+            
+
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VTextField
+                v-model="formData.address.address_street_1"
+                label="Street 1"
+              />
+            </VCol>
+
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VTextField
+                v-model="formData.address.city"
+                label="City"
+              />
+            </VCol>
+
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VTextField
+                v-model="formData.address.state"
                 label="State"
-                name="state"
               />
             </VCol>
 
-            <!-- 👉 Zip Code -->
             <VCol
               cols="12"
               md="6"
             >
               <VTextField
-                v-model="formData.zip"
-                label="Zip Code"
-                name="zip"
+                v-model="formData.address.zip"
+                label="Zip"
+              />
+            </VCol>
+
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VAutocomplete
+                v-model="formData.address.country_id"
+                label="Country"
+                item-title="name"
+                item-value="id"
+                :items="countries"
               />
             </VCol>
 
@@ -233,7 +289,18 @@ const dialogModelValueUpdate = val => {
               />
             </VCol>
 
-          
+            
+            <VDivider class="my-4" />
+
+            <VCol
+              cols="12"
+              md="12"
+            >
+              <span class="text-h6 font-weight-bold">Access Level</span>
+              <VDivider />
+            </VCol>
+
+            
             <VCol
               cols="12"
               md="6"
@@ -249,7 +316,7 @@ const dialogModelValueUpdate = val => {
               />
             </VCol>
 
-          
+            
             <VCol
               cols="12"
               md="6"
@@ -357,6 +424,13 @@ const dialogModelValueUpdate = val => {
                 @click="refForm?.validate()"
               >
                 Update User
+              </VBtn>
+              <VBtn
+                color="secondary"
+                variant="tonal"
+                @click="dialogModelValueUpdate(false)"
+              >
+                Cancel
               </VBtn>
             </VCol>
           </VRow>

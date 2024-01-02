@@ -3,11 +3,12 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Attachment;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class NewInvoice extends Mailable
 {
@@ -17,15 +18,20 @@ class NewInvoice extends Mailable
 
     public $subject;
 
+    public $body;
+
+
+
     /**
      * Create a new message instance.
      */
-    public function __construct($invoice, $subject = null, $body)
+    public function __construct($invoice, $subject, $body)
     {
         $this->invoice = $invoice;
-        $this->subject = $subject ?? 'Invoice from ' . config('app.name');
+        $this->subject = $subject;
+        $this->body = $body;
     }
- 
+
 
     /**
      * Get the message envelope.
@@ -33,7 +39,7 @@ class NewInvoice extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject:  'Invoice from ' . config('app.name'),
+            subject: $this->subject,
         );
     }
 
@@ -43,7 +49,7 @@ class NewInvoice extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'mail.send-invoice',
+            markdown: 'mail.new-invoice',
         );
     }
 
@@ -54,6 +60,11 @@ class NewInvoice extends Mailable
      */
     public function attachments(): array
     {
-        return [];
+        return [
+
+            Attachment::fromStorage('invoices/' . $this->invoice->invoice_id . '.pdf')
+                ->as($this->invoice->invoice_id . '.pdf')
+                ->withMime('application/pdf'),
+        ];
     }
 }

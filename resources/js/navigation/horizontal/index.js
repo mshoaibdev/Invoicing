@@ -39,7 +39,7 @@ export default [
   // },
   {
     title: 'Users',
-    to: { name: 'account-settings-users' },
+    to: { name: 'users' },
     icon: { icon: 'tabler-users' },
     action: 'Read',
     subject: 'settings-users-list',
@@ -48,14 +48,14 @@ export default [
     subject: 'All' },
   {
     title: 'Profile',
-    to: { name: 'account-settings-account' },
+    to: { name: 'settings-account' },
     icon: { icon: 'tabler-user' },
     action: 'Read',
     subject: 'All',
   },
   {
     title: 'Security',
-    to: { name: 'account-settings-security' },
+    to: { name: 'settings-security' },
     icon: { icon: 'tabler-lock' },
     action: 'Read',
     subject: 'All',

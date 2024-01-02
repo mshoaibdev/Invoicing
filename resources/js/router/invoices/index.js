@@ -20,16 +20,16 @@ const routes = [
     },
   },
 
-  // {
-  //   path: '/invoices/edit/:id',
-  //   name: 'edit-invoice',
-  //   component: () => import('@/views/invoices/EditInvoice.vue'),
-  //   meta: {
-  //     auth: false,
-  //     action: 'Update',
-  //     subject: 'invoices-edit',
-  //   },
-  // },
+  {
+    path: '/invoices/edit/:id',
+    name: 'edit-invoice',
+    component: () => import('@/views/invoices/EditInvoice.vue'),
+    meta: {
+      auth: false,
+      action: 'Update',
+      subject: 'invoices-edit',
+    },
+  },
   {
     path: '/invoices/view/:id',
     name: 'view-invoice',

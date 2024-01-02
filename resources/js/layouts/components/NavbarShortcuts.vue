@@ -11,7 +11,7 @@ const shortcuts = [
     title: 'Users',
     subtitle: 'Manage Users',
     to: {
-      name: 'account-settings-users',
+      name: 'users',
     },
   },
   
@@ -20,7 +20,7 @@ const shortcuts = [
     title: 'Settings',
     subtitle: 'Account Settings',
     to: {
-      name: 'account-settings-account',
+      name: 'settings-account',
     },
   },
   {

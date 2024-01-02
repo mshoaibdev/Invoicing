@@ -5,6 +5,8 @@ import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import ViewCustomer from './View.vue'
 import AddCustomer from './Add.vue'
 import EditCustomer from './Edit.vue'
+import ability from '@/plugins/casl/ability'
+
 
 const { customers, totalRecords, isLoading, fetchCustomers, deleteMultipleCustomer, updateCustomerStatus, currentPage, headers, deleteCustomer, itemsPerPage, searchQuery, filters, paginationData, customersByStatus } = useCustomers()
 const selectedRows = ref([])
@@ -174,6 +176,7 @@ const confirmDelete = async ev => {
         >
           <div class="me-3 d-flex gap-3">
             <VBtn
+              v-if="ability.can('Create', 'customers-create')"
               prepend-icon="tabler-plus"
               @click="isAddCustomerDialogVisible = true"
             >
@@ -312,13 +315,22 @@ const confirmDelete = async ev => {
 
             
       <template #item.actions="{ item }">
-        <IconBtn @click="deleteCustomerConfirm(item.raw.id)">
+        <IconBtn
+          v-if="ability.can('Delete', 'customers-delete')"
+          @click="deleteCustomerConfirm(item.raw.id)"
+        >
           <VIcon icon="tabler-trash" />
         </IconBtn>
-        <IconBtn @click="viewCustomer(item.raw.id)">
+        <IconBtn
+          v-if="ability.can('Read', 'customers-view')"
+          @click="viewCustomer(item.raw.id)"
+        >
           <VIcon icon="tabler-eye" />
         </IconBtn>
-        <IconBtn @click="editCustomer(item.raw.id)">
+        <IconBtn
+          v-if="ability.can('Update', 'customers-edit')"
+          @click="editCustomer(item.raw.id)"
+        >
           <VIcon icon="tabler-pencil" />
         </IconBtn>
       </template>

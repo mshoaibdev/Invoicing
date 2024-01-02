@@ -13,7 +13,7 @@ class BootstrapController extends Controller
     {
         $user = $request->user();
 
-        $companies = $user->companies()->get();
+        $companies = $user->companies;
 
         $current_company = Company::find($request->header('company'));
 
@@ -24,6 +24,7 @@ class BootstrapController extends Controller
         return [
             'current_company' => $current_company,
             'companies' => $companies,
+            'is_allowed_to_create_company' => $user->isAllowedTo('company-create'),
         ];
 
     }

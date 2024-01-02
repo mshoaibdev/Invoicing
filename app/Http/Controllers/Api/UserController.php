@@ -28,7 +28,7 @@ class UserController extends Controller
         $limit = $request->has('perPage') ? $request->perPage : 10;
 
         $users = User::query()
-            ->with(['roles'])
+            ->with(['roles','address'])
             ->when($request->q, function ($query, $string) use ($request) {
                 $query->search($request->q);
             })
@@ -54,6 +54,12 @@ class UserController extends Controller
             $this->uploadAvatar($request, $user);
         }
 
+        if ($request->address) {
+            if ($request->hasAddress($request->address)) {
+                $user->address()->create($request->getAddressPayload());
+            }
+        }
+
         if ($request->role_id) {
             $user->assignRole($request->role_id);
         }
@@ -68,7 +74,7 @@ class UserController extends Controller
   
     public function show(User $user)
     {
-        return new UserResource($user->load('roles', 'companies:id'));
+        return new UserResource($user->load('roles', 'companies:id', 'address'));
     }
 
     
@@ -79,6 +85,13 @@ class UserController extends Controller
         }
 
         $user->update($request->getUserPayload());
+
+        if ($request->address) {
+                $user->address()->updateOrCreate(
+                    ['type' => 'home'],
+                    $request->getAddressPayload()
+                );
+        }
 
         if ($request->role_id) {
             $user->syncRoles($request->role_id);
@@ -127,8 +140,10 @@ class UserController extends Controller
         if ($user) {
             $user->clearMediaCollection('avatar');
 
+            $fileName = 'avatar-' . $user->id . '.' . $request->avatar->getClientOriginalExtension();
+
             $user->addMediaFromRequest('avatar')
-                ->usingFileName($user->id . '-' . $request->avatar->getClientOriginalExtension())
+                ->usingFileName($fileName)
                 ->toMediaCollection('avatar');
         }
     }

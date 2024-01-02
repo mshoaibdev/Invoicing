@@ -43,7 +43,6 @@ class Update extends FormRequest
     {
         return collect($this->validated())
             ->merge([
-                'user_id' => $this->user()->id,
                 'creator_id' => $this->user()->id,
                 'company_id' => $this->header('company'),
             ])

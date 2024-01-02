@@ -25,7 +25,7 @@ class InvoiceController extends Controller
         $limit = $request->has('perPage') ? $request->perPage : 10;
 
         $invoices = Invoice::query()
-            ->with(['customer'])
+            ->with(['customer', 'company'])
             ->when($request->q, function ($query) use ($request) {
                 $query->search($request->q);
             })
@@ -84,7 +84,19 @@ class InvoiceController extends Controller
     public function update(Update $request, Invoice $invoice)
     {
 
-        $invoice->update($request->validated());
+        $invoice->update($request->getInvoicePayload());
+
+        $invoice->load([
+            'company' => [
+                'address',
+            ],
+            'customer' => [
+                'billing',
+                'currency',
+            ]
+        ]);
+
+        $this->saveInvoicePdf($invoice);
 
         return response()->json([
             'message' => 'Invoice updated successfully.',
@@ -253,8 +265,16 @@ class InvoiceController extends Controller
         $pdf->loadHTML($pdfView)->setPaper('a4', 'portrait');
 
         $fileName = $invoice->invoice_id . '.pdf';
+
+        $path = 'invoices/' . $invoice->customer->uuid . '/' . $fileName;
+
+        // check if file exists
+        if (\Storage::exists($path)) {
+            \Storage::delete($path);
+        }
+
         \Storage::put(
-            'invoices/' . $fileName,
+            $path,
             $pdf->output()
         );
 
@@ -270,11 +290,16 @@ class InvoiceController extends Controller
         $invoice = Invoice::find($invoiceId);
 
         $invoice->update([
-            'status' => 'SENT',
+            'status' => 'Sent',
         ]);
 
+        $bodyTemplate = $request->body;
+        $subject = $request->subject;
 
-        Mail::to($invoice->customer->email)->send(new NewInvoice($invoice));
+        $body = str_replace('{COMPANY_NAME}', $invoice->company->name, $bodyTemplate);
+
+
+        Mail::to($invoice->customer->email)->send(new NewInvoice($invoice, $subject, $body));
 
         return response()->json([
             'message' => 'Invoice sent successfully.',

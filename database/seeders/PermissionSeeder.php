@@ -19,12 +19,12 @@ class PermissionSeeder extends Seeder
             'customers-create',
             'customers-edit',
             'customers-delete',
-            // 'estimates-list',
-            // 'estimates-create',
-            // 'estimates-edit',
-            // 'estimates-delete',
-            // 'estimates-view',
-            // 'calendar-list',
+            'customers-view',
+            'company-list',
+            'company-create',
+            'company-edit',
+            'company-delete',
+            'company-view',
             'invoices-list',
             'invoices-create',
             'invoices-edit',
@@ -43,7 +43,7 @@ class PermissionSeeder extends Seeder
             'settings-roles-edit',
             'settings-roles-delete',
             'account-settings',
-            'all'
+            // 'all'
 
         ];
 

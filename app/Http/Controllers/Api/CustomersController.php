@@ -91,6 +91,9 @@ class CustomersController extends Controller
      */
     public function destroy(Customer $customer)
     {
+
+        $customer->invoices()->delete();
+        $customer->addresses()->delete();
         $customer->delete();
 
         return response()->json([
@@ -137,7 +140,17 @@ class CustomersController extends Controller
     {
         $ids = $request->ids;
 
-        Customer::whereIn('id', $ids)->delete();
+        $customers = Customer::whereIn('id', $ids)->get();
+
+        // deleted related address, invoices
+
+        foreach ($customers as $customer) {
+
+            $customer->invoices()->delete();
+            $customer->addresses()->delete();
+            $customer->delete();
+        }
+
 
         return response()->json([
             'message' => 'Customers deleted successfully.',

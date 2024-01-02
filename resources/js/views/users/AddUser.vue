@@ -2,8 +2,8 @@
 import useRoles from '@/composables/roles'
 import useUsers from '@/composables/users'
 import useCompanies from '@/composables/companies'
+import axios from '@axios'
 
-// import useGroups from '@/composables/groups'
 
 import {
   emailValidator,
@@ -36,15 +36,32 @@ const initialState = {
   first_name: '',
   last_name: '',
   email: '',
-  phone: '',
-  address: '',
   password: '',
   password_confirmation: '',
-  country: '',
-  zip: '',
-  state: '',
+  phone: '',
   role_id: '',
   companies: [],
+  address: {
+    phone: '',
+    address_street_1: '',
+    city: '',
+    state: '',
+    zip: '',
+    country_id: 166,
+  },
+}
+
+const countries = ref([])
+
+
+const fetchCountries = async () => {
+  try {
+    const resp = await axios.get('/countries')
+
+    countries.value = resp.data.data
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 
@@ -52,6 +69,7 @@ onMounted(async () => {
   if(props.isDialogVisible){
     await fetchRolesList()
     await fetchCompaniesList()
+    await fetchCountries()
   }
 })
 
@@ -73,11 +91,22 @@ const onSubmit = async() => {
     if (isValid){
       const formNewData = new FormData()
 
-      for (const key in formData.value) {
-        if (Object.hasOwnProperty.call(formData.value, key)) {
+      Object.keys(formData.value).forEach(key => {
+        if (key === 'address') {
+          Object.keys(formData.value.address).forEach(addressKey => {
+            formNewData.append(`address[${addressKey}]`, formData.value.address[addressKey] ?? '')
+          })
+        } 
+        else if (key === 'companies') {
+          formData.value.companies.forEach(company => {
+            formNewData.append('companies[]', company)
+          })
+        }
+        else {
           formNewData.append(key, formData.value[key])
         }
-      }
+      })
+      
       
       if(avatarFile.value){
         formNewData.append('avatar', avatarFile.value)
@@ -145,7 +174,6 @@ const dialogModelValueUpdate = val => {
     :model-value="props.isDialogVisible"
     @update:model-value="dialogModelValueUpdate"
   >
-    <!-- Dialog close btn -->
     <DialogCloseBtn @click="dialogModelValueUpdate(false)" />
     <VCard title="Add New User">
       <VCardText>
@@ -193,42 +221,81 @@ const dialogModelValueUpdate = val => {
             >
               <VTextField
                 v-model="formData.phone"
-                label="Phone"
-                :rules="[requiredValidator]"
+                label="Personal Phone Number"
+                name="phone"
               />
             </VCol>
+
+
             <VCol
               cols="12"
               md="12"
             >
-              <VTextField
-                v-model="formData.address"
-                label="Address"
-                :rules="[requiredValidator]"
-              />
+              <span class="text-h6 font-weight-bold">Home Address</span>
+              <VDivider />
             </VCol>
 
-            <!-- 👉 State -->
             <VCol
               cols="12"
               md="6"
             >
               <VTextField
-                v-model="formData.state"
+                v-model="formData.address.phone"
+                label="Home Phone"
+              />
+            </VCol>
+            
+
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VTextField
+                v-model="formData.address.address_street_1"
+                label="Street 1"
+              />
+            </VCol>
+
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VTextField
+                v-model="formData.address.city"
+                label="City"
+              />
+            </VCol>
+
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VTextField
+                v-model="formData.address.state"
                 label="State"
-                name="state"
               />
             </VCol>
 
-            <!-- 👉 Zip Code -->
             <VCol
               cols="12"
               md="6"
             >
               <VTextField
-                v-model="formData.zip"
-                label="Zip Code"
-                name="zip"
+                v-model="formData.address.zip"
+                label="Zip"
+              />
+            </VCol>
+
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VAutocomplete
+                v-model="formData.address.country_id"
+                label="Country"
+                item-title="name"
+                item-value="id"
+                :items="countries"
               />
             </VCol>
 
@@ -246,6 +313,17 @@ const dialogModelValueUpdate = val => {
                 :loading="companiesLoading"
                 :rules="[requiredValidator]"
               />
+            </VCol>
+
+            
+            <VDivider class="my-4" />
+
+            <VCol
+              cols="12"
+              md="12"
+            >
+              <span class="text-h6 font-weight-bold">Access Level</span>
+              <VDivider />
             </VCol>
 
             

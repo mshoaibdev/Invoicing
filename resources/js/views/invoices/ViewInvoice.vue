@@ -79,8 +79,8 @@ const dialogModelValueUpdate = val => {
                   <th>
                     Phone:
                   </th>
-                  <td>
-                    <a :href="`tel:${invoiceData.customer.phone}`">{{ invoiceData.customer.phone }}</a>
+                  <td v-if="invoiceData.customer.billing">
+                    <a :href="`tel:${invoiceData.customer.billing.phone}`">{{ invoiceData.customer.billing.phone }}</a>
                   </td>
                 </tr>
 
@@ -93,10 +93,10 @@ const dialogModelValueUpdate = val => {
                     {{ invoiceData.customer.billing.city }}
                   
                     {{ invoiceData.customer.billing.state }}
+                    {{ invoiceData.customer.billing.zip }}
                    
                     {{ invoiceData.customer.billing.country.name }}
                     
-                    {{ invoiceData.customer.billing.zip }}
                   </td>
                 </tr>
 

@@ -63,7 +63,8 @@ class Invoice extends Model
 
     public function getInvoiceLinkAttribute()
     {
-        return asset("storage/invoices/{$this->invoice_id}.pdf");
+
+        return asset("storage/invoices/{$this->customer->uuid}/{$this->invoice_id}.pdf");
     }
 
     public function getCreatedAtFormattedAttribute()

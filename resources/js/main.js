@@ -27,6 +27,7 @@ const app = createApp(App)
 app.use(vuetifyProTipTap)
 app.use(vuetify)
 app.use(createPinia())
+
 app.use(router)
 app.use(layoutsPlugin)
 app.use(i18n)

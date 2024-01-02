@@ -53,8 +53,6 @@ class Store extends FormRequest
     {
         return collect($this->billing)
             ->merge([
-                'user_id' => $this->user()->id,
-                'company_id' => $this->header('company'),
                 'type' => 'billing',
             ])
             ->toArray();
@@ -68,5 +66,7 @@ class Store extends FormRequest
 
         return $data;
     }
+
+    
 
 }

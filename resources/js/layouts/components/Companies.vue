@@ -6,12 +6,14 @@ const isAddNewDialogVisible = ref(false)
 
 const companies = ref([])
 const selectedCompany = ref({})
+const isAllowedToCreateCompany = ref(false)
 
 const bootstrapApp = async () => {
   try {
     const resp = await axios.get('/bootstrap')
 
     companies.value = resp.data.companies
+    isAllowedToCreateCompany.value = resp.data.is_allowed_to_create_company
 
     setCompany(resp.data.current_company)
   } catch (error) {
@@ -81,7 +83,10 @@ onMounted(async () => {
         </VListItemTitle>
       </VListItem>
 
-      <VListItem @click="isAddNewDialogVisible = true">
+      <VListItem
+        v-if="isAllowedToCreateCompany"
+        @click="isAddNewDialogVisible = true"
+      >
         <template #prepend>
           <VIcon
             class="me-2"

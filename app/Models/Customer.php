@@ -70,7 +70,6 @@ class Customer extends Model
         return $this->hasMany(Invoice::class);
     }
 
-  
 
     // addressable
     public function addresses()
@@ -106,11 +105,11 @@ class Customer extends Model
 
    
 
-    protected static function booted()
-    {
-        static::deleting(function ($customer) {
+    // protected static function booted()
+    // {
+    //     static::deleting(function ($customer) {
 
-            $customer->invoices()->delete();
-        });
-    }
+    //         $customer->invoices()->delete();
+    //     });
+    // }
 }

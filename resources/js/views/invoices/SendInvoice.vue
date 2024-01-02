@@ -1,6 +1,8 @@
 <script setup>
 import { emailValidator, requiredValidator } from '@validators'
 import useInvoices from '@/composables/invoices'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 const props = defineProps({
   isDialogVisible: {
@@ -28,22 +30,15 @@ const formData = ref({
   // from: props.invoice.customer.email,
   to: props.invoice.customer.email,
   subject: 'New Invoice',
-  message: 'You have received a new invoice from {COMPANY_NAME}.<br />Please download using the button below:',
+  body: `Hello ${props.invoice.customer.name}, <br /> You have received a new invoice from {COMPANY_NAME}.<br />Please download using the button below:`,
 })
-
-
-// mount
-// onMounted(async () => {
-//   if(props.isDialogVisible){
-//   }
-// })
 
 const resetFormData = () => {
   formData.value = {
     from: '',
     to: '',
     subject: '',
-    message: '',
+    body: '',
   }
   nextTick(() => {
     refForm.value?.reset()
@@ -51,15 +46,25 @@ const resetFormData = () => {
   })
 }
 
+const sendInvoiceHandler = async() => {
+  isLoading.value = true
+  await sendInvoice(props.invoice.id, formData.value).then(resp => {
+    if (resp.status === 200) {
+      toast.success('Invoice sent successfully')
+
+      emit('update:isDialogVisible', false)
+      resetFormData()
+    }
+  })
+    .finally(() => {
+      isLoading.value = false
+    })
+}
+
 const onSubmit = async() => {
   refForm.value?.validate().then(async ({ valid: isValid }) => {
     if (isValid){
-
-      await sendInvoice(formData.value)
-      if (respResult.value.status === 200) {
-        emit('update:isDialogVisible', false)
-        resetFormData()
-      }
+      sendInvoiceHandler()
     }
   })
 }
@@ -116,7 +121,7 @@ const dialogModelValueUpdate = val => {
             <VCol cols="12">
               <VLabel>Body </VLabel>
               <VuetifyTiptap
-                v-model="formData.message"
+                v-model="formData.body"
                 rounded
                 :max-height="465"
               />
@@ -132,7 +137,7 @@ const dialogModelValueUpdate = val => {
                 :disabled="isLoading"
                 @click="refForm?.validate()"
               >
-                Send Invoice
+                {{ isLoading ? 'Sending...' : 'Send' }}
               </VBtn>
               <VBtn
                 color="secondary"

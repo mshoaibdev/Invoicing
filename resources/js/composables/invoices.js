@@ -103,13 +103,15 @@ export default function useInvoices() {
   const getInvoice = async id => {
     const response = await axios.get(route('invoices.show', id))
 
+
     invoiceData.value = response.data.data
   }
 
   // sendInvoice
 
   const sendInvoice = async (invoiceId, formData) => {
-    await axios.post(route('invoices.send', invoiceId), formData)
+
+    return axios.post(route('invoices.send', invoiceId), formData)
 
   }
 
@@ -247,12 +249,12 @@ export default function useInvoices() {
       }
     if (status === 'Draft')
       return {
-        variant: 'primary',
+        variant: 'secondary',
         icon: 'tabler-device-floppy',
       }
     if (status === 'Sent')
       return {
-        variant: 'secondary',
+        variant: 'success',
         icon: 'tabler-circle-check',
       }
     if (status === 'Overdue')

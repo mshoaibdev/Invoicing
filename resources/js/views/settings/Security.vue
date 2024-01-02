@@ -121,15 +121,23 @@ const generatePassword = () => {
           <!-- 👉 Password Requirements -->
           <VCardText>
             <h6 class="text-base font-weight-medium mb-3">
-                Password Requirements:
+              Password Requirements:
             </h6>
             <ul class="card-list">
-                <li v-for="item in passwordRequirements" :key="item" class="password-item">
-                  <span class="password-icon">
-                    <VIcon size="8" icon="tabler-circle" class="me-3" />
-                  </span>
-                  <span class="password-text">{{ item }}</span>
-                </li>
+              <li
+                v-for="item in passwordRequirements"
+                :key="item"
+                class="password-item"
+              >
+                <span class="password-icon">
+                  <VIcon
+                    size="8"
+                    icon="tabler-circle"
+                    class="me-3"
+                  />
+                </span>
+                <span class="password-text">{{ item }}</span>
+              </li>
             </ul>
           </VCardText>
 
@@ -137,8 +145,9 @@ const generatePassword = () => {
           <VCardText class="d-flex flex-wrap gap-4">
             <VBtn
               type="submit"
-              @click="refForm?.validate()"
+              :loading="isLoading"
               class="securitybtnForMobileSize"
+              @click="refForm?.validate()"
             >
               <span class="securityfontForMobileSize">Update password</span> 
             </VBtn>
@@ -148,7 +157,7 @@ const generatePassword = () => {
               color="secondary"
               variant="tonal"
             >
-             <span class="securityfontForMobileSize">Reset</span> 
+              <span class="securityfontForMobileSize">Reset</span> 
             </VBtn>
           </VCardText>
         </VForm>
@@ -179,6 +188,4 @@ const generatePassword = () => {
 .password-text {
   word-wrap: break-word;
 }
-
-
 </style>

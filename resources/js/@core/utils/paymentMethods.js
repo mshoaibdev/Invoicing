@@ -1,19 +1,7 @@
 export  default [
   {
-    title: "Bank Account",
-    value: "Bank",
-  },
-  {
-    title: "Cash",
-    value: "Cash",
-  },
-  {
-    title: "Check",
-    value: "Check",
-  },
-  {
-    title: "Credit Card",
-    value: "CreditCard",
+    title: "Authorize.net",
+    value: "Authorize.net",
   },
   {
     title: "Paypal",
@@ -23,6 +11,15 @@ export  default [
     title: "Stripe",
     value: "Stripe",
   },
+  {
+    title: "Cash",
+    value: "Cash",
+  },
+  {
+    title: "Check",
+    value: "Check",
+  },
+
   {
     title: "Other",
     value: "Other",

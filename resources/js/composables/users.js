@@ -25,24 +25,30 @@ export default function useUsers() {
     },
     {
       title: 'Address',
-      key: 'address',
+      key: 'address.address_street_1',
       sortable: false,
     },
     {
       title: 'Zip',
-      key: 'zip',
+      key: 'address.zip',
       sortable: false,
     },
     {
       title: 'State',
-      key: 'state',
+      key: 'address.state',
       sortable: false,
     },
     {
-      title: 'Group',
-      key: 'group.name',
+      title: 'City',
+      key: 'address.city',
       sortable: false,
     },
+    {
+      title: 'Country',
+      key: 'address.country.name',
+      sortable: false,
+    },
+   
     {
       title: 'Role',
       key: 'role',
