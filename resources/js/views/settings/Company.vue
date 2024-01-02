@@ -55,11 +55,17 @@ onMounted( async () => {
   await currentCompany().then( async resp => {
     formData.value = resp.data.data
     logoPreview.value = formData.value.logo_url
-
-    // check address object
-    if(!formData.value.address){
-      formData.value.address = {}
+    if (formData.value.address === null) {
+      formData.value.address = {
+        phone: '',
+        address_street_1: '',
+        city: '',
+        state: '',
+        zip: '',
+        country_id: '',
+      }
     }
+
   })
   await fetchCountries()
   await fetchCurrencies()
@@ -211,8 +217,8 @@ const onSubmit = async() => {
 
             
               <VCol
-                cols="12"
-                md="12"
+              cols="12"
+                md="6"
               >
                 <VAutocomplete
                   v-model="formData.currency_id"

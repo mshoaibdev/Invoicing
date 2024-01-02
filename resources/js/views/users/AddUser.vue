@@ -215,16 +215,6 @@ const dialogModelValueUpdate = val => {
                 :rules="[requiredValidator, emailValidator]"
               />
             </VCol>
-            <VCol
-              cols="12"
-              md="6"
-            >
-              <VTextField
-                v-model="formData.phone"
-                label="Personal Phone Number"
-                name="phone"
-              />
-            </VCol>
 
 
             <VCol
@@ -241,7 +231,7 @@ const dialogModelValueUpdate = val => {
             >
               <VTextField
                 v-model="formData.address.phone"
-                label="Home Phone"
+                label="Phone"
               />
             </VCol>
             

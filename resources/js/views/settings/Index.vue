@@ -25,7 +25,7 @@ const tabs = [
   },
 ]
 
-if (ability.can('Read', 'company-edit')) {
+if (ability.can('Update', 'company-edit')) {
   tabs.push( {
     title: 'Company Information',
     icon: 'tabler-building',

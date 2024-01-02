@@ -11,7 +11,6 @@ const formData = ref({
   first_name: '',
   last_name: '',
   email: '',
-  phone: '',
   address: {
     phone: '',
     address_street_1: '',
@@ -45,7 +44,17 @@ onMounted( async () => {
   formData.value = { ...accountData.value }
   avatarPreview.value = accountData.value.avatar_url
 
-  // remove avatar from formData
+  if (formData.value.address === null) {
+    formData.value.address = {
+      phone: '',
+      address_street_1: '',
+      city: '',
+      state: '',
+      zip: '',
+      country_id: '',
+    }
+  }
+
   delete formData.value.avatar
 })
 
@@ -196,16 +205,7 @@ const resetAvatar = () => {
                 />
               </VCol>
 
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="formData.phone"
-                  label="Personal Phone Number"
-                  name="phone"
-                />
-              </VCol>
+             
 
               <!-- 👉 Email -->
               <VCol

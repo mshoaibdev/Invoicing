@@ -41,7 +41,7 @@ class DashboardController extends Controller
         $getMonthlySales = $this->getMonthlySales();
 
         return response()->json([
-            'companyCurrency' => $currentCompany->currency,
+            'companyCurrency' => $currentCompany->currency ?? ['code' => 'USD', 'symbol' => '$'],
             'totalCustomers' => $totalCustomers,
             'totalInvoices' => $totalInvoices,
             'monthlySales' => $getMonthlySales,
