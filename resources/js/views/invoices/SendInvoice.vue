@@ -17,6 +17,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   'update:isDialogVisible',
+  'refetch',
 ])
 
 
@@ -51,7 +52,7 @@ const sendInvoiceHandler = async() => {
   await sendInvoice(props.invoice.id, formData.value).then(resp => {
     if (resp.status === 200) {
       toast.success('Invoice sent successfully')
-
+      emit('refetch')
       emit('update:isDialogVisible', false)
       resetFormData()
     }

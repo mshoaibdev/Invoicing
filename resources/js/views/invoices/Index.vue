@@ -359,6 +359,7 @@ const confirmDelete = async ev => {
       v-if="isSendInvoiceDialogVisible"
       v-model:isDialogVisible="isSendInvoiceDialogVisible"
       :invoice="invoice"
+      @refetch="fetchInvoices"
     />
   </VCard>
 </template>
