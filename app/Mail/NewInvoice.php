@@ -62,7 +62,7 @@ class NewInvoice extends Mailable
     {
         return [
 
-            Attachment::fromStorage('invoices/' . $this->invoice->invoice_id . '.pdf')
+            Attachment::fromStorage('invoices/'. $this->invoice->customer->uuid .'/' . $this->invoice->invoice_id . '.pdf')
                 ->as($this->invoice->invoice_id . '.pdf')
                 ->withMime('application/pdf'),
         ];
