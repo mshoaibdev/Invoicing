@@ -9,5 +9,9 @@
 <body>
         
 <h1>Failed</h1>
+
+<p>
+    {{ request()->get('message') }}
+</p>
 </body>
 </html>

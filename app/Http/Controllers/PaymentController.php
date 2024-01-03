@@ -33,6 +33,12 @@ class PaymentController extends Controller
 
         $formatter = new NumberFormatter($invoice->customer->currency->code, NumberFormatter::CURRENCY);
 
+        // check if invoice is already paid
+
+        if ($invoice->is_paid) {
+            return redirect()->route('payment.success', ['invoiceId' => $invoice->uuid, 'transactionId' => $invoice->payments->first()->transaction_id, 'message' => 'Invoice already paid']);
+        }
+
 
         // check fro payment method keys
         if ($invoice->paymentMethod->mode == 'sandbox') {

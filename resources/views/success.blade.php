@@ -17,5 +17,9 @@
         <h1>Success</h1>
     </div>
 
+    <p>
+        {{ request()->get('message') }}
+    </p>
+
 </body>
 </html>
