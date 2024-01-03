@@ -37,6 +37,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+
+
+
+Route::post('/new-purchase', \App\Http\Controllers\LeadsWebhookController::class);
+
+
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
@@ -60,16 +67,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::get('/countries', CountriesController::class);
     Route::get('/currencies', CurrenciesController::class);
-
     // fetch companies
     Route::get('/fetch-companies', [CompanyController::class, 'getCompanies'])->name('fetch-companies');
-
     // fetch customers
     Route::get('/fetch-customers', [CustomersController::class, 'getCustomers'])->name('fetch-customers');
-
-
     Route::get('/current-company', [CompanyController::class, 'currentCompany'])->name('current-company');
-
     // send invoice
     Route::post('/invoices/send/{id}', [InvoiceController::class, 'sendInvoice'])->name('invoices.send');
     

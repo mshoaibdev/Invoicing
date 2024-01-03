@@ -11,7 +11,6 @@ const formData = ref({
   name: '',
   last_name: '',
   currency_id: 1,
-  country_id: 231,
   address: {
     phone: '',
     address_street_1: '',
@@ -217,7 +216,7 @@ const onSubmit = async() => {
 
             
               <VCol
-              cols="12"
+                cols="12"
                 md="6"
               >
                 <VAutocomplete
@@ -238,6 +237,7 @@ const onSubmit = async() => {
                 <VTextField
                   v-model="formData.address.address_street_1"
                   label="Street 1"
+                  :rules="[requiredValidator]"
                 />
               </VCol>
 
@@ -248,6 +248,7 @@ const onSubmit = async() => {
                 <VTextField
                   v-model="formData.address.city"
                   label="City"
+                  :rules="[requiredValidator]"
                 />
               </VCol>
 
@@ -258,6 +259,7 @@ const onSubmit = async() => {
                 <VTextField
                   v-model="formData.address.state"
                   label="State"
+                  :rules="[requiredValidator]"
                 />
               </VCol>
 
@@ -268,6 +270,7 @@ const onSubmit = async() => {
                 <VTextField
                   v-model="formData.address.zip"
                   label="Zip"
+                  :rules="[requiredValidator]"
                 />
               </VCol>
 
@@ -281,6 +284,7 @@ const onSubmit = async() => {
                   item-title="name"
                   item-value="id"
                   :items="countries"
+                  :rules="[requiredValidator]"
                 />
               </VCol>
 

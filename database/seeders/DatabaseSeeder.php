@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             CurrenciesTableSeeder::class,
             CountriesTableSeeder::class,
+            CompanySeeder::class,
+            PaymentMethodSeeder::class,
         ]);
 
     }

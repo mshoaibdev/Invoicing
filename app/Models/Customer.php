@@ -12,8 +12,16 @@ class Customer extends Model
 {
     use HasFactory, Notifiable, HasUuids;
 
-    protected $guarded = [
-        'id'
+    protected $fillable = [
+        'uuid',
+        'name',
+        'email',
+        'website',
+        'company_name',
+        'notes',
+        'currency_id',
+        'company_id',
+        'creator_id',
     ];
 
 
@@ -81,6 +89,12 @@ class Customer extends Model
     public function billing()
     {
         return $this->morphOne(Address::class, 'addressable')->where('type', 'billing');
+    }
+
+
+    public function payments()
+    {
+        return $this->morphMany(Payment::class, 'paymentable');
     }
 
 

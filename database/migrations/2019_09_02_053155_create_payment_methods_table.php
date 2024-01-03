@@ -18,6 +18,8 @@ class CreatePaymentMethodsTable extends Migration
                 $table->id();
                 $table->string('name');
                 $table->boolean('is_default')->default(false);
+                $table->boolean('is_gateway')->default(false);
+                $table->boolean('is_enabled')->default(false);
                 $table->foreignId('company_id')->constrained('companies')->onDelete('restrict');
                 $table->timestamps();
             });

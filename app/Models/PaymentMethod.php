@@ -13,27 +13,14 @@ class PaymentMethod extends Model
         'id'
     ];
 
-    public const TYPE_GENERAL = 'GENERAL';
-    public const TYPE_MODULE = 'MODULE';
 
     protected $casts = [
-        'settings' => 'array',
-        'use_test_env' => 'boolean'
     ];
 
-    public function setSettingsAttribute($value)
-    {
-        $this->attributes['settings'] = json_encode($value);
-    }
 
     public function payments()
     {
         return $this->hasMany(Payment::class);
-    }
-
-    public function expenses()
-    {
-        return $this->hasMany(Expense::class);
     }
 
     public function company()
@@ -96,11 +83,5 @@ class PaymentMethod extends Model
         return $paymentMethod;
     }
 
-    public static function getSettings($id)
-    {
-        $settings = PaymentMethod::find($id)
-            ->settings;
-
-        return $settings;
-    }
+    
 }
