@@ -35,7 +35,7 @@ class PaymentController extends Controller
 
         // check if invoice is already paid
 
-        if ($invoice->is_paid) {
+        if ($invoice->status == 'Paid') {
             return redirect()->route('payment.success', ['invoiceId' => $invoice->uuid, 'transactionId' => $invoice->payments->first()->transaction_id, 'message' => 'Invoice already paid']);
         }
 
