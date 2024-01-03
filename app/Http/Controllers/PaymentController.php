@@ -25,13 +25,25 @@ class PaymentController extends Controller
                     'country',
                 ],
             ],
+            'paymentMethod',
             'customer' => [
-                'billing',
                 'currency',
             ]
         ])->where('uuid', $invoiceId)->firstOrFail();
 
         $formatter = new NumberFormatter($invoice->customer->currency->code, NumberFormatter::CURRENCY);
+
+
+        // check fro payment method keys
+        if ($invoice->paymentMethod->mode == 'sandbox') {
+            if (!$invoice->paymentMethod->sandbox_identifier || !$invoice->paymentMethod->sandbox_secret) {
+                return redirect()->route('payment.failed', ['invoiceId' => $invoice->uuid, 'message' => 'Payment method not configured']);
+            }
+        } else {
+            if (!$invoice->paymentMethod->live_identifier || !$invoice->paymentMethod->live_secret) {
+                return redirect()->route('payment.failed', ['invoiceId' => $invoice->uuid, 'message' => 'Payment method not configured']);
+            }
+        }
 
         return view('payment-form', ['invoice' => $invoice, 'formatter' => $formatter]);
     }
