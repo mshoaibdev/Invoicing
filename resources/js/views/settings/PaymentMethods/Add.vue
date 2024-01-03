@@ -33,6 +33,7 @@ const initialState = {
   sandbox_identifier: '',
   sandbox_secret: '',
   mode: 'sandbox',
+  description: '',
 }
 
 onMounted(async () => {
@@ -103,6 +104,17 @@ const dialogModelValueUpdate = val => {
               <VAutocomplete
                 v-model="formData.name"
                 :items="paymentMethods"
+                :rules="[requiredValidator]"
+              />
+            </VCol>
+
+            <VCol
+              cols="12"
+              md="12"
+            >
+              <VTextarea
+                v-model="formData.description"
+                label="Description"
                 :rules="[requiredValidator]"
               />
             </VCol>

@@ -111,6 +111,17 @@ const dialogModelValueUpdate = val => {
               cols="12"
               md="12"
             >
+              <VTextarea
+                v-model="formData.description"
+                label="Description"
+                :rules="[requiredValidator]"
+              />
+            </VCol>
+
+            <VCol
+              cols="12"
+              md="12"
+            >
               <VSwitch
                 v-model="formData.is_default"
                 label="Make It Default"
