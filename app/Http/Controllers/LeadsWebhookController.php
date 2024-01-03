@@ -54,10 +54,11 @@ class LeadsWebhookController extends Controller
                     'company_id' => $request->company_id,
                     'payment_method_id' => 1,
                     'amount' => $request->amount,
-                    'payment_date' => $request->payment_date,
+                    'payment_date' => date('Y-m-d'),
                     'notes' => $request->notes,
-                    'transactionId' => $request->payment_number,
+                    'transaction_id' => $request->transaction_id,
                     'order_details' => $request->order_details,
+                    'payment_response' => $request->payment_response,
                 ]);
             } catch (\Throwable $th) {
                 
