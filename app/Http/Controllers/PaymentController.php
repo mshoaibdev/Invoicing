@@ -224,7 +224,7 @@ class PaymentController extends Controller
                         'is_paid' => true,
                     ]);
 
-                    return redirect()->route('payment.success', ['invoiceId' => $invoice->uuid, 'transactionId' => $tresponse->getTransId()]);
+                    return redirect()->route('payment.success', ['invoiceId' => $invoice->uuid, 'transactionId' => $tresponse->getTransId(), 'message' => 'Payment successful']);
 
 
                 } else {
