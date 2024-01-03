@@ -237,6 +237,7 @@ const dialogModelValueUpdate = val => {
                 item-title="name"
                 item-value="id"
                 :items="countries"
+                :rules="[requiredValidator]"
               />
             </VCol>
 
