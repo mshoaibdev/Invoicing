@@ -2,6 +2,7 @@
 
 use App\Models\Invoice;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PaymentController;
 
 
 /*
@@ -15,37 +16,21 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// webhook lead receiver
 
+// invoice.pay
+Route::get('/invoice/pay/{invoiceId}', [PaymentController::class, 'paymentForm'])->name('invoice.pay');
+// process-payment
+Route::post('/process-payment', [PaymentController::class, 'processPayment'])->name('process.payment');
 
+// success
+Route::get('/success', function () {
+    return view('success');
+})->name('payment.success');
 
-Route::get('/pdf', function () {
-
-
-    $invoice = Invoice::with([
-        'company' => [
-            'address',
-        ],
-        'customer' => [
-            'billing',
-            'currency',
-        ]
-    ])->find(1000);
-
-
-
-    $pdfView = view('pdf.invoice', ['invoice' => $invoice])->render();
-
-    $pdf = App::make('dompdf.wrapper');
-    $pdf->loadHTML($pdfView)->setPaper('a4', 'portrait');
-
-    $fileName = $invoice->invoice_id . '.pdf';
-    Storage::put(
-        'invoices/' . $fileName,
-        $pdf->output()
-    );
-
-});
+// failed
+Route::get('/failed', function () {
+    return view('failed');
+})->name('payment.failed');
 
 Route::get('{any?}', function () {
     return view('application');

@@ -12,9 +12,17 @@ export default [
     title: 'Invoices',
 
     to: { name: 'invoices' },
-    icon: { icon: 'tabler-cash' },
+    icon: { icon: 'tabler-file-description' },
     action: 'Read',
     subject: 'invoices-list',
+  },
+
+  {
+    title: 'Payments',
+    to: { name: 'payments' },
+    icon: { icon: 'tabler-cash' },
+    action: 'Read',
+    subject: 'payments-list',
   },
 
   {

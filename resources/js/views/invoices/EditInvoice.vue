@@ -1,7 +1,8 @@
 <script setup>
 import useInvoices from "@/composables/invoices"
 import useCustomers from "@/composables/customers"
-import paymentMethods from "@core/utils/paymentMethods"
+import usePaymentMethods from '@/composables/paymentMethods'
+
 import { requiredValidator } from "@validators"
 import { formatCurrency } from "@core/utils/formatters"
 import { toast } from 'vue3-toastify'
@@ -15,6 +16,8 @@ const {
 } = useCustomers()
 
 const { updateInvoice, respResult, isLoading: invoiceLoading, getInvoice, invoiceData: invoiceItem } = useInvoices()
+const { fetchPaymentMethodsList, paymentMethods, isLoading: paymentMethodsLoading } = usePaymentMethods()
+
 
 const route = useRoute()
 const invoiceId = route.params.id
@@ -31,6 +34,7 @@ const invoiceData = ref({
 onMounted(async() => {
   await fetchCustomersList()
   await getInvoice(invoiceId)
+  await fetchPaymentMethodsList()
   invoiceData.value = {
     ...invoiceItem.value,
   }
@@ -135,7 +139,8 @@ const onSubmit = async () => {
       formNewData.append("vat_amount", invoiceData.value.vat_amount)
       formNewData.append("vat_percentage", invoiceData.value.vat_percentage)
       formNewData.append("note", invoiceData.value.note ?? "")
-      formNewData.append("payment_method", invoiceData.value.payment_method)
+      formNewData.append("terms", invoiceData.value.terms ?? "")
+      formNewData.append("payment_method_id", invoiceData.value.payment_method_id)
       formNewData.append("status", invoiceData.value.status)
 
       for (let index = 0; index < items.length; index++) {
@@ -569,8 +574,12 @@ const removeProduct = id => {
           </h6>
                 
           <VSelect
-            v-model="invoiceData.payment_method"
+            v-model="invoiceData.payment_method_id"
             :items="paymentMethods"
+            :rules="[requiredValidator]"
+            :loading="paymentMethodsLoading"
+            item-title="name"
+            item-value="id"
             label="Payment Method"
             class="mb-6"
           />

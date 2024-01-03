@@ -18,7 +18,6 @@ class CustomersController extends Controller
      */
     public function index(Request $request)
     {
-        $isAdmin = auth()->user()->hasRole('Admin');
 
         $limit = $request->has('perPage') ? $request->perPage : 10;
 

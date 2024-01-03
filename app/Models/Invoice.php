@@ -25,8 +25,7 @@ class Invoice extends Model
         'subtotal',
         'uuid',
         'status',
-        'payment_method',
-        'currency',
+        'payment_method_id',
         'customer_id',
         'note',
         'payment_response',
@@ -45,6 +44,7 @@ class Invoice extends Model
         'items' => 'array',
         'payment_response' => 'array',
         'creator_id' => 'integer',
+        'payment_method_id' => 'integer',
     ];
 
     protected $appends = [
@@ -52,7 +52,8 @@ class Invoice extends Model
         'created_at_formatted',
         'due_date_formatted',
         'invoice_date_formatted',
-        'invoice_link'
+        'invoice_link',
+        'payment_link'
     ];
 
 
@@ -65,6 +66,11 @@ class Invoice extends Model
     {
 
         return asset("storage/invoices/{$this->customer->uuid}/{$this->invoice_id}.pdf");
+    }
+
+    public function getPaymentLinkAttribute()
+    {
+        return route('invoice.pay', $this->uuid);
     }
 
     public function getCreatedAtFormattedAttribute()
@@ -86,6 +92,11 @@ class Invoice extends Model
     public function payments()
     {
         return $this->morphMany(Payment::class, 'paymentable');
+    }
+
+    public function paymentMethod()
+    {
+        return $this->belongsTo(PaymentMethod::class);
     }
 
 

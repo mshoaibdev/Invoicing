@@ -39,11 +39,12 @@ return new class extends Migration
             $table->tinyInteger('is_paid')->default(0);
 
             $table->string('status', 50)->nullable()->default('Paid');
-            $table->string('payment_method', 50);
             $table->json('payment_response')->nullable();
             $table->string('invoice_link')->nullable();
             $table->text('note')->nullable();
+            $table->text('terms')->nullable();
 
+            $table->foreignId('payment_method_id')->nullable()->constrained()->onDelete('restrict');
             $table->foreignId('customer_id')->constrained()->onDelete('restrict');
             $table->foreignId('company_id')->constrained()->onDelete('restrict');
             $table->foreignId('creator_id')->constrained('users')->onDelete('restrict');

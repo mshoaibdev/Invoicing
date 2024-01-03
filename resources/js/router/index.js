@@ -7,12 +7,10 @@ import accountSettingsRoutes from './settings'
 import authRoutes from './auth'
 import customersRoutes from './customers'
 
-// import estimatesRoutes from './estimates'
 import invoicesRoutes from './invoices'
 import usersRoutes from './users'
+import paymentsRoutes from './payments'
 
-// import calendarRoutes from './calendar'
-// import projectsRoutes from './projects'
 
 
 const routes = [
@@ -27,9 +25,7 @@ const routes = [
     },
   },
 
-  // ...projectsRoutes,
-  // ...calendarRoutes,
-  // ...estimatesRoutes,
+  ...paymentsRoutes,
   ...usersRoutes,
   ...customersRoutes,
   ...invoicesRoutes,

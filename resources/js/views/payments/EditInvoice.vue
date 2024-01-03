@@ -7,10 +7,7 @@ import { requiredValidator } from "@validators"
 import { formatCurrency } from "@core/utils/formatters"
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
-import moment from 'moment'
-
-const { fetchPaymentMethodsList, paymentMethods, isLoading: paymentMethodsLoading } = usePaymentMethods()
-
+import SendInvoiceDialog from './SendInvoice.vue'
 
 const {
   customers,
@@ -18,50 +15,37 @@ const {
   fetchCustomersList,
 } = useCustomers()
 
-const { storeInvoice, respResult, isLoading: invoiceLoading } = useInvoices()
+const { updateInvoice, respResult, isLoading: invoiceLoading, getInvoice, invoiceData: invoiceItem } = useInvoices()
+const { fetchPaymentMethods, paymentMethods, isLoading: paymentMethodsLoading } = usePaymentMethods()
 
 
-onMounted(async () => {
-  await fetchCustomersList()
-  await fetchPaymentMethodsList()
-})
-
-const initialState = {
-  due_date: moment().add(15, 'days').format('YYYY-MM-DD'),
-  invoice_date: '',
-  total: 0,
-  customer: {
-    id: "",
-    name: "",
-    address: "",
-    phone: "",
-    email: "",
-  },
-  subtotal: 0,
-  tax_percentage: 0,
-  tax_amount: 0,
-  vat_percentage: 0,
-  vat_amount: 0,
-  note: "",
-  terms: "",
-  payment_method_id: '',
-  status: "Draft",
-  items: [
-    {
-      id: 1,
-      quantity: 0,
-      description: "",
-      item_code: "",
-      cost: 0,
-      total: 0,
-    },
-  ],
-}
-
-const invoiceData = ref({ ...initialState })
+const route = useRoute()
+const invoiceId = route.params.id
+const isSendInvoiceDialogVisible = ref(false)
 const refForm = ref()
 const currency = ref({})
 const selectedCustomer = ref({})
+
+const invoiceData = ref({
+  invoice_date: '',
+  due_date: '',
+})
+
+onMounted(async() => {
+  await fetchCustomersList()
+  await getInvoice(invoiceId)
+  await fetchPaymentMethods()
+  invoiceData.value = {
+    ...invoiceItem.value,
+  }
+
+  if(invoiceData.value.customer_id){
+    selectCustomer(invoiceData.value.customer_id)
+  }
+ 
+})
+
+
 
 const selectCustomer = customerId => {
 
@@ -130,7 +114,7 @@ const generateItemTotal = index => {
 
 const resetFormData = () => {
   invoiceData.value = {
-    ...initialState,
+    ...invoiceItem.value,
   }
   nextTick(() => {
     refForm.value?.reset()
@@ -168,7 +152,11 @@ const onSubmit = async () => {
         formNewData.append(`items[${index}][cost]`, items[index].cost)
         formNewData.append(`items[${index}][total]`, items[index].total)
       }
-      await storeInvoice(formNewData)
+      formNewData.append("_method", "PUT")
+      await updateInvoice(
+        invoiceId,
+        formNewData,
+      )
       if (respResult.value.status === 200) {
         resetFormData()
       }
@@ -190,7 +178,10 @@ const addItem = () => {
 }
 
 const removeProduct = id => {
-  invoiceData.value.items.splice(id, 1)
+  invoiceData.value.items = invoiceData.value.items.filter(
+    item => item.id !== id,
+  )
+  calculateSubTotal()
 }
 </script>
 
@@ -199,7 +190,17 @@ const removeProduct = id => {
     ref="refForm"
     @submit.prevent="onSubmit"
   >
-    <VRow>
+    <div
+      v-if="!invoiceData.customer_id"
+      class="text-center pa-12"
+    >
+      <VProgressCircular
+        :width="3"
+        :size="70"
+        indeterminate
+      />
+    </div>
+    <VRow v-else>
       <!-- 👉 InvoiceEditable -->
       <VCol
         cols="12"
@@ -207,7 +208,7 @@ const removeProduct = id => {
       >
         <VCard>
           <h2 class="p-4 text-center pt-2">
-            New Invoice
+            Edit Invoice
           </h2>
 
           <VCardText>
@@ -249,7 +250,7 @@ const removeProduct = id => {
                           {{ selectedCustomer.name }}
                         </td>
                       </tr>
-                      <tr >
+                      <tr>
                         <td class="pe-6">
                           Address:
                         </td>
@@ -257,15 +258,17 @@ const removeProduct = id => {
                           {{ selectedCustomer.billing.address_street_1 }}
                           {{ selectedCustomer.billing.city }}
                           {{ selectedCustomer.billing.state }}
+                          {{ selectedCustomer.billing.zip }} <br/>
                           {{ selectedCustomer.billing.country_name }}
-                          {{ selectedCustomer.billing.zip }}
                         </td>
                       </tr>
-                      <tr >
+                      <tr>
                         <td class="pe-6">
                           Phone:
                         </td>
-                        <td v-if="selectedCustomer.billing">{{ selectedCustomer.billing.phone }}</td>
+                        <td v-if="selectedCustomer.billing">
+                          {{ selectedCustomer.billing.phone }}
+                        </td>
                       </tr>
                       <tr>
                         <td class="pe-6">
@@ -431,7 +434,7 @@ const removeProduct = id => {
                     color="default"
                     variant="text"
                     :disabled="index === 0"
-                    @click="removeProduct"
+                    @click="removeProduct(product.id)"
                   >
                     <VIcon
                       size="20"
@@ -550,18 +553,6 @@ const removeProduct = id => {
 
           <VCardText class="mx-sm-4">
             <p class="font-weight-semibold mb-2 mt-2">
-              Terms and Conditions:
-            </p>
-            <VTextarea
-              v-model="invoiceData.terms"
-              clearable
-              placeholder="Enter your terms here..."
-              clear-icon="tabler-circle-x"
-            />
-          </VCardText>
-
-          <VCardText class="mx-sm-4">
-            <p class="font-weight-semibold mb-2 mt-2">
               Note:
             </p>
             <VTextarea
@@ -577,7 +568,11 @@ const removeProduct = id => {
         cols="12"
         md="3"
       >
-        <div class="mt-13">
+        <VCardText>
+          <h6 class="font-weight-medium text-h5 mb-3">
+            Invoice #{{ invoiceData.invoice_id }}
+          </h6>
+                
           <VSelect
             v-model="invoiceData.payment_method_id"
             :items="paymentMethods"
@@ -589,7 +584,7 @@ const removeProduct = id => {
             class="mb-6"
           />
 
-        
+       
           <VSelect
             v-model="invoiceData.status"
             label="Status"
@@ -597,29 +592,61 @@ const removeProduct = id => {
             :menu-props="{ maxHeight: 500 }"
             class="mb-6"
           />
-        </div>
-        <div class="d-flex flex-wrap gap-4 justify-end pt-4 pb-4">
+
           <VBtn
             block
             type="submit"
-            prepend-icon="tabler-file"
+            prepend-icon="tabler-edit"
             :loading="invoiceLoading"
             :disabled="invoiceLoading"
+            class="mb-2"
             @click="refForm?.validate()"
           >
-            Create Invoice
+            Update Invoice
           </VBtn>
+
+
+          <!-- 👉 Send Invoice Trigger button -->
+          <VBtn
+            block
+            prepend-icon="tabler-send"
+            class="mb-2"
+            @click="isSendInvoiceDialogVisible = true"
+          >
+            Send Invoice
+          </VBtn>
+
+          
+       
+
+          <VBtn
+            block
+            class="mb-2"
+            prepend-icon="tabler-download"
+            :href="invoiceData.invoice_link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Download Invoice
+          </VBtn>
+
           <VBtn
             block
             prepend-icon="tabler-arrow-left"
             color="secondary"
+            class="mb-2"
             variant="tonal"
             :to="{ name: 'invoices' }"
           >
             Back to Invoices
           </VBtn>
-        </div>
+        </VCardText>
       </VCol>
     </VRow>
+    <SendInvoiceDialog
+      v-if="isSendInvoiceDialogVisible"
+      v-model:isDialogVisible="isSendInvoiceDialogVisible"
+      :invoice="invoiceData"
+    />
   </VForm>
 </template>

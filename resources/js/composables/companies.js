@@ -154,7 +154,7 @@ export default function useCompanies() {
 
       companies.value = response?.data?.data
     } catch (e) {
-      console.log(e);
+      console.log(e)
       toast.error(e.response.data.message)
     } finally {
       isLoading.value = false

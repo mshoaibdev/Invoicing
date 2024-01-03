@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\AccountController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\InvoiceController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\SettingController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Api\CustomersController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\CurrenciesController;
 use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\ResetPasswordController;
 use App\Http\Controllers\Api\ForgotPasswordController;
 
@@ -74,7 +76,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/current-company', [CompanyController::class, 'currentCompany'])->name('current-company');
     // send invoice
     Route::post('/invoices/send/{id}', [InvoiceController::class, 'sendInvoice'])->name('invoices.send');
-    
+
+    Route::get('/fetch-payment-methods', [PaymentMethodController::class, 'getPaymentMethods'])->name('fetch-payment-methods');
+    // update payment method status
+    Route::post('/payment-methods/status/{id}', [PaymentMethodController::class, 'updateStatus'])->name('payment-methods.status');
 
 
     Route::apiResources([
@@ -86,6 +91,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         'invoices' => InvoiceController::class,
         'projects' => ProjectController::class,
         'companies' => CompanyController::class,
+        'payment-methods' => PaymentMethodController::class,
+        'payments' => PaymentController::class,
     ]);
 
 });

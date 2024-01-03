@@ -9,7 +9,7 @@ import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 import moment from 'moment'
 
-const { fetchPaymentMethodsList, paymentMethods, isLoading: paymentMethodsLoading } = usePaymentMethods()
+const { fetchPaymentMethods, paymentMethods, isLoading: paymentMethodsLoading } = usePaymentMethods()
 
 
 const {
@@ -23,7 +23,7 @@ const { storeInvoice, respResult, isLoading: invoiceLoading } = useInvoices()
 
 onMounted(async () => {
   await fetchCustomersList()
-  await fetchPaymentMethodsList()
+  await fetchPaymentMethods()
 })
 
 const initialState = {

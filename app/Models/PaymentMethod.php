@@ -15,6 +15,9 @@ class PaymentMethod extends Model
 
 
     protected $casts = [
+        'is_default' => 'boolean',
+        'is_enabled' => 'boolean',
+        'is_gateway' => 'boolean',
     ];
 
 

@@ -1,6 +1,6 @@
 import axios from '@axios'
-import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 import route from 'ziggy-js'
 
 export default function useSettings() {
@@ -11,13 +11,16 @@ export default function useSettings() {
   const settingData = ref({})
 
 
-  const fetchSettings = async () => {
+  const fetchSettings = async keys => {
     try {
       isLoading.value = true
 
-      const response = await axios.get(route('settings.index'))
-
-      settings.value = response.data.data
+      const response = await axios.get(route('settings.index'), {
+        params: {
+          keys: keys,
+        },
+      })
+      settings.value = response.data
     } catch (error) {
       if (error.message === 'Network Error') {
         toast.error(error.message)
@@ -86,7 +89,6 @@ export default function useSettings() {
       respResult.value = response
       toast.success(response.data.message)
     } catch (error) {
-      console.log(error)
       if (error.message === 'Network Error') {
         toast.error(error.message)
       } else {

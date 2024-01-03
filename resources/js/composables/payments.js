@@ -4,7 +4,7 @@ import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 import route from 'ziggy-js'
 
-export default function useInvoices() {
+export default function usePayments() {
   // Use toast
   const isLoading = ref(false)
 
@@ -14,34 +14,29 @@ export default function useInvoices() {
   // Table Handlers
   const headers = [
     {
-      title: '#Invoice ID',
-      key: 'invoice_id',
+      title: '#Transaction ID',
+      key: 'transaction_id',
       sortable: false,
     },
     {
       title: 'Customer',
-      key: 'customer.name',
+      key: 'paymentable.customer.name',
       sortable: false,
     },
     {
       title: 'Email',
-      key: 'customer.email',
+      key: 'paymentable.customer.email',
       sortable: false,
     },
     {
-      title: 'Total',
-      key: 'total',
-      sortable: false,
-    },
-    {
-      title: 'Status',
-      key: 'status',
+      title: 'Amount',
+      key: 'amount',
       sortable: false,
     },
    
     {
-      title: 'Due Date',
-      key: 'due_date',
+      title: 'Payment Date',
+      key: 'payment_date',
       sortable: false,
     },
     {
@@ -56,8 +51,8 @@ export default function useInvoices() {
     status: '',
   })
 
-  const invoices = ref([])
-  const invoicesByStatus = ref([])
+  const payments = ref([])
+  const paymentsByStatus = ref([])
   const itemsPerPage = ref(10)
   const totalRecords = ref(0)
   const currentPage = ref(1)
@@ -66,15 +61,15 @@ export default function useInvoices() {
   const searchQuery = ref('')
   const sortBy = ref('id')
   const isSortDirDesc = ref(true)
-  const invoiceId = ref(null)
-  const invoiceData = ref({})
+  const paymentId = ref(null)
+  const paymentData = ref({})
 
 
-  const deleteInvoice = async id => {
+  const deletePayment = async id => {
     try {
       isLoading.value = true
 
-      const res = await axios.delete(route('invoices.destroy', id))
+      const res = await axios.delete(route('payments.destroy', id))
 
       respResult.value = res
       toast.success(res.data.message)
@@ -82,39 +77,41 @@ export default function useInvoices() {
       // refetchData()
     } catch (error) {
       console.log(error)
-      toast.error('Error! Deleting invoice')
+      toast.error('Error! Deleting payment')
     } finally {
       isLoading.value = false
     }
   }
 
-  const getInvoice = async id => {
-    const response = await axios.get(route('invoices.show', id))
+  const getPayment = async id => {
+    const response = await axios.get(route('payments.show', id))
 
 
-    invoiceData.value = response.data.data
+    paymentData.value = response.data.data
   }
 
-  // sendInvoice
+  // sendPayment
 
-  const sendInvoice = async (invoiceId, formData) => {
+  const sendPayment = async (paymentId, formData) => {
 
-    return axios.post(route('invoices.send', invoiceId), formData)
+    return axios.post(route('payments.send', paymentId), formData)
 
   }
 
 
 
-  const updateInvoice = async (id, formData) => {
+  const updatePayment = async (id, formData) => {
     try {
       isLoading.value = true
 
-      const response = await axios.post(route('invoices.update', id), formData)
+      const response = await axios.post(route('payments.update', id), formData)
 
       respResult.value = response
       toast.success(response.data.message)
     } catch (error) {
-    
+      if (error.response.status === 422) {
+        errors.value = error.response.data.errors
+      }
       toast.error(error.response.data.message)
     } finally {
       isLoading.value = false
@@ -122,11 +119,11 @@ export default function useInvoices() {
   }
 
 
-  const updateInvoiceStatus = async (id, formData) => {
+  const updatePaymentstatus = async (id, formData) => {
     try {
       isLoading.value = true  
 
-      const response = await axios.post(route('invoices.status', id), formData)
+      const response = await axios.post(route('payments.status', id), formData)
 
       respResult.value = response
       toast.success(response.data.message)
@@ -142,10 +139,10 @@ export default function useInvoices() {
 
 
 
-  const storeInvoice = async formData => {
+  const storePayment = async formData => {
     isLoading.value = true
     await axios
-      .post(route('invoices.store'), formData)
+      .post(route('payments.store'), formData)
       .then(resp => {
         respResult.value = resp
         toast.success(resp.data.message)
@@ -161,10 +158,10 @@ export default function useInvoices() {
   }
 
 
-  const fetchInvoices = async () => {
+  const fetchPayments = async () => {
     isLoading.value = true
     try {
-      const response = await axios.get(route('invoices.index'), {
+      const response = await axios.get(route('payments.index'), {
         params: {
           q: searchQuery.value,
           perPage: itemsPerPage.value,
@@ -178,7 +175,7 @@ export default function useInvoices() {
       const { total, last_page } = response.data.meta
 
       totalPages.value = last_page
-      invoices.value = response.data.data
+      payments.value = response.data.data
       totalRecords.value = total
     } catch (e) {
       toast.error(e.response.data.message)
@@ -187,12 +184,12 @@ export default function useInvoices() {
     }
   }
 
-  const fetchInvoicesByStatus= async () => {
+  const fetchPaymentsByStatus= async () => {
     isLoading.value = true
     try {
-      const response = await axios.get(route('invoices.count-by-status'))
+      const response = await axios.get(route('payments.count-by-status'))
 
-      invoicesByStatus.value = response.data.data
+      paymentsByStatus.value = response.data.data
     } catch (e) {
       toast.error(e.response.data.message)
     } finally {
@@ -200,16 +197,16 @@ export default function useInvoices() {
     }
   }
 
-  const fetchInvoicesList = async role => {
+  const fetchPaymentsList = async role => {
     isLoading.value = true
     try {
-      const response = await axios.get(route('invoices.index'), {
+      const response = await axios.get(route('payments.index'), {
         params: {
           ...filters,
         },
       })
 
-      invoices.value = response.data.data
+      payments.value = response.data.data
     } catch (e) {
       toast.error(e.response.data.message)
     } finally {
@@ -217,7 +214,7 @@ export default function useInvoices() {
     }
   }
 
-  const resolveInvoiceStatusVariantAndIcon = status => {
+  const resolvePaymentstatusVariantAndIcon = status => {
     if (status === 'Paid')
       return {
         variant: 'primary',
@@ -257,7 +254,7 @@ export default function useInvoices() {
   
 
   const debouncedSearch = debounce(() => {
-    fetchInvoices()
+    fetchPayments()
   }, 500)
 
   watch(searchQuery, () => {
@@ -267,35 +264,36 @@ export default function useInvoices() {
 
 
   watch([currentPage, itemsPerPage, filters], () => {
-    fetchInvoices()
+    fetchPayments()
   })
 
   return {
-    invoiceData,
+    paymentData,
     isLoading,
-    getInvoice,
-    invoiceId,
+    getPayment,
+    paymentId,
     sortBy,
     itemsPerPage,
     totalPages,
     filters,
     respResult,
-    fetchInvoicesByStatus,
-    invoices,
-    invoicesByStatus,
-    fetchInvoices,
-    deleteInvoice,
-    updateInvoice,
-    sendInvoice,
+    fetchPaymentsByStatus,
+    payments,
+    paymentsByStatus,
+    fetchPayments,
+    deletePayment,
+    updatePayment,
+    sendPayment,
     currentPage,
     searchQuery,
+    refListTable,
     totalRecords,
     headers,
     isSortDirDesc,
     perPageOptions,
-    storeInvoice,
-    fetchInvoicesList,
-    resolveInvoiceStatusVariantAndIcon,
-    updateInvoiceStatus,
+    storePayment,
+    fetchPaymentsList,
+    resolvePaymentstatusVariantAndIcon,
+    updatePaymentstatus,
   }
 }

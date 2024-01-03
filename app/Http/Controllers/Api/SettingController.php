@@ -12,11 +12,10 @@ class SettingController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $settings = Setting::getAll();
+        return Setting::getSettings($request->keys, $request->header('company'));
 
-        return new SettingResource($settings);
     }
 
     /**
@@ -24,11 +23,8 @@ class SettingController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->all();
 
-        foreach ($data as $key => $value) {
-            Setting::set($key, $value);
-        }
+        Setting::setSettings($request->all(), $request->header('company'));
 
         return response()->json([
             'message' => 'Settings successfully updated ',
@@ -48,11 +44,7 @@ class SettingController extends Controller
      */
     public function update(Request $request)
     {
-        $data = $request->all();
-
-        foreach ($data as $key => $value) {
-            Setting::set($key, $value);
-        }
+        Setting::setSettings($request->all(), $request->header('company'));
 
         return response()->json([
             'message' => 'Settings successfully updated ',
@@ -69,12 +61,10 @@ class SettingController extends Controller
 
     // getSetting
 
-    public function getSetting($key)
+    public function getSetting(Request $request)
     {
-        $setting = Setting::get($key);
+        return Setting::getSetting($request->keys, $request->header('company'));
 
-        return response()->json([
-            'data' => $setting,
-        ], 200);
     }
+    
 }

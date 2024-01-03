@@ -8,10 +8,6 @@ export  default [
     value: "Paypal",
   },
   {
-    title: "Stripe",
-    value: "Stripe",
-  },
-  {
     title: "Cash",
     value: "Cash",
   },
@@ -19,10 +15,13 @@ export  default [
     title: "Check",
     value: "Check",
   },
-
   {
-    title: "Other",
-    value: "Other",
+    title: "Bank Transfer",
+    value: "Bank Transfer",
+  },
+  {
+    title: "Payoneer",
+    value: "Payoneer",
   },
 ]
   

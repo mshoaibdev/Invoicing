@@ -29,11 +29,13 @@ class PermissionSeeder extends Seeder
             'invoices-create',
             'invoices-edit',
             'invoices-delete',
-            // 'projects-list',
-            // 'projects-create',
-            // 'projects-edit',
-            // 'projects-view',
-            // 'projects-delete',
+
+            'payments-list',
+            'payments-create',
+            'payments-edit',
+            'payments-view',
+            'payments-delete',
+
             'users-list',
             'users-create',
             'users-edit',
@@ -42,7 +44,17 @@ class PermissionSeeder extends Seeder
             'settings-roles-create',
             'settings-roles-edit',
             'settings-roles-delete',
+            'settings-mail-configuration-edit',
+
+            'payment-methods-list',
+            'payment-methods-create',
+            'payment-methods-edit',
+            'payment-methods-delete',
+
             'account-settings',
+
+
+
             // 'all'
 
         ];

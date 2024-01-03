@@ -5,6 +5,8 @@ import Account from './Account.vue'
 import Company from './Company.vue'
 import Roles from './Roles.vue'
 import Security from './Security.vue'
+import PaymentMethods from './PaymentMethods.vue'
+import MailConfigurations from './MailConfigurations.vue'
 
 const route = useRoute()
 const activeTab = ref(route.params.tab)
@@ -23,7 +25,17 @@ const tabs = [
     icon: 'tabler-lock',
     tab: 'security',
   },
+
+  
 ]
+
+if (ability.can('Update', 'settings-mail-configuration-edit')) {
+  tabs.push({
+    title: 'Mail Configurations',
+    icon: 'tabler-mail',
+    tab: 'mail-configurations',
+  })
+}
 
 if (ability.can('Update', 'company-edit')) {
   tabs.push( {
@@ -38,6 +50,14 @@ if (ability.can('Read', 'settings-roles-list')) {
     title: 'Roles',
     icon: 'tabler-lock',
     tab: 'roles',
+  })
+}
+
+if (ability.can('Read', 'payment-methods-list')) {
+  tabs.push( {
+    title: 'Payment Methods',
+    icon: 'tabler-credit-card',
+    tab: 'payment-methods',
   })
 }
 </script>
@@ -82,6 +102,14 @@ if (ability.can('Read', 'settings-roles-list')) {
 
           <VWindowItem value="company-information">
             <Company />
+          </VWindowItem>
+
+          <VWindowItem value="payment-methods">
+            <PaymentMethods />
+          </VWindowItem>
+
+          <VWindowItem value="mail-configurations">
+            <MailConfigurations />
           </VWindowItem>
 
           <VWindowItem value="security">

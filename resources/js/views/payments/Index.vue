@@ -1,9 +1,7 @@
 <script setup>
-import useInvoices from '@/composables/invoices'
+import usePayments from '@/composables/payments'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import { formatCurrency } from '@core/utils/formatters'
-import ViewInvoiceDialog from './ViewInvoice.vue'
-import SendInvoiceDialog from './SendInvoice.vue'
 import ability from '@/plugins/casl/ability'
 
 const props = defineProps({
@@ -14,7 +12,7 @@ const props = defineProps({
   },
 })
 
-const { invoices, totalRecords, isLoading, fetchInvoices, currentPage, headers, deleteInvoice, itemsPerPage, searchQuery, paginationData, filters, resolveInvoiceStatusVariantAndIcon } = useInvoices()
+const { payments, totalRecords, isLoading, fetchPayments, currentPage, headers, deleteInvoice, itemsPerPage, searchQuery, paginationData, filters, resolvePaymentstatusVariantAndIcon } = usePayments()
 const selectedRows = ref([])
 const isConfirmDialogVisible = ref(false)
 const isViewInvoiceDialogVisible = ref(false)
@@ -33,44 +31,9 @@ onMounted(async () => {
 
     filters.customerId = props.customerId
   }
-  await fetchInvoices()
+  await fetchPayments()
 })
 
-const tableColumns = ref([])
-
-// computed 
-
-const updateTableColumns = () => {
-
-  const storageColumns = JSON.parse(localStorage.getItem('invoices.table'))
-
-  if(storageColumns) {
-    tableColumns.value =  storageColumns.filter(column => column.visible === true)
-
-  } else {
-    tableColumns.value = headers
-  }
-
-}
-
-
-
-
-updateTableColumns()
-
-
-const toggleTableColumns = async items => {
-
-  headers.forEach(header => {
-    header.visible = items.includes(header.title)
-  })
-
-
-  localStorage.setItem('invoices.table', JSON.stringify(headers))
-
-  updateTableColumns()
- 
-}
 
 const sendInvoice = async item => {
   
@@ -103,13 +66,13 @@ const confirmDelete = async ev => {
   await deleteInvoice(invoiceId.value)
   isConfirmDialogVisible.value = false
   isViewInvoiceDialogVisible.value = false
-  await fetchInvoices()
+  await fetchPayments()
 }
 </script>
 
 <template>
   <VCard
-    v-if="invoices"
+    v-if="payments"
     id="invoice-list"
   >
     <VCardText class="d-flex align-center flex-wrap gap-4">
@@ -121,45 +84,18 @@ const confirmDelete = async ev => {
           cols="12"
         >
           <div class="me-3 d-flex gap-3">
-            <VBtn
-              v-if="ability.can('Create', 'invoices-create')"
+            <!--<VBtn
+              v-if="ability.can('Create', 'payments-create')"
               prepend-icon="tabler-plus"
               :to="{ name: 'create-invoice' }"
             >
               Create Invoice
-            </VBtn>
+            </VBtn>-->
           </div>
         </VCol>
+      
         <VCol
-          lg="6"
-          md="6"
-          sm="8"
-          cols="12"
-        >
-          <!--
-            <AppSelect
-            v-model="tableColumns"
-            label="Select Column Visibility "
-            multiple
-            eager
-            :items="headers"
-            @update:model-value="toggleTableColumns"
-            > 
-            <template #selection="{ item, index }">
-            <VChip v-if="index < 4">
-            <span>{{ item.title }}</span>
-            </VChip>
-            <span
-            v-if="index === 4"
-            class="text-grey text-caption align-self-center"
-            >
-            (+{{ tableColumns.length - 4 }} others)
-            </span>
-            </template>
-            </AppSelect>
-          -->
-        </VCol>
-        <VCol
+          offset="6"
           lg="3"
           md="3"
           cols="12"
@@ -167,7 +103,7 @@ const confirmDelete = async ev => {
         >
           <AppTextField
             v-model="searchQuery"
-            label="Search Invoices"
+            label="Search Payments"
             density="compact"
           />
         </VCol>
@@ -183,8 +119,8 @@ const confirmDelete = async ev => {
       v-model:page="currentPage"
       :loading="isLoading"
       :items-length="totalRecords"
-      :headers="tableColumns"
-      :items="invoices"
+      :headers="headers"
+      :items="payments"
       class="text-no-wrap"
     >
       <template #item.invoice_id="{ item }">
@@ -252,7 +188,7 @@ const confirmDelete = async ev => {
                 :size="30"
                 v-bind="props"
                 :color="
-                  resolveInvoiceStatusVariantAndIcon(item.raw.status)
+                  resolvePaymentstatusVariantAndIcon(item.raw.status)
                     .variant
                 "
                 variant="tonal"
@@ -260,7 +196,7 @@ const confirmDelete = async ev => {
                 <VIcon
                   :size="20"
                   :icon="
-                    resolveInvoiceStatusVariantAndIcon(item.raw.status)
+                    resolvePaymentstatusVariantAndIcon(item.raw.status)
                       .icon
                   "
                 />
@@ -304,15 +240,6 @@ const confirmDelete = async ev => {
                 <VIcon icon="tabler-pencil" /> Edit Invoice  
               </VListItem>
 
-              <VListItem
-                v-if="item.raw.status === 'Draft'"
-                :href="item.raw.payment_link"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <VIcon icon="tabler-credit-card" /> Payment Link
-              </VListItem>
-
               <VListItem @click="sendInvoice(item.raw)">
                 <VIcon icon="tabler-send" /> Send Invoice  
               </VListItem>
@@ -328,7 +255,7 @@ const confirmDelete = async ev => {
                 <VIcon icon="tabler-eye" /> View Invoice  
               </VListItem>
               <VListItem
-                v-if="ability.can('Delete', 'invoices-delete')"
+                v-if="ability.can('Delete', 'payments-delete')"
                 @click="deleteInvoiceConfirm(item.raw.id)"
               >
                 <VIcon icon="tabler-trash" /> Delete Invoice  
@@ -356,20 +283,7 @@ const confirmDelete = async ev => {
       @confirm="confirmDelete"
     />
 
-    <ViewInvoiceDialog
-      v-if="isViewInvoiceDialogVisible"
-      v-model:isDialogVisible="isViewInvoiceDialogVisible"
-      :invoice-id="invoiceId"
-      @edit-invoice="editInvoice"
-      @delete-invoice="deleteInvoiceConfirm"
-    />
-
-    <SendInvoiceDialog
-      v-if="isSendInvoiceDialogVisible"
-      v-model:isDialogVisible="isSendInvoiceDialogVisible"
-      :invoice="invoice"
-      @refetch="fetchInvoices"
-    />
+    
   </VCard>
 </template>
 

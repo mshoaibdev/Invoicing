@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('key')->unique();
             $table->text('value')->nullable();
             $table->string('group')->default('general');
+            $table->foreignId('company_id')->constrained()->onDelete('restrict');
             $table->timestamps();
         });
     }

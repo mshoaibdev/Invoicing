@@ -48,6 +48,18 @@ const routes = [
     },
   },
 
+  {
+    path: '/settings/mail-configurations',
+    name: 'mail-configurations',
+    redirect: { name: 'settings', params: { tab: 'mail-configurations' } },
+    component: () => import('@/views/settings/Index.vue'),
+    meta: {
+      auth: true,
+      action: 'Read',
+      subject: 'All',
+    },
+  },
+
 
   
 ]
