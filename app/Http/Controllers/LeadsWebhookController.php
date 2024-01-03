@@ -37,6 +37,15 @@ class LeadsWebhookController extends Controller
                         'currency_id' => $request->currency_id,
                         'creator_id' => $user->id,
                     ]);
+
+                    // if phone 
+                    if ($request->phone) {
+                        $customer->addresses()->create([
+                            'phone' => $request->phone,
+                            'country_id' => 166,
+                            'type' => 'billing',
+                        ]);
+                    }
                 }
 
                 // create new payment
