@@ -36,7 +36,12 @@ export default function usePayments() {
    
     {
       title: 'Payment Date',
-      key: 'payment_date',
+      key: 'formattedPaymentDate',
+      sortable: false,
+    },
+    {
+      title: 'Order Details',
+      key: 'order_details',
       sortable: false,
     },
     {

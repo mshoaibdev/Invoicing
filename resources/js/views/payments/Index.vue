@@ -84,13 +84,15 @@ const confirmDelete = async ev => {
           cols="12"
         >
           <div class="me-3 d-flex gap-3">
-            <!--<VBtn
+            <!--
+              <VBtn
               v-if="ability.can('Create', 'payments-create')"
               prepend-icon="tabler-plus"
               :to="{ name: 'create-invoice' }"
-            >
+              >
               Create Invoice
-            </VBtn>-->
+              </VBtn>
+            -->
           </div>
         </VCol>
       
@@ -123,95 +125,14 @@ const confirmDelete = async ev => {
       :items="payments"
       class="text-no-wrap"
     >
-      <template #item.invoice_id="{ item }">
-        <div class="d-flex align-center">
-          <VAvatar
-            variant="tonal"
-            class="me-3"
-            size="38"
-            color="primary"
-          >
-            <VImg
-              v-if="item.raw.company"
-              :src="item.raw.company.logo_url"
-            />
-            <span v-else>{{
-              item.raw.company?.name
-            }}</span>
-          </VAvatar>
-
-          <div class="d-flex flex-column">
-            <h6 class="text-base">
-              {{ item.raw.company?.name }}
-            </h6>
-            <span class="text-sm text-disabled">{{
-              item.raw.invoice_id
-            }}</span>
-          </div>
-        </div>
-      </template>
-      
-
-      <template #item.customer.email="{ item }">
-        <a
-          :href="`mailto:${item.raw.customer.email}`"
-          class="text-decoration-none"
-        >
-          {{ item.raw.customer.email }}
-        </a>
-      </template>
-
-
-      <template #item.customer.phone="{ item }">
-        <a
-          :href="`tel:${item.raw.customer.phone}`"
-          class="text-decoration-none"
-        >
-          {{ item.raw.customer.phone }}
-        </a>
-      </template>
-
-      
-      <template #item.total="{ item }">
+      <template #item.amount="{ item }">
         <div class="d-flex align-center">
           <span class="me-3">
-            {{ formatCurrency(item.raw.total) }}
+            {{ formatCurrency(item.raw.amount) }}
           </span>
         </div>
       </template>
 
-      <template #item.status="{ item }">
-        <div class="d-flex align-center">
-          <VTooltip>
-            <template #activator="{ props }">
-              <VAvatar
-                :size="30"
-                v-bind="props"
-                :color="
-                  resolvePaymentstatusVariantAndIcon(item.raw.status)
-                    .variant
-                "
-                variant="tonal"
-              >
-                <VIcon
-                  :size="20"
-                  :icon="
-                    resolvePaymentstatusVariantAndIcon(item.raw.status)
-                      .icon
-                  "
-                />
-              </VAvatar>
-            </template>
-
-            <p class="mb-0">
-              {{ item.raw.status }}
-            </p>
-            <p class="mb-0">
-              Due date: {{ item.raw.due_date }}
-            </p>
-          </VTooltip>
-        </div>
-      </template>
 
       <template #item.title="{ item }">
         <div class="d-flex align-center">
@@ -224,53 +145,6 @@ const confirmDelete = async ev => {
           </a>
         </div>
       </template>
-            
-      <template #item.actions="{ item }">
-        <IconBtn density="compact">
-          <VIcon icon="tabler-dots-vertical" />
-
-          <VMenu activator="parent">
-            <VList>
-              <VListItem 
-                :to="{
-                  name: 'edit-invoice',
-                  params: { id: item.raw.id },
-                }"
-              >
-                <VIcon icon="tabler-pencil" /> Edit Invoice  
-              </VListItem>
-
-              <VListItem @click="sendInvoice(item.raw)">
-                <VIcon icon="tabler-send" /> Send Invoice  
-              </VListItem>
-              <VListItem
-                :href="item.raw.invoice_link"
-                target="_blank"
-                rel="noopener noreferrer"
-                download
-              >
-                <VIcon icon="tabler-download" /> Download Invoice  
-              </VListItem>
-              <VListItem @click="viewInvoice(item.raw.id)">
-                <VIcon icon="tabler-eye" /> View Invoice  
-              </VListItem>
-              <VListItem
-                v-if="ability.can('Delete', 'payments-delete')"
-                @click="deleteInvoiceConfirm(item.raw.id)"
-              >
-                <VIcon icon="tabler-trash" /> Delete Invoice  
-              </VListItem>
-            </VList>
-          </VMenu>
-        </IconBtn>
-
-
-        <!--
-          <IconBtn @click="editInvoice(item.raw.id)">
-          <VIcon icon="tabler-pencil" />
-          </IconBtn>
-        -->
-      </template>
     </VDataTableServer>
    
     <ConfirmDialog
@@ -282,8 +156,6 @@ const confirmDelete = async ev => {
       cancel-msg="Invoice deletion cancelled."
       @confirm="confirmDelete"
     />
-
-    
   </VCard>
 </template>
 
