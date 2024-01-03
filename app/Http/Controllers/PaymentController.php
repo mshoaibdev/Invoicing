@@ -213,6 +213,11 @@ class PaymentController extends Controller
                         'payment_response' => json_encode($tresponse),
                     ]);
 
+                    $invoice->update([
+                        'status' => 'Paid',
+                        'is_paid' => true,
+                    ]);
+
                     return redirect()->route('payment.success', ['invoiceId' => $invoice->uuid, 'transactionId' => $tresponse->getTransId()]);
 
 
