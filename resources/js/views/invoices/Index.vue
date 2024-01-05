@@ -305,7 +305,7 @@ const confirmDelete = async ev => {
               </VListItem>
 
               <VListItem
-                v-if="item.raw.status === 'Draft'"
+                v-if="['Sent', 'Draft'].includes(item.raw.status) && item.raw.payment_method.is_gateway && item.raw.payment_method !== ''"
                 :href="item.raw.payment_link"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -313,7 +313,10 @@ const confirmDelete = async ev => {
                 <VIcon icon="tabler-credit-card" /> Payment Link
               </VListItem>
 
-              <VListItem @click="sendInvoice(item.raw)">
+              <VListItem
+                v-if="item.raw.status !== 'Paid' && item.raw.payment_method.is_gateway"
+                @click="sendInvoice(item.raw)"
+              >
                 <VIcon icon="tabler-send" /> Send Invoice  
               </VListItem>
               <VListItem

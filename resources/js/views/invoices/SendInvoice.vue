@@ -21,17 +21,20 @@ const emit = defineEmits([
 ])
 
 
-const { sendInvoice } = useInvoices()
+const { sendInvoice, isLoading, respResult } = useInvoices()
 
 
 const refForm = ref('')
-const isLoading = ref(false)
+
 
 const formData = ref({
   // from: props.invoice.customer.email,
   to: props.invoice.customer.email,
   subject: 'New Invoice',
-  body: `Hello ${props.invoice.customer.name}, <br /> You have received a new invoice from {COMPANY_NAME}.<br />Please download using the button below:`,
+  body: `Hello ${props.invoice.customer.name}, <br /> 
+  You have received a new invoice from {COMPANY_NAME}. <br /> 
+  You can pay using this link: {PAY_LINK} <br /> 
+  <br />Please download using the button below:`,
 })
 
 const resetFormData = () => {
@@ -48,18 +51,15 @@ const resetFormData = () => {
 }
 
 const sendInvoiceHandler = async() => {
-  isLoading.value = true
-  await sendInvoice(props.invoice.id, formData.value).then(resp => {
-    if (resp.status === 200) {
-      toast.success('Invoice sent successfully')
-      emit('refetch')
-      emit('update:isDialogVisible', false)
-      resetFormData()
-    }
-  })
-    .finally(() => {
-      isLoading.value = false
-    })
+  
+  await sendInvoice(props.invoice.id, formData.value)
+
+  if (respResult.value.status === 200) {
+    emit('refetch')
+    emit('update:isDialogVisible', false)
+    resetFormData()
+  }
+  
 }
 
 const onSubmit = async() => {

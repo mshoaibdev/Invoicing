@@ -53,7 +53,7 @@ class Company extends Model implements HasMedia
 
     public function settings()
     {
-        return $this->hasMany(CompanySetting::class);
+        return $this->hasMany(Setting::class);
     }
 
 

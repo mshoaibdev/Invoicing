@@ -5,7 +5,7 @@ export  default [
   },
   {
     title: "Paypal",
-    value: "Paypal",
+    value: "PayPal",
   },
   {
     title: "Cash",

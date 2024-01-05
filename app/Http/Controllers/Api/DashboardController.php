@@ -18,21 +18,18 @@ class DashboardController extends Controller
 
         $totalCustomers = Customer::query()
         ->whereCompany()
-        ->when(!$isAdmin, function ($query) {
-            $query->where('creator_id', auth()->id());
-        })->count();
+        ->whereCreator()
+        ->count();
 
         $totalInvoices = Invoice::query()
-        ->when(!$isAdmin, function ($query) {
-            $query->where('creator_id', auth()->id());
-        })->count();
+        ->whereCompany()
+        ->whereCreator()
+        ->count();
 
 
         $totalDraftInvoices = Invoice::query()
         ->whereCompany()
-        ->when(!$isAdmin, function ($query) {
-            $query->where('creator_id', auth()->id());
-        })
+        ->whereCreator()
         ->where('status', 'Draft')
         ->count();
 
@@ -58,9 +55,7 @@ class DashboardController extends Controller
         $isAdmin = auth()->user()->hasRole('Admin');
 
         $invoices = Invoice::query()
-        // ->when(!$isAdmin, function ($query) {
-        //     $query->where('creator_id', auth()->id());
-        // })
+        ->whereCreator()
         ->whereCompany()
         ->where('status', 'Paid')
         ->whereBetween('created_at', [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()])

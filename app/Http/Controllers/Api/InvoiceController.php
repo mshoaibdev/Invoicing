@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Company;
 use App\Models\Invoice;
+use App\Models\Setting;
 use App\Mail\NewInvoice;
 use Illuminate\Http\Request;
+use App\Models\PaymentMethod;
+use Srmklive\PayPal\Facades\PayPal;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\Invoice\Store;
+use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\Invoice\Update;
 use App\Http\Requests\InvoiceRequest;
 use App\Http\Resources\InvoiceResource;
-use Srmklive\PayPal\Facades\PayPal;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 
 
@@ -25,10 +28,9 @@ class InvoiceController extends Controller
         $limit = $request->has('perPage') ? $request->perPage : 10;
 
         $invoices = Invoice::query()
-            ->with(['customer', 'company'])
-            ->when($request->q, function ($query) use ($request) {
-                $query->search($request->q);
-            })
+            ->with(['customer', 'company', 'paymentMethod'])
+            ->whereSearch($request)
+            ->whereCreator()
             ->whereCompany()
             ->applyFilters($request)
             ->latest()
@@ -45,20 +47,26 @@ class InvoiceController extends Controller
 
         $invoice = Invoice::create($request->getInvoicePayload());
 
-
-        // $this->createPaypalInvoice($invoice);
-
-        // Mail::to($invoice->customer->email)->send(new NewInvoice($invoice));
-
         $invoice->load([
             'company' => [
-                'address',
+                'address' => [
+                    'country',
+                ],
             ],
+            'paymentMethod',
             'customer' => [
                 'billing',
                 'currency',
             ]
         ]);
+
+        if ($invoice->paymentMethod->name == 'PayPal') {
+            $this->createPaypalInvoice($invoice);
+        }
+
+        if($request->status == "Sent"){
+            $this->sendInvoice($request, $invoice->id);
+        }
 
         $this->saveInvoicePdf($invoice);
 
@@ -154,11 +162,17 @@ class InvoiceController extends Controller
     public function createPaypalInvoice($invoice)
     {
 
+
+        // set paypal config
+        $this->setPaypalConfig($invoice->payment_method_id);
+
+
         $provider = new PayPalClient;
         $provider = PayPal::setProvider();
         $provider->getAccessToken();
 
-        // return $provider->showInvoiceDetails('INV2-TKZ3-SPZ3-HTDZ-RM27');
+        $provider->setCurrency($invoice->customer->currency->code);
+        $provider->setRequestHeader('Prefer', 'return=representation');
 
 
         $items = [];
@@ -167,7 +181,7 @@ class InvoiceController extends Controller
                 'name' => $product['description'],
                 'category' => 'DIGITAL_GOODS',
                 'unit_amount' => [
-                    'currency_code' => $invoice->currency,
+                    'currency_code' => $invoice->customer->currency->code,
                     'value' => $product['total'],
                 ],
                 'quantity' => $product['quantity'],
@@ -177,10 +191,9 @@ class InvoiceController extends Controller
         $data = [
             'items' => $items,
             'detail' => [
-                'invoice_number' => $invoice->invoice_id . '-' . time(),
-                'reference' => 'deal-ref',
+                'invoice_number' => $invoice->invoice_id,
                 'invoice_date' => $invoice->invoice_date,
-                'currency_code' => $invoice->currency,
+                'currency_code' => $invoice->customer->currency->code,
                 'note' => $invoice->note,
                 'payment_term' => [
                     'term_type' => 'DUE_ON_DATE_SPECIFIED',
@@ -189,20 +202,23 @@ class InvoiceController extends Controller
             ],
             'invoicer' => [
                 'name' => [
-                    'given_name' => Auth()->user()->fist_name,
-                    'surname' => Auth()->user()->last_name,
+                    'given_name' => $invoice->company->name,
+                    // 'surname' => Auth()->user()->last_name,
                 ],
                 'address' => [
-                    'address_line_1' => Auth()->user()->address,
-                    'postal_code' => Auth()->user()->zip,
-                    'country_code' => Auth()->user()->country,
+                    'address_line_1' => $invoice->company->address->address_street_1 ?? '',
+                    'postal_code' => $invoice->company->address->zip ?? '',
                 ],
-                'email_address' => Auth()->user()->email,
+                'email_address' => $invoice->company->email,
             ],
             'primary_recipients' => [
                 [
                     'name' => [
                         'given_name' => $invoice->customer->name,
+                    ],
+                    'address' => [
+                        'address_line_1' => $invoice->customer->address->address_street_1 ?? '',
+                        'postal_code' => $invoice->customer->address->zip ?? '',
                     ],
                     'billing_info' => [
                         'email_address' => $invoice->customer->email,
@@ -215,18 +231,15 @@ class InvoiceController extends Controller
             ],
             'breakdown' => [
                 'item_total' => [
-                    'currency_code' => $invoice->currency,
                     'value' => $invoice->subtotal,
                 ],
                 'tax_total' => [
-                    'currency_code' => $invoice->currency,
                     'value' => $invoice->tax_amount ?? 0,
                 ],
             ],
             'tax_inclusive' => false,
-            'logo_url' => asset('assets/images/logo.png'),
+            'logo_url' => $invoice->company->logo_url,
             'total_amount' => [
-                'currency_code' => $invoice->currency,
                 'value' => $invoice->total,
             ],
         ];
@@ -234,22 +247,20 @@ class InvoiceController extends Controller
 
         $response = $provider->createInvoice($data);
 
-        $invoiceId = $response['href'];
+        // check for error key
+        if (array_key_exists('error', $response)) {
 
-        $invoiceId = explode('/', $invoiceId);
-
-        $invoiceId = end($invoiceId);
-
-        $paypalInvoice = $provider->showInvoiceDetails($invoiceId);
-
+            return response()->json([
+                'message' => $response['error']['message'],
+            ], 500);
+        }
 
         $invoice->update([
             'payment_response' => $response,
-            'invoice_link' => $paypalInvoice['detail']['metadata']['recipient_view_url']
         ]);
 
 
-        return $paypalInvoice;
+        return $response;
 
     }
 
@@ -287,16 +298,56 @@ class InvoiceController extends Controller
     public function sendInvoice(Request $request, $invoiceId)
     {
 
-        $invoice = Invoice::find($invoiceId);
+        $companyMailConfig = Setting::query()
+            ->whereCompany()
+            ->where('group', 'mail')
+            ->pluck('value', 'key');
 
-        $invoice->update([
+        if (empty($companyMailConfig) || count($companyMailConfig) == 0) {
+            return response()->json([
+                'message' => 'Please configure mail settings for this company in the settings.',
+            ], 422);
+        }
+
+        $invoice = Invoice::query()
+            ->with(['paymentMethod'])
+            ->whereCompany()
+            ->where('id', $invoiceId)
+            ->first();
+        
+        $data = [
             'status' => 'Sent',
+        ];
+
+        if ($invoice->paymentMethod && $invoice->paymentMethod->name == 'PayPal') {
+
+            $paypalResponse = $this->sendPaypalInvoice($request, $invoice);
+
+            if (is_array($paypalResponse) && array_key_exists('error', $paypalResponse)) {
+                return response()->json([
+                    'message' => json_decode($paypalResponse['error'], true)['details'][0]['description'],
+                ], 500);
+            }
+
+
+            $data['payment_response'] = json_decode($paypalResponse, true)['href'];
+        }
+
+        $invoice->update($data);
+
+        config([
+            'mail.driver' => $companyMailConfig['mail_driver'],
+            'mail.host' => $companyMailConfig['mail_host'],
+            'mail.port' => $companyMailConfig['mail_port'],
+            'mail.encryption' => $companyMailConfig['mail_encryption'],
+            'mail.username' => $companyMailConfig['mail_username'],
+            'mail.password' => $companyMailConfig['mail_password'],
+            'mail.from.address' => $companyMailConfig['mail_from_address'],
+            'mail.from.name' => $companyMailConfig['mail_from_name'],
         ]);
 
-        $bodyTemplate = $request->body;
         $subject = $request->subject;
-
-        $body = str_replace('{COMPANY_NAME}', $invoice->company->name, $bodyTemplate);
+        $body = $this->processBody($request->body, $invoice);
 
 
         Mail::to($invoice->customer->email)->send(new NewInvoice($invoice, $subject, $body));
@@ -304,5 +355,69 @@ class InvoiceController extends Controller
         return response()->json([
             'message' => 'Invoice sent successfully.',
         ]);
+    }
+
+
+    public function sendPaypalInvoice(Request $request, Invoice $invoice)
+    {
+
+        // set paypal config
+        $this->setPaypalConfig($invoice->payment_method_id);
+
+        $provider = new PayPalClient;
+        $provider = PayPal::setProvider();
+        $provider->getAccessToken();
+
+
+        return $provider->sendInvoice($invoice->payment_response['id']);
+    }
+
+
+    public function processBody($body, $invoice)
+    {
+
+        $body = str_replace('{COMPANY_NAME}', $invoice->company->name, $body);
+        $body = str_replace('{PAY_LINK}', '<a href="' . $invoice->payment_link . '" target="_blank">Pay Now</a>', $body);
+
+        return $body;
+    }
+
+    // set paypal config 
+
+    public function setPaypalConfig($paymentMethodId)
+    {
+
+        $companyPaypalMethod = PaymentMethod::query()
+            ->whereCompany()
+            ->where('id', $paymentMethodId)
+            ->first();
+
+        if (empty($companyPaypalMethod)) {
+            return response()->json([
+                'message' => 'Please configure PayPal settings for this company in the settings.',
+            ], 422);
+        }
+
+        // get paypal settings
+        $secretKey = "";
+        $clientId = "";
+
+        if ($companyPaypalMethod->mode == 'sandbox') {
+            $secretKey = $companyPaypalMethod->sandbox_secret;
+            $clientId = $companyPaypalMethod->sandbox_identifier;
+        } else {
+            $secretKey = $companyPaypalMethod->live_secret;
+            $clientId = $companyPaypalMethod->live_identifier;
+        }
+
+        // update paypal config
+        config([
+            'paypal.mode' => $companyPaypalMethod->mode,
+            'paypal.sandbox.client_id' => $clientId,
+            'paypal.sandbox.client_secret' => $secretKey,
+            // 'paypal.live.client_id' => $clientId,
+            // 'paypal.live.client_secret' => $secretKey,
+        ]);
+
     }
 }

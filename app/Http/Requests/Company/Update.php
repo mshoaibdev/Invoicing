@@ -91,4 +91,13 @@ class Update extends FormRequest
             ])
             ->toArray();
     }
+
+    public function hasAddress(array $address)
+    {
+        $data = \Arr::where($address, function ($value, $key) {
+            return isset($value);
+        });
+
+        return $data;
+    }
 }

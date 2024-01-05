@@ -49,6 +49,20 @@ class Customer extends Model
         return $query->where('company_id', request()->header('company'));
     }
 
+    public function scopeWhereCreator($query)
+    {
+        $user = auth()->user();
+        if (!$user->hasRole('Admin')) {
+            return $query->where('creator_id', auth()->id());
+        }
+    }
+
+    public function scopeWhereSearch($query, $request)
+    {
+        $query->when($request->q, function ($query, $search) {
+            $query->search($search);
+        });
+    }
 
 
     public function scopeApplyFilters($query, Request $request)

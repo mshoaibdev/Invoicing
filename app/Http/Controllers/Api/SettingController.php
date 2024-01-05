@@ -24,7 +24,7 @@ class SettingController extends Controller
     public function store(Request $request)
     {
 
-        Setting::setSettings($request->all(), $request->header('company'));
+        Setting::setSettings($request->except('group'), $request->header('company'), $request->group);
 
         return response()->json([
             'message' => 'Settings successfully updated ',
@@ -44,7 +44,7 @@ class SettingController extends Controller
      */
     public function update(Request $request)
     {
-        Setting::setSettings($request->all(), $request->header('company'));
+        Setting::setSettings($request->except('group'), $request->header('company'), $request->group);
 
         return response()->json([
             'message' => 'Settings successfully updated ',

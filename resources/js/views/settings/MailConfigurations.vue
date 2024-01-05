@@ -42,7 +42,11 @@ const onSubmit = async() => {
   refForm.value?.validate().then(async ({ valid: isValid }) => {
     if (isValid){
 
-      await updateSettings(formData.value)
+      console.log(formData.value);
+      await updateSettings({
+        ...formData.value,
+        group: 'mail',
+      })
     }
   })
 }

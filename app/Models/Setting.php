@@ -9,19 +9,19 @@ class Setting extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['company_id', 'key', 'value'];
+    protected $fillable = ['company_id', 'key', 'value', 'group'];
 
     public function company()
     {
         return $this->belongsTo(Company::class);
     }
 
-    public function scopeWhereCompany($query, $company_id)
+    public function scopeWhereCompany($query)
     {
-        $query->where('company_id', $company_id);
+        return $query->where('company_id', request()->header('company'));
     }
 
-    public static function setSettings($settings, $company_id)
+    public static function setSettings($settings, $company_id, $group = 'general')
     {
         foreach ($settings as $key => $value) {
             self::updateOrCreate(
@@ -33,6 +33,7 @@ class Setting extends Model
                     'key' => $key,
                     'company_id' => $company_id,
                     'value' => $value,
+                    'group' => $group,
                 ]
             );
         }
@@ -59,6 +60,17 @@ class Setting extends Model
 
         if ($setting) {
             return $setting->value;
+        } else {
+            return null;
+        }
+    }
+
+    public static function getSettingByGroup($group, $company_id)
+    {
+        $setting = static::whereGroup($group)->whereCompany($company_id)->get();
+
+        if ($setting) {
+            return $setting;
         } else {
             return null;
         }

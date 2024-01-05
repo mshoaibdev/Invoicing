@@ -91,8 +91,17 @@ class CompanyController extends Controller
     {
         $company->update($request->getCompanyPayload());
 
+        // if ($request->address) {
+        //     $company->address()->update($request->getAddressPayload());
+        // }
+
         if ($request->address) {
-            $company->address()->update($request->getAddressPayload());
+            if ($request->hasAddress($request->address)) {
+                $company->address()->updateOrCreate(
+                    ['type' => 'company'],
+                    $request->getAddressPayload()
+                );
+            }
         }
 
         if ($request->hasFile('logo')) {

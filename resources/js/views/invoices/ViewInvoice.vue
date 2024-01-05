@@ -201,7 +201,9 @@ const dialogModelValueUpdate = val => {
                     <a
                       :href="invoiceData.invoice_link"
                       target="_blank"
-                    >{{ invoiceData.invoice_link }}</a>
+                    >
+                      Invoice Link
+                    </a>
                   </td>
                 </tr>
                 <tr>

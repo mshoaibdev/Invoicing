@@ -23,9 +23,8 @@ class CustomersController extends Controller
 
         $customers = Customer::query()
             ->with(['billing', 'currency'])
-            ->when($request->q, function ($query) use ($request) {
-                $query->search($request->q);
-            })
+            ->whereSearch($request)
+            ->whereCreator()
             ->whereCompany()
             ->applyFilters($request)
             ->latest()

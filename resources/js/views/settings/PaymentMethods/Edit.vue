@@ -173,7 +173,7 @@ const dialogModelValueUpdate = val => {
 
             <VCol
               cols="12"
-              md="6"
+              md="12"
             >
               <VTextField
                 v-model="formData.live_identifier"
@@ -184,7 +184,7 @@ const dialogModelValueUpdate = val => {
 
             <VCol
               cols="12"
-              md="6"
+              md="12"
             >
               <VTextField
                 v-model="formData.live_secret"
@@ -205,7 +205,7 @@ const dialogModelValueUpdate = val => {
 
             <VCol
               cols="12"
-              md="6"
+              md="12"
             >
               <VTextField
                 v-model="formData.sandbox_identifier"
@@ -216,7 +216,7 @@ const dialogModelValueUpdate = val => {
 
             <VCol
               cols="12"
-              md="6"
+              md="12"
             >
               <VTextField
                 v-model="formData.sandbox_secret"

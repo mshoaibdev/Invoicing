@@ -70,6 +70,15 @@ class Invoice extends Model
 
     public function getPaymentLinkAttribute()
     {
+        if ($this->paymentMethod->name == "PayPal") {
+
+            if ($this->status === "Sent") {
+                return $this->payment_response;
+            } else {
+                return "";
+            }
+        }
+
         return route('invoice.pay', $this->uuid);
     }
 
@@ -118,19 +127,18 @@ class Invoice extends Model
         if (Str::startsWith($queryString, 'INV')) {
             $id = Str::after($queryString, 'INV');
             $query->where('id', $id);
-        }
-        else{
+        } else {
             $query->where('id', $queryString);
         }
 
         return $query
-            ->orWhere('total', 'like', '%'.$queryString.'%')
+            ->orWhere('total', 'like', '%' . $queryString . '%')
             ->orWhere('subtotal', 'like', '%' . $queryString . '%')
-            ->orWhere('tax_amount', 'like', '%'.$queryString.'%')
-            ->orWhere('payment_method', 'like', '%'.$queryString.'%')
-            ->orWhere('status', 'like', '%'.$queryString.'%')
+            ->orWhere('tax_amount', 'like', '%' . $queryString . '%')
+            ->orWhere('payment_method', 'like', '%' . $queryString . '%')
+            ->orWhere('status', 'like', '%' . $queryString . '%')
             ->whereHas('customer', function ($query) use ($queryString) {
-                return $query->where('name', 'like', $queryString.'%');
+                return $query->where('name', 'like', $queryString . '%');
             });
     }
 
@@ -138,6 +146,26 @@ class Invoice extends Model
     {
         return $query->where('company_id', request()->header('company'));
     }
+
+    // if the user is not admin then only show the invoices created by the user
+
+    public function scopeWhereCreator($query)
+    {
+        $user = auth()->user();
+        if (!$user->hasRole('Admin')) {
+            return $query->where('creator_id', auth()->id());
+        }
+    }
+
+    // where search
+
+    public function scopeWhereSearch($query, $request)
+    {
+        $query->when($request->q, function ($query, $search) {
+            $query->search($search);
+        });
+    }
+
 
     // created at
     // public function getCreatedAtAttribute($value)
@@ -148,7 +176,7 @@ class Invoice extends Model
     protected function invoiceId(): Attribute
     {
         return Attribute::make(
-            get: fn () => "INV{$this->id}",
+            get: fn() => "INV{$this->id}",
         );
     }
 
@@ -215,7 +243,7 @@ class Invoice extends Model
      * Get the user that owns the invoice
      */
 
-    public function creater(): BelongsTo
+    public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'creator_id');
     }

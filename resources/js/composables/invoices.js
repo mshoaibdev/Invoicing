@@ -99,7 +99,21 @@ export default function useInvoices() {
 
   const sendInvoice = async (invoiceId, formData) => {
 
-    return axios.post(route('invoices.send', invoiceId), formData)
+    try {
+      isLoading.value = true
+
+      const response =  await axios.post(route('invoices.send', invoiceId), formData)
+
+      console.log(response)
+     
+      respResult.value = response
+      toast.success(response.data.message)
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response.data.message)
+    } finally {
+      isLoading.value = false
+    }
 
   }
 
@@ -221,7 +235,7 @@ export default function useInvoices() {
     if (status === 'Paid')
       return {
         variant: 'primary',
-        icon: 'tabler-circle-half-2',
+        icon: 'tabler-circle-check',
       }
     if (status === 'Unpaid')
       return {
@@ -241,7 +255,7 @@ export default function useInvoices() {
     if (status === 'Sent')
       return {
         variant: 'success',
-        icon: 'tabler-circle-check',
+        icon: 'tabler-mail',
       }
     if (status === 'Overdue')
       return {

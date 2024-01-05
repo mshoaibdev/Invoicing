@@ -28,7 +28,7 @@ onMounted(async () => {
 
 const initialState = {
   due_date: moment().add(15, 'days').format('YYYY-MM-DD'),
-  invoice_date: '',
+  invoice_date: moment().format('YYYY-MM-DD'),
   total: 0,
   customer: {
     id: "",
