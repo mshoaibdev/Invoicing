@@ -158,7 +158,6 @@ const dialogModelValueUpdate = val => {
                 v-model="formData.mode"
                 :items="['sandbox', 'live']"
                 label="Mode"
-                :rules="[requiredValidator]"
               />
             </VCol>
             <VCol
@@ -180,7 +179,6 @@ const dialogModelValueUpdate = val => {
               <VTextField
                 v-model="formData.live_identifier"
                 label="Live Identifier"
-                :rules="[requiredValidator]"
               />
             </VCol>
 
@@ -191,7 +189,6 @@ const dialogModelValueUpdate = val => {
               <VTextField
                 v-model="formData.live_secret"
                 label="Live Secret"
-                :rules="[requiredValidator]"
               />
             </VCol>
 
@@ -212,7 +209,6 @@ const dialogModelValueUpdate = val => {
               <VTextField
                 v-model="formData.sandbox_identifier"
                 label="Sandbox Identifier"
-                :rules="[requiredValidator]"
               />
             </VCol>
 
@@ -223,7 +219,6 @@ const dialogModelValueUpdate = val => {
               <VTextField
                 v-model="formData.sandbox_secret"
                 label="Sandbox Secret"
-                :rules="[requiredValidator]"
               />
             </VCol>
 
