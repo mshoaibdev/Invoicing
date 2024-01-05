@@ -61,6 +61,7 @@ class DashboardController extends Controller
         ->when(!$isAdmin, function ($query) {
             $query->where('creator_id', auth()->id());
         })
+        ->whereCompany()
         ->where('status', 'Paid')
         ->whereBetween('created_at', [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()])
         ->get()
