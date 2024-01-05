@@ -58,9 +58,9 @@ class DashboardController extends Controller
         $isAdmin = auth()->user()->hasRole('Admin');
 
         $invoices = Invoice::query()
-        ->when(!$isAdmin, function ($query) {
-            $query->where('creator_id', auth()->id());
-        })
+        // ->when(!$isAdmin, function ($query) {
+        //     $query->where('creator_id', auth()->id());
+        // })
         ->whereCompany()
         ->where('status', 'Paid')
         ->whereBetween('created_at', [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()])
