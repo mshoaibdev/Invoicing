@@ -162,16 +162,16 @@ class InvoiceController extends Controller
     public function createPaypalInvoice($invoice)
     {
 
-
+        $currencyCode = $invoice->customer->currency->code;
         // set paypal config
-        $this->setPaypalConfig($invoice->payment_method_id);
+        $this->setPaypalConfig($invoice->payment_method_id, $currencyCode);
 
 
         $provider = new PayPalClient;
         $provider = PayPal::setProvider();
         $provider->getAccessToken();
 
-        $provider->setCurrency($invoice->customer->currency->code);
+        $provider->setCurrency($currencyCode);
         $provider->setRequestHeader('Prefer', 'return=representation');
 
 
@@ -181,7 +181,7 @@ class InvoiceController extends Controller
                 'name' => $product['description'],
                 'category' => 'DIGITAL_GOODS',
                 'unit_amount' => [
-                    'currency_code' => $invoice->customer->currency->code,
+                    'currency_code' => $currencyCode,
                     'value' => $product['total'],
                 ],
                 'quantity' => $product['quantity'],
@@ -193,7 +193,7 @@ class InvoiceController extends Controller
             'detail' => [
                 'invoice_number' => $invoice->invoice_id,
                 'invoice_date' => $invoice->invoice_date,
-                'currency_code' => $invoice->customer->currency->code,
+                'currency_code' => $currencyCode,
                 'note' => $invoice->note,
                 'payment_term' => [
                     'term_type' => 'DUE_ON_DATE_SPECIFIED',
@@ -310,7 +310,7 @@ class InvoiceController extends Controller
         }
 
         $invoice = Invoice::query()
-            ->with(['paymentMethod', 'company'])
+            ->with(['paymentMethod', 'company', 'customer'])
             ->whereCompany()
             ->where('id', $invoiceId)
             ->first();
@@ -321,7 +321,7 @@ class InvoiceController extends Controller
 
         if ($invoice->paymentMethod && $invoice->paymentMethod->name == 'PayPal') {
 
-            $paypalResponse = $this->sendPaypalInvoice($request, $invoice);
+            $paypalResponse = $this->sendPaypalInvoice($request, $invoice, $invoice->customer->currency->code);
 
             if (is_array($paypalResponse) && array_key_exists('error', $paypalResponse)) {
                 return response()->json([
@@ -358,11 +358,11 @@ class InvoiceController extends Controller
     }
 
 
-    public function sendPaypalInvoice(Request $request, Invoice $invoice)
+    public function sendPaypalInvoice(Request $request, Invoice $invoice, $currencyCode)
     {
 
         // set paypal config
-        $this->setPaypalConfig($invoice->payment_method_id);
+        $this->setPaypalConfig($invoice->payment_method_id, $currencyCode);
 
         $provider = new PayPalClient;
         $provider = PayPal::setProvider();
@@ -384,7 +384,7 @@ class InvoiceController extends Controller
 
     // set paypal config 
 
-    public function setPaypalConfig($paymentMethodId)
+    public function setPaypalConfig($paymentMethodId, $currencyCode)
     {
 
         $companyPaypalMethod = PaymentMethod::query()
@@ -417,6 +417,7 @@ class InvoiceController extends Controller
             'paypal.sandbox.client_secret' => $secretKey,
             'paypal.live.client_id' => $clientId,
             'paypal.live.client_secret' => $secretKey,
+            'paypal.currency' => $currencyCode,
         ]);
 
     }
