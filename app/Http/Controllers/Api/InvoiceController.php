@@ -310,7 +310,7 @@ class InvoiceController extends Controller
         }
 
         $invoice = Invoice::query()
-            ->with(['paymentMethod'])
+            ->with(['paymentMethod', 'company'])
             ->whereCompany()
             ->where('id', $invoiceId)
             ->first();
@@ -343,7 +343,7 @@ class InvoiceController extends Controller
             'mail.username' => $companyMailConfig['mail_username'],
             'mail.password' => $companyMailConfig['mail_password'],
             'mail.from.address' => $companyMailConfig['mail_from_address'],
-            'mail.from.name' => $companyMailConfig['mail_from_name'],
+            'mail.from.name' => $invoice->company->name,
         ]);
 
         $subject = $request->subject;
@@ -415,8 +415,8 @@ class InvoiceController extends Controller
             'paypal.mode' => $companyPaypalMethod->mode,
             'paypal.sandbox.client_id' => $clientId,
             'paypal.sandbox.client_secret' => $secretKey,
-            // 'paypal.live.client_id' => $clientId,
-            // 'paypal.live.client_secret' => $secretKey,
+            'paypal.live.client_id' => $clientId,
+            'paypal.live.client_secret' => $secretKey,
         ]);
 
     }
