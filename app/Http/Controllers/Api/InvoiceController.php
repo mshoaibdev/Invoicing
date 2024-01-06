@@ -67,7 +67,7 @@ class InvoiceController extends Controller
             }
 
             if($request->status == "Sent"){
-                $this->sendInvoice($request, $invoice);
+                $this->sendInvoiceHandler($request, $invoice);
             }
 
             $this->saveInvoicePdf($invoice);
@@ -302,13 +302,30 @@ class InvoiceController extends Controller
 
     // sendInvoice
 
-    public function sendInvoice(Request $request, $invoice)
+    public function sendInvoice(Request $request, $invoiceId)
+    {
+        $invoice = Invoice::with([
+            'company' => [
+                'address' => [
+                    'country',
+                ],
+            ],
+            'paymentMethod',
+            'customer' => [
+                'currency',
+            ]
+        ])->find($invoiceId);
+
+        $this->sendInvoiceHandler($request, $invoice);
+    }
+
+    public function sendInvoiceHandler(Request $request, $invoice)
     {
 
         $companyMailConfig = Setting::query()
-            ->whereCompany()
-            ->where('group', 'mail')
-            ->pluck('value', 'key');
+        ->whereCompany()
+        ->where('group', 'mail')
+        ->pluck('value', 'key');
 
         if (empty($companyMailConfig) || count($companyMailConfig) == 0) {
             return response()->json([
@@ -322,7 +339,7 @@ class InvoiceController extends Controller
             'is_sent' => true,
         ];
 
-        if ($invoice->paymentMethod && $invoice->paymentMethod->name == 'PayPal') {
+        if ($invoice->payment_method && $invoice->payment_method->name == 'PayPal') {
 
             $paypalResponse = $this->sendPaypalInvoice($request, $invoice, $invoice->customer->currency->code);
 
