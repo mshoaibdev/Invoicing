@@ -141,6 +141,24 @@ class Company extends Model implements HasMedia
         Unit::create(['name' => 'pc', 'company_id' => $this->id]);
     }
 
+    public function defaultInvoiceEmailBody()
+    {
+        $defaultInvoiceEmailBody = '
+        You have received a new invoice from <b>{COMPANY_NAME}</b>. <br /> 
+        You can pay using this link: {PAY_LINK} <br /> 
+        <br />Please download using the button below:';
+
+        return $defaultInvoiceEmailBody;
+    }
+
+    // subject
+    public function defaultInvoiceEmailSubject()
+    {
+        $defaultInvoiceEmailSubject = 'Invoice {INVOICE_ID} from {COMPANY_NAME}';
+
+        return $defaultInvoiceEmailSubject;
+    }
+
     public function setupDefaultSettings()
     {
         $defaultInvoiceEmailBody = 'You have received a new invoice from <b>{COMPANY_NAME}</b>.</br> Please download using the button below:';

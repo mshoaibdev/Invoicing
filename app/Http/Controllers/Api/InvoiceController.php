@@ -68,7 +68,10 @@ class InvoiceController extends Controller
             }
 
             if (in_array($invoice->status, ['Sent'])) {
-                $this->sendInvoiceHandler($request, $invoice);
+                $body = $invoice->company->defaultInvoiceEmailBody();
+                $subject = str_replace('{INVOICE_ID}', $invoice->invoice_id, $invoice->company->defaultInvoiceEmailSubject());
+                $subject = str_replace('{COMPANY_NAME}', $invoice->company->name, $subject);
+                $this->sendInvoiceHandler($invoice, $invoice->customer->email, $subject, $body);
             }
 
         });
@@ -314,10 +317,10 @@ class InvoiceController extends Controller
             ]
         ])->find($invoiceId);
 
-        $this->sendInvoiceHandler($request, $invoice);
+        $this->sendInvoiceHandler($invoice,$request->to, $request->subject, $request->body);
     }
 
-    public function sendInvoiceHandler(Request $request, $invoice)
+    public function sendInvoiceHandler($invoice, $toEmail, $subject, $body)
     {
         $companyMailConfig = Setting::query()
             ->whereCompany()
@@ -330,13 +333,13 @@ class InvoiceController extends Controller
             ], 500);
         }
 
-        $result = \DB::transaction(function () use ($request, $invoice, $companyMailConfig) {
+        $result = \DB::transaction(function () use ($invoice, $companyMailConfig, $subject, $body) {
 
             $payPalLink = '';
 
             if ($invoice->paymentMethod && $invoice->paymentMethod->name == 'PayPal') {
 
-                $paypalResponse = $this->sendPaypalInvoice($request, $invoice, $invoice->customer->currency->code);
+                $paypalResponse = $this->sendPaypalInvoice($invoice, $invoice->customer->currency->code);
 
                 if (is_array($paypalResponse) && array_key_exists('error', $paypalResponse)) {
                     return response()->json([
@@ -357,9 +360,7 @@ class InvoiceController extends Controller
 
             $this->setSmtpConfig($companyMailConfig, $invoice->company->name);
 
-            $subject = $request->subject;
-            $body = $this->processBody($request->body, $invoice);
-
+            $body = $this->processBody($body, $invoice);
 
             Mail::to($invoice->customer->email)->send(new NewInvoice($invoice, $subject, $body));
 
@@ -379,7 +380,7 @@ class InvoiceController extends Controller
     }
 
 
-    public function sendPaypalInvoice(Request $request, Invoice $invoice, $currencyCode)
+    public function sendPaypalInvoice(Invoice $invoice, $currencyCode)
     {
 
         // set paypal config

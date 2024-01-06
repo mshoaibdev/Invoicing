@@ -261,6 +261,13 @@ class Invoice extends Model
         return $this->belongsTo(User::class, 'creator_id');
     }
 
+
+
+
+
+
+
+
     protected static function booted()
     {
         static::deleting(function ($item) {

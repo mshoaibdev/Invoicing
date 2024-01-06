@@ -5,13 +5,11 @@
     @if($invoice->company->logo_url)
         <img class="header-logo" src="{{$invoice->company->logo_url}}" alt="{{$invoice->company->name}}" style="height: 90px">
     @else
-        {{$$invoice->company->name}}
+        {{$invoice->company->name}}
     @endif
     @endcomponent
 @endslot
 
-{{-- Body --}}
-<!-- Body here -->
 {!! $body !!}
 
 {{-- Subcopy --}}
