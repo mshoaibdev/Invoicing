@@ -339,7 +339,7 @@ class InvoiceController extends Controller
             'is_sent' => true,
         ];
 
-        if ($invoice->payment_method && $invoice->payment_method->name == 'PayPal') {
+        if ($invoice->paymentMethod && $invoice->paymentMethod->name == 'PayPal') {
 
             $paypalResponse = $this->sendPaypalInvoice($request, $invoice, $invoice->customer->currency->code);
 
@@ -352,6 +352,7 @@ class InvoiceController extends Controller
 
             $data['payment_response'] = json_decode($paypalResponse, true)['href'];
         }
+
 
         $invoice->update($data);
 
