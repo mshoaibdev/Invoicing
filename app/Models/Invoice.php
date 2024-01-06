@@ -148,7 +148,6 @@ class Invoice extends Model
             ->orWhere('total', 'like', '%' . $queryString . '%')
             ->orWhere('subtotal', 'like', '%' . $queryString . '%')
             ->orWhere('tax_amount', 'like', '%' . $queryString . '%')
-            ->orWhere('payment_method', 'like', '%' . $queryString . '%')
             ->orWhere('status', 'like', '%' . $queryString . '%')
             ->whereHas('customer', function ($query) use ($queryString) {
                 return $query->where('name', 'like', $queryString . '%');

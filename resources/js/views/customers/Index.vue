@@ -323,7 +323,12 @@ const confirmDelete = async ev => {
         </IconBtn>
         <IconBtn
           v-if="ability.can('Read', 'customers-view')"
-          @click="viewCustomer(item.raw.id)"
+          :to="{
+            name: 'customers.view',
+            params: {
+              id: item.raw.id
+            }
+          }"
         >
           <VIcon icon="tabler-eye" />
         </IconBtn>

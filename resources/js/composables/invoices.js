@@ -171,7 +171,7 @@ export default function useInvoices() {
       })
       .catch(err => {
         respResult.value = err
-        
+
         toast.error(err.response.data.message)
       }).finally(() => {
         isLoading.value = false
@@ -284,7 +284,7 @@ export default function useInvoices() {
   
 
 
-  watch([currentPage, itemsPerPage, filters], () => {
+  watch([currentPage, itemsPerPage], () => {
     fetchInvoices()
   })
 

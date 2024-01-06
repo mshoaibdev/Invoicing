@@ -10,6 +10,20 @@ const routes = [
       subject: 'customers-list',
     },
   },
+
+  // view single customer
+
+  {
+    path: '/customers/:id',
+    name: 'customers.view',
+    component: () => import('@/views/customers/CustomerInvoices.vue'),
+
+    meta: {
+      auth: true,
+      action: 'Read',
+      subject: 'customers-list',
+    },
+  },
 ]
 
 export default routes

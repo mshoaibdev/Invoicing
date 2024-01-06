@@ -78,6 +78,10 @@ class Customer extends Model
             ->when($request->companyId, function ($query, $companyId) {
                 $query->where('user_id', $companyId);
             })
+            // customerId
+            ->when($request->customerId, function ($query, $customerId) {
+                $query->where('customer_id', $customerId);
+            })
             ->when($request->sortBy, function ($query, $sortBy) {
                 $query->orderBy($sortBy);
             }, function ($query) {
