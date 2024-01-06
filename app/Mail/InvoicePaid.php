@@ -30,7 +30,7 @@ class InvoicePaid extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Invoice Paid' . $this->invoice->invoice_id .' - ' . $this->invoice->company->name,
+            subject: 'Invoice Paid - ' . $this->invoice->invoice_id .' - ' . $this->invoice->company->name,
         );
     }
 
