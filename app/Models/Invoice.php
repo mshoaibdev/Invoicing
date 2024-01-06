@@ -36,6 +36,7 @@ class Invoice extends Model
         'creator_id',
         'is_sent',
         'sent_at',
+        'paid_date',
     ];
 
     protected $casts = [
@@ -48,7 +49,6 @@ class Invoice extends Model
         'creator_id' => 'integer',
         'payment_method_id' => 'integer',
         'is_sent' => 'boolean',
-        'sent_at' => 'datetime',
     ];
 
     protected $appends = [
@@ -101,6 +101,15 @@ class Invoice extends Model
         return Carbon::parse($this->invoice_date)->format('F j, Y');
     }
 
+    // paid date
+
+    public function getPaidDateFormattedAttribute()
+    {
+        if (!$this->paid_date) {
+            return "";
+        }
+        return Carbon::parse($this->paid_date)->format('F j, Y');
+    }
 
     public function payments()
     {

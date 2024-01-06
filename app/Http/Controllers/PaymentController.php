@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use NumberFormatter;
 use App\Models\Invoice;
+use App\Models\Setting;
 use App\Mail\NewPayment;
+use App\Mail\InvoicePaid;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\ProcessPayment;
@@ -176,41 +178,26 @@ class PaymentController extends Controller
                 // and parse it to display the results of authorizing the card
                 $tresponse = $response->getTransactionResponse();
 
-                // return json response
 
                 if ($tresponse != null && $tresponse->getMessages() != null) {
 
+                    $companyMailConfig = Setting::query()
+                        ->where('company_id', $invoice->company->id)
+                        ->where('group', 'mail')
+                        ->pluck('value', 'key');
 
-                    //    $webhookResp =  Http::post(config('app.invoice_crm_url') . '/api/new-purchase', [
-                    //         'name' => $cardName,
-                    //         'email' => $email,
-                    //         'phone' => $phone,
-                    //         'notes' => $message,
-                    //         'order_details' => $packageDescription,
-                    //         'amount' => $packageAmount,
-                    //         'transaction_id' => $tresponse->getTransId(),
-                    //         'payment_method_id' => 1,
-                    //         'company_id' => 1,
-                    //         'currency_id' => 1,
-                    //         'payment_response' => json_encode($tresponse),
-                    //     ]);
 
-                    // Mail::to($email)->bcc(config('app.email'))->send(new NewPayment([
-                    //     'name' => $cardName,
-                    //     'email' => $email,
-                    //     'phone' => $phone,
-                    //     'message' => $message,
-                    //     'package' => $packageDescription,
-                    //     'amount' => $packageAmount,
-                    //     'invoiceNumber' => $invoiceNumber,
-                    //     'transactionId' => $tresponse->getTransId(),
-                    //     'code' => $tresponse->getResponseCode(),
-                    //     'paymentMethod' => 'Credit Card',
-                    // ]));
+                    if ($companyMailConfig->isNotEmpty()) {
+
+                        $this->setSmtpConfig($companyMailConfig, $invoice->company->name);
+
+                        Mail::to($invoice->customer->email)->bcc(config('app.email'))->send(new InvoicePaid($invoice));
+                    }
+
 
                     $invoice->payments()->create([
                         'amount' => $amount,
-                        'order_details' => 'Payment for ' . $invoice->company->name . ' invoice',
+                        'order_details' => 'Payment for invoice ' . $invoice->invoice_id,
                         'transaction_id' => $tresponse->getTransId(),
                         'payment_method_id' => $invoice->paymentMethod->id,
                         'currency_id' => $invoice->customer->currency->id,
@@ -222,6 +209,7 @@ class PaymentController extends Controller
                     $invoice->update([
                         'status' => 'Paid',
                         'is_paid' => true,
+                        'paid_date' => now(),
                     ]);
 
                     return redirect()->route('payment.success', ['invoiceId' => $invoice->uuid, 'transactionId' => $tresponse->getTransId(), 'message' => 'Payment successful']);
@@ -251,6 +239,22 @@ class PaymentController extends Controller
         } else {
             return redirect()->route('payment.failed', ['invoiceId' => $invoice->uuid, 'message' => 'Unknown error']);
         }
+
+    }
+
+    public function setSmtpConfig($companyMailConfig, $companyName)
+    {
+
+        config([
+            'mail.driver' => $companyMailConfig['mail_driver'],
+            'mail.host' => $companyMailConfig['mail_host'],
+            'mail.port' => $companyMailConfig['mail_port'],
+            'mail.encryption' => $companyMailConfig['mail_encryption'],
+            'mail.username' => $companyMailConfig['mail_username'],
+            'mail.password' => $companyMailConfig['mail_password'],
+            'mail.from.address' => $companyMailConfig['mail_from_address'],
+            'mail.from.name' => $companyName,
+        ]);
 
     }
 }
