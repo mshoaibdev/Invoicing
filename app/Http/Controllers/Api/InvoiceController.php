@@ -61,6 +61,7 @@ class InvoiceController extends Controller
                 ]
             ]);
 
+            $this->saveInvoicePdf($invoice);
 
             if ($invoice->paymentMethod->name == 'PayPal' && in_array($invoice->status, ['Sent', 'Draft'])) {
                 $this->createPaypalInvoice($invoice);
@@ -70,7 +71,6 @@ class InvoiceController extends Controller
                 $this->sendInvoiceHandler($request, $invoice);
             }
 
-            $this->saveInvoicePdf($invoice);
         });
 
 
@@ -168,9 +168,7 @@ class InvoiceController extends Controller
     {
 
         $currencyCode = $invoice->customer->currency->code;
-        // set paypal config
         $this->setPaypalConfig($invoice->payment_method_id, $currencyCode);
-
 
         $provider = new PayPalClient;
         $provider = PayPal::setProvider();
@@ -196,7 +194,7 @@ class InvoiceController extends Controller
         $data = [
             'items' => $items,
             'detail' => [
-                'invoice_number' => $invoice->invoice_id . '-' . $invoice->company->name,
+                'invoice_number' => $invoice->invoice_id . '-' . rand(1000, 9999),
                 'invoice_date' => $invoice->invoice_date,
                 'currency_code' => $currencyCode,
                 'note' => $invoice->note,
