@@ -25,7 +25,7 @@ Invoice Number: {{$invoice->invoice_id}}<br>
 Invoice Date: {{$invoice->invoice_date}}<br>
 Due Date: {{$invoice->due_date}}<br>
 Amount: {{$invoice->total}}<br>
-Paid Date: {{$invoice->paid_date}}<br>
+Paid Date: {{ date('Y-m-d') }}<br>
 Payment Method: {{$invoice->paymentMethod->name}}<br>
 
 @endcomponent
