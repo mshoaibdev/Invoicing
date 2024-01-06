@@ -350,6 +350,7 @@ class InvoiceController extends Controller
                 [
                     'status' => 'Sent',
                     'is_sent' => true,
+                    'sent_at' => now(),
                     'payment_response' => $payPalLink,
                 ]
             );
