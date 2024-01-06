@@ -62,11 +62,11 @@ class InvoiceController extends Controller
             ]);
 
 
-            if ($invoice->paymentMethod->name == 'PayPal') {
+            if ($invoice->paymentMethod->name == 'PayPal' && in_array($invoice->status, ['Sent', 'Draft'])) {
                 $this->createPaypalInvoice($invoice);
             }
 
-            if ($request->status == "Sent") {
+            if (in_array($invoice->status, ['Sent'])) {
                 $this->sendInvoiceHandler($request, $invoice);
             }
 

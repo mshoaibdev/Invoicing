@@ -96,7 +96,6 @@ const dialogModelValueUpdate = val => {
                     {{ invoiceData.customer.billing.zip }}
                    
                     {{ invoiceData.customer.billing.country.name }}
-                    
                   </td>
                 </tr>
 
@@ -114,7 +113,7 @@ const dialogModelValueUpdate = val => {
                     Payment Method:
                   </th>
                   <td>
-                    {{ invoiceData.payment_method }}
+                    {{ invoiceData.payment_method.name }}
                   </td>
                 </tr>
 

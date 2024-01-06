@@ -34,6 +34,11 @@ export default function useInvoices() {
       sortable: false,
     },
     {
+      title: 'Payment Method',
+      key: 'payment_method.name',
+      sortable: false,
+    },
+    {
       title: 'Status',
       key: 'status',
       sortable: false,

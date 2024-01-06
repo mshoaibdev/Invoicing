@@ -270,9 +270,6 @@ const confirmDelete = async ev => {
             <p class="mb-0">
               {{ item.raw.status }}
             </p>
-            <p class="mb-0">
-              Due date: {{ item.raw.due_date }}
-            </p>
           </VTooltip>
         </div>
       </template>
