@@ -19,11 +19,8 @@ class PaymentMethodController extends Controller
         $limit = $request->has('perPage') ? $request->perPage : 10;
 
         $customers = PaymentMethod::query()
-            ->when($request->q, function ($query) use ($request) {
-                $query->whereSearch($request->q);
-            })
+            ->whereSearch($request)
             ->whereCompany()
-            // ->applyFilters($request)
             ->latest()
             ->paginate($limit);
 
@@ -40,7 +37,7 @@ class PaymentMethodController extends Controller
         PaymentMethod::create($request->getPaymentMethodPayload());
 
         return response()->json([
-            'message' => 'PaymentMethod created successfully.',
+            'message' => 'Payment Method created successfully.',
         ]);
     }
 
@@ -64,7 +61,7 @@ class PaymentMethodController extends Controller
         $paymentMethod->update($request->getPaymentMethodPayload());
 
         return response()->json([
-            'message' => 'PaymentMethod updated successfully.',
+            'message' => 'Payment Method updated successfully.',
         ]);
     }
 
@@ -75,6 +72,10 @@ class PaymentMethodController extends Controller
     {
 
         $paymentMethod->delete();
+
+        return response()->json([
+            'message' => 'Payment Method deleted successfully.',
+        ]);
     }
 
     public function getPaymentMethods(Request $request)
@@ -107,7 +108,7 @@ class PaymentMethodController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'PaymentMethod updated successfully',
+            'message' => 'Payment Method updated successfully',
         ], 200);
     }
 }

@@ -332,10 +332,9 @@ class InvoiceController extends Controller
             ], 500);
         }
 
-        \DB::transaction(function () use ($request, $invoice, $companyMailConfig) {
+        $result = \DB::transaction(function () use ($request, $invoice, $companyMailConfig) {
 
-
-            $payPalLink = null;
+            $payPalLink = '';
 
             if ($invoice->paymentMethod && $invoice->paymentMethod->name == 'PayPal') {
 
@@ -353,7 +352,6 @@ class InvoiceController extends Controller
                 [
                     'status' => 'Sent',
                     'is_sent' => true,
-                    // 'sent_at' => now(),
                     'payment_response' => $payPalLink,
                 ]
             );
@@ -366,11 +364,19 @@ class InvoiceController extends Controller
 
             Mail::to($invoice->customer->email)->send(new NewInvoice($invoice, $subject, $body));
 
+            return true;
+
         });
 
+        if ($result) {
+            return response()->json([
+                'message' => 'Invoice sent successfully.',
+            ]);
+        }
+
         return response()->json([
-            'message' => 'Invoice sent successfully.',
-        ]);
+            'message' => 'Something went wrong.',
+        ], 500);
     }
 
 

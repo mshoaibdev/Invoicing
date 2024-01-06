@@ -46,9 +46,16 @@ class PaymentMethod extends Model
         $query->orWhere('id', $payment_id);
     }
 
-    public function scopeWhereSearch($query, $search)
+    public function scopeSearch($query, $search)
     {
         $query->where('name', 'LIKE', '%'.$search.'%');
+    }
+
+    public function scopeWhereSearch($query, $request)
+    {
+        $query->when($request->q, function ($query, $search) {
+            $query->search($search);
+        });
     }
 
     public function scopeApplyFilters($query, array $filters)
