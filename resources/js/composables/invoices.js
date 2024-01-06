@@ -171,9 +171,8 @@ export default function useInvoices() {
       })
       .catch(err => {
         respResult.value = err
-        if (err.response.status === 422) {
-          toast.error(err.response.data.message)
-        }
+        
+        toast.error(err.response.data.message)
       }).finally(() => {
         isLoading.value = false
       })

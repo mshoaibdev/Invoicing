@@ -63,6 +63,7 @@ class InvoiceController extends Controller
 
             $this->saveInvoicePdf($invoice);
 
+
             if ($invoice->paymentMethod->name == 'PayPal' && in_array($invoice->status, ['Sent', 'Draft'])) {
                 $this->createPaypalInvoice($invoice);
             }
@@ -175,11 +176,15 @@ class InvoiceController extends Controller
 
         $provider = new PayPalClient;
         $provider = PayPal::setProvider();
-        $provider->getAccessToken();
+        $resp = $provider->getAccessToken();
 
         $provider->setCurrency($currencyCode);
         $provider->setRequestHeader('Prefer', 'return=representation');
 
+        if (array_key_exists('error', $resp)) {
+
+            throw new \Exception($resp['error']['error_description']);
+        }
 
         $items = [];
         foreach ($invoice->items as $product) {
@@ -253,7 +258,6 @@ class InvoiceController extends Controller
 
         $response = $provider->createInvoice($data);
 
-        // dd($response);
 
         // check for error key
         if (array_key_exists('error', $response)) {
@@ -268,7 +272,7 @@ class InvoiceController extends Controller
         ]);
 
 
-        return $response;
+        return $response->json();
 
     }
 
@@ -299,9 +303,6 @@ class InvoiceController extends Controller
 
     }
 
-
-
-    // sendInvoice
 
     public function sendInvoice(Request $request, $invoiceId)
     {
