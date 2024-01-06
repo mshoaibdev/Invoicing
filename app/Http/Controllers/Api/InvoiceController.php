@@ -66,7 +66,7 @@ class InvoiceController extends Controller
                 $this->createPaypalInvoice($invoice);
             }
 
-            if($request->status == "Sent"){
+            if ($request->status == "Sent") {
                 $this->sendInvoiceHandler($request, $invoice);
             }
 
@@ -77,7 +77,7 @@ class InvoiceController extends Controller
         return response()->json([
             'message' => 'Invoice created successfully.',
         ]);
-       
+
 
     }
 
@@ -86,7 +86,7 @@ class InvoiceController extends Controller
      */
     public function show(Invoice $invoice)
     {
-        $invoice->load(['customer' => ['billing','currency']]);
+        $invoice->load(['customer' => ['billing', 'currency']]);
 
         return new InvoiceResource($invoice);
     }
@@ -196,7 +196,7 @@ class InvoiceController extends Controller
         $data = [
             'items' => $items,
             'detail' => [
-                'invoice_number' => $invoice->invoice_id. '-'. $invoice->company->name,
+                'invoice_number' => $invoice->invoice_id . '-' . $invoice->company->name,
                 'invoice_date' => $invoice->invoice_date,
                 'currency_code' => $currencyCode,
                 'note' => $invoice->note,
@@ -321,48 +321,52 @@ class InvoiceController extends Controller
 
     public function sendInvoiceHandler(Request $request, $invoice)
     {
-
         $companyMailConfig = Setting::query()
-        ->whereCompany()
-        ->where('group', 'mail')
-        ->pluck('value', 'key');
+            ->whereCompany()
+            ->where('group', 'mail')
+            ->pluck('value', 'key');
 
         if (empty($companyMailConfig) || count($companyMailConfig) == 0) {
             return response()->json([
                 'message' => 'Please configure mail settings for this company in the settings.',
-            ], 422);
+            ], 500);
         }
 
+        \DB::transaction(function () use ($request, $invoice, $companyMailConfig) {
 
-        $data = [
-            'status' => 'Sent',
-            'is_sent' => true,
-        ];
 
-        if ($invoice->paymentMethod && $invoice->paymentMethod->name == 'PayPal') {
+            $payPalLink = null;
 
-            $paypalResponse = $this->sendPaypalInvoice($request, $invoice, $invoice->customer->currency->code);
+            if ($invoice->paymentMethod && $invoice->paymentMethod->name == 'PayPal') {
 
-            if (is_array($paypalResponse) && array_key_exists('error', $paypalResponse)) {
-                return response()->json([
-                    'message' => json_decode($paypalResponse['error'], true)['details'][0]['description'],
-                ], 500);
+                $paypalResponse = $this->sendPaypalInvoice($request, $invoice, $invoice->customer->currency->code);
+
+                if (is_array($paypalResponse) && array_key_exists('error', $paypalResponse)) {
+                    return response()->json([
+                        'message' => json_decode($paypalResponse['error'], true)['details'][0]['description'],
+                    ], 500);
+                }
+                $payPalLink = json_decode($paypalResponse, true)['href'];
             }
 
+            $invoice->update(
+                [
+                    'status' => 'Sent',
+                    'is_sent' => true,
+                    // 'sent_at' => now(),
+                    'payment_response' => $payPalLink,
+                ]
+            );
 
-            $data['payment_response'] = json_decode($paypalResponse, true)['href'];
-        }
+            $this->setSmtpConfig($companyMailConfig, $invoice->company->name);
+
+            $subject = $request->subject;
+            $body = $this->processBody($request->body, $invoice);
 
 
-        $invoice->update($data);
+            Mail::to($invoice->customer->email)->send(new NewInvoice($invoice, $subject, $body));
 
-        $this->setSmtpConfig($companyMailConfig, $invoice->company->name);
-
-        $subject = $request->subject;
-        $body = $this->processBody($request->body, $invoice);
-
-
-        Mail::to($invoice->customer->email)->send(new NewInvoice($invoice, $subject, $body));
+        });
 
         return response()->json([
             'message' => 'Invoice sent successfully.',
