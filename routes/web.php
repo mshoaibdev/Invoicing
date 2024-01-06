@@ -16,6 +16,29 @@ use App\Http\Controllers\PaymentController;
 |
 */
 
+Route::get('/pdf', function () {
+
+    
+    // $invoice = Invoice::with([
+    //     'company' => [
+    //         'address',
+    //     ],
+    //     'customer' => [
+    //         'billing',
+    //         'currency',
+    //     ]
+    // ])->find(1000);
+
+
+    $pdfView = view('test')->render();
+
+    $pdf = App::make('dompdf.wrapper');
+    $pdf->loadHTML($pdfView)->setPaper('a4', 'portrait');
+    return $pdf->stream();
+    // $pdfContent = $pdf->output();
+
+});
+
 
 // invoice.pay
 Route::get('/invoice/pay/{invoiceId}', [PaymentController::class, 'paymentForm'])->name('invoice.pay');

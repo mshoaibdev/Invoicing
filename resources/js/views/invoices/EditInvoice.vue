@@ -608,6 +608,7 @@ const removeProduct = id => {
 
           <!-- 👉 Send Invoice Trigger button -->
           <VBtn
+            v-if="invoiceData.status === 'Draft' || invoiceData.status === 'Sent'"
             block
             prepend-icon="tabler-send"
             class="mb-2"
