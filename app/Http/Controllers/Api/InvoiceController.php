@@ -45,34 +45,38 @@ class InvoiceController extends Controller
     public function store(Store $request)
     {
 
-        $invoice = Invoice::create($request->getInvoicePayload());
+        $result = \DB::transaction(function () use ($request) {
+            $invoice = Invoice::create($request->getInvoicePayload());
 
-        $invoice->load([
-            'company' => [
-                'address' => [
-                    'country',
+            $invoice->load([
+                'company' => [
+                    'address' => [
+                        'country',
+                    ],
                 ],
-            ],
-            'paymentMethod',
-            'customer' => [
-                'billing',
-                'currency',
-            ]
-        ]);
+                'paymentMethod',
+                'customer' => [
+                    'billing',
+                    'currency',
+                ]
+            ]);
 
-        if ($invoice->paymentMethod->name == 'PayPal') {
-            $this->createPaypalInvoice($invoice);
-        }
+            if ($invoice->paymentMethod->name == 'PayPal') {
+                $this->createPaypalInvoice($invoice);
+            }
 
-        if($request->status == "Sent"){
-            $this->sendInvoice($request, $invoice->id);
-        }
+            if($request->status == "Sent"){
+                $this->sendInvoice($request, $invoice->id);
+            }
 
-        $this->saveInvoicePdf($invoice);
+            $this->saveInvoicePdf($invoice);
+        });
+
 
         return response()->json([
             'message' => 'Invoice created successfully.',
         ]);
+       
 
     }
 

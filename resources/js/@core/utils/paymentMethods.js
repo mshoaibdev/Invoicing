@@ -1,7 +1,7 @@
 export  default [
   {
-    title: "Authorize.net",
-    value: "Authorize.net",
+    title: "Authorized.net",
+    value: "Authorized.net",
   },
   {
     title: "Paypal",

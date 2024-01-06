@@ -310,7 +310,16 @@ const confirmDelete = async ev => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <VIcon icon="tabler-credit-card" /> Payment Link
+                <VIcon icon="tabler-credit-card" /> 
+                <span
+                  v-if="item.raw.payment_link === '' && item.raw.payment_method.name === 'PayPal' " 
+                  class="text-grey text-caption align-self-center"
+                >
+                  Link is not available
+                </span>  
+                <span v-else>
+                  {{ item.raw.payment_method.name == 'PayPal' ? ' Pay with PayPal' : ' Pay Invoice' }}
+                </span>
               </VListItem>
 
               <VListItem
