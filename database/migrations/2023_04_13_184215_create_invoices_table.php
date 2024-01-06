@@ -37,6 +37,7 @@ return new class extends Migration
             $table->tinyInteger('is_sent')->default(0);
             $table->tinyInteger('is_viewed')->default(0);
             $table->tinyInteger('is_paid')->default(0);
+            $table->timestamp('sent_at')->nullable();
 
             $table->string('status', 50)->nullable()->default('Paid');
             $table->json('payment_response')->nullable();

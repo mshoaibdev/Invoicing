@@ -34,6 +34,8 @@ class Invoice extends Model
         'vat_amount',
         'vat_percentage',
         'creator_id',
+        'is_sent',
+        'sent_at',
     ];
 
     protected $casts = [
@@ -45,6 +47,8 @@ class Invoice extends Model
         'payment_response' => 'array',
         'creator_id' => 'integer',
         'payment_method_id' => 'integer',
+        'is_sent' => 'boolean',
+        'sent_at' => 'datetime',
     ];
 
     protected $appends = [

@@ -61,12 +61,13 @@ class InvoiceController extends Controller
                 ]
             ]);
 
+
             if ($invoice->paymentMethod->name == 'PayPal') {
                 $this->createPaypalInvoice($invoice);
             }
 
             if($request->status == "Sent"){
-                $this->sendInvoice($request, $invoice->id);
+                $this->sendInvoice($request, $invoice);
             }
 
             $this->saveInvoicePdf($invoice);
@@ -195,7 +196,7 @@ class InvoiceController extends Controller
         $data = [
             'items' => $items,
             'detail' => [
-                'invoice_number' => $invoice->invoice_id,
+                'invoice_number' => $invoice->invoice_id. '-'. $invoice->company->name,
                 'invoice_date' => $invoice->invoice_date,
                 'currency_code' => $currencyCode,
                 'note' => $invoice->note,
@@ -251,6 +252,8 @@ class InvoiceController extends Controller
 
         $response = $provider->createInvoice($data);
 
+        // dd($response);
+
         // check for error key
         if (array_key_exists('error', $response)) {
 
@@ -299,7 +302,7 @@ class InvoiceController extends Controller
 
     // sendInvoice
 
-    public function sendInvoice(Request $request, $invoiceId)
+    public function sendInvoice(Request $request, $invoice)
     {
 
         $companyMailConfig = Setting::query()
@@ -313,14 +316,10 @@ class InvoiceController extends Controller
             ], 422);
         }
 
-        $invoice = Invoice::query()
-            ->with(['paymentMethod', 'company', 'customer'])
-            ->whereCompany()
-            ->where('id', $invoiceId)
-            ->first();
-        
+
         $data = [
             'status' => 'Sent',
+            'is_sent' => true,
         ];
 
         if ($invoice->paymentMethod && $invoice->paymentMethod->name == 'PayPal') {
@@ -339,16 +338,7 @@ class InvoiceController extends Controller
 
         $invoice->update($data);
 
-        config([
-            'mail.driver' => $companyMailConfig['mail_driver'],
-            'mail.host' => $companyMailConfig['mail_host'],
-            'mail.port' => $companyMailConfig['mail_port'],
-            'mail.encryption' => $companyMailConfig['mail_encryption'],
-            'mail.username' => $companyMailConfig['mail_username'],
-            'mail.password' => $companyMailConfig['mail_password'],
-            'mail.from.address' => $companyMailConfig['mail_from_address'],
-            'mail.from.name' => $invoice->company->name,
-        ]);
+        $this->setSmtpConfig($companyMailConfig, $invoice->company->name);
 
         $subject = $request->subject;
         $body = $this->processBody($request->body, $invoice);
@@ -422,6 +412,22 @@ class InvoiceController extends Controller
             'paypal.live.client_id' => $clientId,
             'paypal.live.client_secret' => $secretKey,
             'paypal.currency' => $currencyCode,
+        ]);
+
+    }
+
+    public function setSmtpConfig($companyMailConfig, $companyName)
+    {
+
+        config([
+            'mail.driver' => $companyMailConfig['mail_driver'],
+            'mail.host' => $companyMailConfig['mail_host'],
+            'mail.port' => $companyMailConfig['mail_port'],
+            'mail.encryption' => $companyMailConfig['mail_encryption'],
+            'mail.username' => $companyMailConfig['mail_username'],
+            'mail.password' => $companyMailConfig['mail_password'],
+            'mail.from.address' => $companyMailConfig['mail_from_address'],
+            'mail.from.name' => $companyName,
         ]);
 
     }
