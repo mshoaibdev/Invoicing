@@ -11,9 +11,7 @@
       style="
         width: 100%;
         max-width: 600px;
-        padding: 30px 60px;
         margin: auto;
-        background: #fff;
         background-image: url('https://res.cloudinary.com/dxsqw4dbf/image/upload/v1704477555/2_qqyzic.png'),
           url('https://res.cloudinary.com/dxsqw4dbf/image/upload/v1704477555/1_ezkhhy.png');
         background-repeat: no-repeat, no-repeat;

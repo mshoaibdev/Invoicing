@@ -437,16 +437,15 @@ const dialogModelValueUpdate = val => {
         </VForm>
       </VCardText>
       <div
-      v-else
-      class="text-center pa-12"
-    >
-      <VProgressCircular
-        :width="3"
-        :size="70"
-        color="#F3BB45"
-        indeterminate
-      />
-    </div>
+        v-else
+        class="text-center pa-12"
+      >
+        <VProgressCircular
+          :width="3"
+          :size="70"
+          indeterminate
+        />
+      </div>
     </VCard>
   </VDialog>
 </template>

@@ -163,6 +163,7 @@ const dialogModelValueUpdate = val => {
             <VTable>
               <thead>
                 <tr>
+                  <th>Title</th>
                   <th>Description</th>
                   <th>Quantity</th>
                   <th>Price</th>
@@ -174,6 +175,7 @@ const dialogModelValueUpdate = val => {
                   v-for="(item, index) in invoiceData.items"
                   :key="index"
                 >
+                  <td>{{ item.title }}</td>
                   <td>{{ item.description }}</td>
                   <td>{{ item.quantity }}</td>
                   <td>{{ formatCurrency(item.cost, invoiceData.customer.currency.code ?? "USD") }}</td>

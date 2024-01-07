@@ -231,7 +231,15 @@ const removeProduct = id => {
                   :menu-props="{ maxHeight: 300 }"
                   density="compact"
                   @update:model-value="selectCustomer"
-                />
+                >
+                  <template #item="{ props, item }">
+                    <VListItem
+                      v-bind="props"
+                      :subtitle="item.raw.email"
+                    />
+                  </template>
+                </VAutocomplete>
+                
 
                 <div
                   v-if="selectedCustomer"
@@ -258,7 +266,7 @@ const removeProduct = id => {
                           {{ selectedCustomer.billing.address_street_1 }}
                           {{ selectedCustomer.billing.city }}
                           {{ selectedCustomer.billing.state }}
-                          {{ selectedCustomer.billing.zip }} <br/>
+                          {{ selectedCustomer.billing.zip }} <br>
                           {{ selectedCustomer.billing.country_name }}
                         </td>
                       </tr>
@@ -335,7 +343,9 @@ const removeProduct = id => {
                   cols="12"
                   md="6"
                 >
-                  <span class="text-sm"> Description </span>
+                  <span class="text-sm"> 
+                    Product Name
+                  </span>
                 </VCol>
                 <VCol
                   cols="12"
@@ -375,10 +385,10 @@ const removeProduct = id => {
                       md="6"
                     >
                       <VTextarea
-                        v-model="product.description"
+                        v-model="product.title"
                         :rules="[requiredValidator]"
                         rows="1"
-                        label="Description"
+                        label="Title"
                       />
                     </VCol>
                    
@@ -422,6 +432,16 @@ const removeProduct = id => {
                           )
                         }}</span>
                       </p>
+                    </VCol>
+                    <VCol
+                      cols="12"
+                      md="12"
+                    >
+                      <VTextarea
+                        v-model="product.description"
+                        rows="3"
+                        label="Description"
+                      />
                     </VCol>
                   </VRow>
                 </div>
@@ -553,6 +573,18 @@ const removeProduct = id => {
 
           <VCardText class="mx-sm-4">
             <p class="font-weight-semibold mb-2 mt-2">
+              Terms and Conditions:
+            </p>
+            <VTextarea
+              v-model="invoiceData.terms"
+              clearable
+              placeholder="Enter your terms here..."
+              clear-icon="tabler-circle-x"
+            />
+          </VCardText>
+
+          <VCardText class="mx-sm-4">
+            <p class="font-weight-semibold mb-2 mt-2">
               Note:
             </p>
             <VTextarea
@@ -585,14 +617,6 @@ const removeProduct = id => {
           />
 
        
-          <VSelect
-            v-model="invoiceData.status"
-            label="Status"
-            :items="['Draft', 'Sent', 'Paid', 'Overdue']"
-            :menu-props="{ maxHeight: 500 }"
-            class="mb-6"
-          />
-
           <VBtn
             block
             type="submit"

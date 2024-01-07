@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\User\Store;
-use App\Http\Requests\User\Update;
-use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Traits\Upload;
 use Illuminate\Http\Request;
+use App\Http\Requests\User\Store;
+use App\Http\Requests\User\Update;
+use App\Mail\NewUserAccountCreated;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
@@ -65,6 +67,8 @@ class UserController extends Controller
         }
 
         $user->companies()->sync($request->companies);
+
+        Mail::to($user->email)->send(new NewUserAccountCreated($request->getUserPayload()));
 
         return response()->json([
             'message' => 'User successfully added.',

@@ -40,6 +40,7 @@ Route::get('/pdf', function () {
 });
 
 
+
 // invoice.pay
 Route::get('/invoice/pay/{invoiceId}', [PaymentController::class, 'paymentForm'])->name('invoice.pay');
 // process-payment

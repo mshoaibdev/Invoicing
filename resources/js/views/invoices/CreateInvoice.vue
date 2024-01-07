@@ -50,6 +50,7 @@ const initialState = {
     {
       id: 1,
       quantity: 0,
+      title: "",
       description: "",
       item_code: "",
       cost: 0,
@@ -160,11 +161,13 @@ const onSubmit = async () => {
       formNewData.append("status", invoiceData.value.status)
 
       for (let index = 0; index < items.length; index++) {
+
         formNewData.append(`items[${index}][quantity]`, items[index].quantity)
         formNewData.append(
           `items[${index}][description]`,
           items[index].description,
         )
+        formNewData.append(`items[${index}][title]`, items[index].title)
         formNewData.append(`items[${index}][cost]`, items[index].cost)
         formNewData.append(`items[${index}][total]`, items[index].total)
       }
@@ -184,6 +187,7 @@ const addItem = () => {
     id: invoiceData.value.items.length + 1,
     quantity: 0,
     description: "",
+    title: "",
     cost: 0,
     total: 0,
   })
@@ -191,6 +195,20 @@ const addItem = () => {
 
 const removeProduct = id => {
   invoiceData.value.items.splice(id, 1)
+}
+
+// InvoiceAsDraft
+
+const InvoiceAsDraft = async () => {
+
+  invoiceData.value.status = 'Draft'
+  await onSubmit()
+}
+
+const InvoiceAsSent = async () => {
+
+  invoiceData.value.status = 'Sent'
+  await onSubmit()
 }
 </script>
 
@@ -230,7 +248,15 @@ const removeProduct = id => {
                   :menu-props="{ maxHeight: 300 }"
                   density="compact"
                   @update:model-value="selectCustomer"
-                />
+                >
+                  <template #item="{ props, item }">
+                    <VListItem
+                      v-bind="props"
+                      :subtitle="item.raw.email"
+                    />
+                  </template>
+                </VAutocomplete>
+                
 
                 <div
                   v-if="selectedCustomer"
@@ -249,7 +275,7 @@ const removeProduct = id => {
                           {{ selectedCustomer.name }}
                         </td>
                       </tr>
-                      <tr >
+                      <tr>
                         <td class="pe-6">
                           Address:
                         </td>
@@ -261,11 +287,13 @@ const removeProduct = id => {
                           {{ selectedCustomer.billing.zip }}
                         </td>
                       </tr>
-                      <tr >
+                      <tr>
                         <td class="pe-6">
                           Phone:
                         </td>
-                        <td v-if="selectedCustomer.billing">{{ selectedCustomer.billing.phone }}</td>
+                        <td v-if="selectedCustomer.billing">
+                          {{ selectedCustomer.billing.phone }}
+                        </td>
                       </tr>
                       <tr>
                         <td class="pe-6">
@@ -332,7 +360,7 @@ const removeProduct = id => {
                   cols="12"
                   md="6"
                 >
-                  <span class="text-sm"> Description </span>
+                  <span class="text-sm"> Product Name </span>
                 </VCol>
                 <VCol
                   cols="12"
@@ -371,11 +399,10 @@ const removeProduct = id => {
                       cols="12"
                       md="6"
                     >
-                      <VTextarea
-                        v-model="product.description"
+                      <VTextField
+                        v-model="product.title"
                         :rules="[requiredValidator]"
-                        rows="1"
-                        label="Description"
+                        label="Title"
                       />
                     </VCol>
                    
@@ -419,6 +446,17 @@ const removeProduct = id => {
                           )
                         }}</span>
                       </p>
+                    </VCol>
+
+                    <VCol
+                      cols="12"
+                      md="12"
+                    >
+                      <VTextarea
+                        v-model="product.description"
+                        rows="3"
+                        label="Description"
+                      />
                     </VCol>
                   </VRow>
                 </div>
@@ -587,27 +625,33 @@ const removeProduct = id => {
             item-value="id"
             label="Payment Method"
             class="mb-6"
-          />
-
-        
-          <VSelect
-            v-model="invoiceData.status"
-            label="Status"
-            :items="['Draft', 'Sent', 'Paid', 'Overdue']"
-            :menu-props="{ maxHeight: 500 }"
-            class="mb-6"
-          />
+          >
+            <template #item="{ props, item }">
+              <VListItem
+                v-bind="props"
+                :subtitle="item.raw.description"
+              />
+            </template>
+          </VSelect>
         </div>
         <div class="d-flex flex-wrap gap-4 justify-end pt-4 pb-4">
           <VBtn
             block
-            type="submit"
-            prepend-icon="tabler-file"
             :loading="invoiceLoading"
             :disabled="invoiceLoading"
-            @click="refForm?.validate()"
+            prepend-icon="tabler-archive"
+            @click="InvoiceAsDraft"
           >
-            Create Invoice
+            Save as Draft
+          </VBtn>
+          <VBtn
+            block
+            :loading="invoiceLoading"
+            :disabled="invoiceLoading"
+            prepend-icon="tabler-send"
+            @click="InvoiceAsSent"
+          >
+            Send Invoice
           </VBtn>
           <VBtn
             block
