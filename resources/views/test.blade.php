@@ -5,12 +5,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Email Template</title>
+    <style>
+    * {
+      margin: 0px;
+      padding: 0px;
+      box-sizing: border-box;
+    }
+    </style>
   </head>
   <body style="margin: 0px; background: #f4f4f4">
     <div
       style="
-        width: 100%;
-        max-width: 600px;
+        padding: 20px;
         margin: auto;
         background-image: url('https://res.cloudinary.com/dxsqw4dbf/image/upload/v1704477555/2_qqyzic.png'),
           url('https://res.cloudinary.com/dxsqw4dbf/image/upload/v1704477555/1_ezkhhy.png');
@@ -21,17 +27,17 @@
           sans-serif;
       "
     >
-      <table style="width: 100%">
+      <table style="width: 100%;">
         <thead>
           <tr>
             <td>
-              <table style="width: 100%; margin-bottom: 40px">
+              <table style="width: 100%; margin-bottom: 20px">
                 <tr>
                   <td>
                     <h1
                       style="
                         font-family: Georgia, 'Times New Roman', Times, serif;
-                        font-size: 70px;
+                        font-size: 46px;
                         font-weight: 400;
                       "
                     >
@@ -42,7 +48,7 @@
                     <img
                       src="https://res.cloudinary.com/dxsqw4dbf/image/upload/v1704476746/1704476734-trimmy-0_ytsrqv.png"
                       alt="The Meta Mavericks"
-                      width="180"
+                      width="150"
                     />
                   </td>
                 </tr>
@@ -95,7 +101,7 @@
                 style="
                   width: 100%;
                   border-collapse: collapse;
-                  margin: 10px 0 40px;
+                  margin: 10px 0 20px;
                 "
               >
                 <thead>
@@ -218,124 +224,12 @@
                     <td style="font-weight: 600; padding: 10px">3</td>
                     <td style="font-weight: 600; padding: 10px">$ 150.00</td>
                   </tr>
-                  <tr>
-                    <td
-                      style="
-                        font-weight: 600;
-                        padding: 10px;
-                        background: #d9d9d9;
-                      "
-                    >
-                      2.
-                    </td>
-                    <td
-                      style="
-                        font-weight: 600;
-                        padding: 10px;
-                        background: #d9d9d9;
-                      "
-                    >
-                      Bussiness Card Design
-                    </td>
-                    <td
-                      style="
-                        font-weight: 600;
-                        padding: 10px;
-                        background: #d9d9d9;
-                      "
-                    >
-                      $ 50.00
-                    </td>
-                    <td
-                      style="
-                        font-weight: 600;
-                        padding: 10px;
-                        background: #d9d9d9;
-                      "
-                    >
-                      3
-                    </td>
-                    <td
-                      style="
-                        font-weight: 600;
-                        padding: 10px;
-                        background: #d9d9d9;
-                      "
-                    >
-                      $ 150.00
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="font-weight: 600; padding: 10px">1.</td>
-                    <td style="font-weight: 600; padding: 10px">
-                      Bussiness Card Design
-                    </td>
-                    <td style="font-weight: 600; padding: 10px">$ 50.00</td>
-                    <td style="font-weight: 600; padding: 10px">3</td>
-                    <td style="font-weight: 600; padding: 10px">$ 150.00</td>
-                  </tr>
-                  <tr>
-                    <td
-                      style="
-                        font-weight: 600;
-                        padding: 10px;
-                        background: #d9d9d9;
-                      "
-                    >
-                      2.
-                    </td>
-                    <td
-                      style="
-                        font-weight: 600;
-                        padding: 10px;
-                        background: #d9d9d9;
-                      "
-                    >
-                      Bussiness Card Design
-                    </td>
-                    <td
-                      style="
-                        font-weight: 600;
-                        padding: 10px;
-                        background: #d9d9d9;
-                      "
-                    >
-                      $ 50.00
-                    </td>
-                    <td
-                      style="
-                        font-weight: 600;
-                        padding: 10px;
-                        background: #d9d9d9;
-                      "
-                    >
-                      3
-                    </td>
-                    <td
-                      style="
-                        font-weight: 600;
-                        padding: 10px;
-                        background: #d9d9d9;
-                      "
-                    >
-                      $ 150.00
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="font-weight: 600; padding: 10px">1.</td>
-                    <td style="font-weight: 600; padding: 10px">
-                      Bussiness Card Design
-                    </td>
-                    <td style="font-weight: 600; padding: 10px">$ 50.00</td>
-                    <td style="font-weight: 600; padding: 10px">3</td>
-                    <td style="font-weight: 600; padding: 10px">$ 150.00</td>
-                  </tr>
                 </tbody>
               </table>
 
               <table
                 style="
-                  margin: 80px 0 20px;
+                  margin: 40px 0 20px;
                   width: 100%;
                   font-family: 'Trebuchet MS', 'Lucida Sans Unicode',
                     'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
@@ -391,7 +285,6 @@
                           color: #fff;
                           font-size: 20px;
                           font-weight: 700;
-                          width: 300px;
                           border-radius: 35px;
                         "
                       >
@@ -410,7 +303,6 @@
                           color: #fff;
                           font-size: 20px;
                           font-weight: 700;
-                          width: 300px;
                           border-radius: 35px;
                         "
                       >
@@ -438,12 +330,6 @@
                     </th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td></td>
-                    <td></td>
-                  </tr>
-                </tbody>
               </table>
 
               <table style="width: 100%; margin-bottom: 20px">
@@ -473,30 +359,7 @@
                       text-align: right;
                     "
                   >
-                    <!-- <a
-                      href="#"
-                      style="
-                        padding: 8px 30px;
-                        width: 200px;
-                        box-sizing: border-box;
-                        text-align: center;
-                        background-color: #000;
-                        background-image: url('https://res.cloudinary.com/dxsqw4dbf/image/upload/v1704556112/3_eezen1.png');
-                        background-position: center;
-                        background-size: 100% 100%;
-                        background-repeat: no-repeat;
-                        color: #fff;
-                        font-size: 20px;
-                        font-weight: 400;
-                        border-radius: 35px;
-                        display: inline-block;
-                        text-decoration: none;
-                        margin-bottom: 30px;
-                      "
-                    >
-                      Pay Now
-                    </a> -->
-                    <a href="#">
+                    <a href="https://www.google.com">
                       <img
                         src="https://res.cloudinary.com/dxsqw4dbf/image/upload/v1704556360/Group_2_e5j6ic.png"
                         width="150"

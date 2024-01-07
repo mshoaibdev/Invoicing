@@ -76,14 +76,15 @@ const onSubmit = () => {
           class="auth-card pa-4"
           max-width="448"
         >
-          <VCardItem class="justify-center">
+          <!--
+            <VCardItem class="justify-center">
             <template #prepend>
-              <div class="d-flex">
-                <VNodeRenderer :nodes="themeConfig.app.logo" />
-              </div>
+            <div class="d-flex">
+            <VNodeRenderer :nodes="themeConfig.app.logo" />
+            </div>
             </template>
-          </VCardItem>
-
+            </VCardItem>
+          -->
           <div>
             <h4 class="text-h4 font-weight-semibold mb-1 text-center">
               Welcome to {{ themeConfig.app.title }}!
