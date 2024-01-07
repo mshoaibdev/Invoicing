@@ -214,6 +214,16 @@ const confirmDelete = async ev => {
           </div>
         </div>
       </template>
+
+      <template #item.payment_method="{ item }">
+        <h6 class="text-h6 font-weight-bold">
+          {{ item.raw.payment_method.name }}
+        </h6>
+        <span class="text-sm">
+          {{ item.raw.payment_method.description }}
+        </span>
+      </template>
+
       
 
       <template #item.customer.email="{ item }">
