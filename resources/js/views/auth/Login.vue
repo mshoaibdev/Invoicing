@@ -7,6 +7,8 @@ import authV1TopShape from '@images/svg/auth-v1-top-shape.svg?raw'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
 
+import authBg from '@images/circuit100.jpg'
+
 import {
   emailValidator,
   requiredValidator,
@@ -165,6 +167,7 @@ const onSubmit = () => {
 .auth-wrapper {
   background-position: center !important;
   background-repeat: no-repeat !important;
-  background-size: auto !important;
+  background-size: cover;
+  background-image: url(@images/circuit100.jpg) !important;
 }
 </style>

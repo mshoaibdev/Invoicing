@@ -11,6 +11,7 @@ const totalInvoices = ref(0)
 const totalDraftInvoices = ref(0)
 const monthlySales = ref(null)
 const companyCurrency = ref({})
+import authBg from '@images/circuit100.jpg'
 
 
 
@@ -128,6 +129,22 @@ onMounted( async () => {
         :company-currency="companyCurrency"
       />
     </VCol>
+
+    <VCol
+      cols="12"
+      sm="12"
+      md="12"
+    >
+    </VCol>
   </VRow>
 </template>
 
+<style>
+.blank-space{
+  min-height: 483px;
+  background-image: url(@images/circuit100.jpg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+</style>
