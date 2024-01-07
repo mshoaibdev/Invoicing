@@ -91,6 +91,16 @@ const confirmDelete = paymentMethod => {
             :items="paymentMethods"
             class="text-no-wrap"
           >
+            <template #item.name="{ item }">
+              <h6 class="text-h6 font-weight-bold">
+                {{ item.raw.name }}
+              </h6>
+              <span class="text-sm">
+                {{ item.raw.description }}
+              </span>
+            </template>
+
+
             <template #item.is_enabled="{ item }">
               <VSwitch
                 v-model="item.raw.is_enabled"
