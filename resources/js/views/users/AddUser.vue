@@ -216,6 +216,18 @@ const dialogModelValueUpdate = val => {
               />
             </VCol>
 
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VTextField
+                v-model="formData.phone"
+                label="Personal Phone Number"
+                name="phone"
+              />
+            </VCol>
+
+
 
             <VCol
               cols="12"
@@ -231,7 +243,7 @@ const dialogModelValueUpdate = val => {
             >
               <VTextField
                 v-model="formData.address.phone"
-                label="Phone"
+                label="Home Phone"
               />
             </VCol>
             

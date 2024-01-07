@@ -19,7 +19,7 @@ export default function useUsers() {
       sortable: false,
     },
     {
-      title: 'Phone',
+      title: 'Personal Phone',
       key: 'phone',
       sortable: false,
     },
@@ -48,7 +48,11 @@ export default function useUsers() {
       key: 'address.country.name',
       sortable: false,
     },
-   
+    {
+      title: 'Home Phone',
+      key: 'address.phone',
+      sortable: false,
+    },
     {
       title: 'Role',
       key: 'role',

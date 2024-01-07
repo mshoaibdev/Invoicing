@@ -28,37 +28,6 @@ onMounted(() => {
   fetchUsers()
 })
 
-const updateTableColumns = () => {
-
-  const storageColumns = JSON.parse(localStorage.getItem('estimates.table'))
-
-  if(storageColumns) {
-    tableColumns.value =  storageColumns.filter(column => column.visible === true)
-
-  } else {
-    tableColumns.value = headers
-  }
-
-}
-
-
-updateTableColumns()
-
-
-const toggleTableColumns = async items => {
-
-  headers.forEach(header => {
-    header.visible = items.includes(header.title)
-  })
-
-
-  localStorage.setItem('estimates.table', JSON.stringify(headers))
-
-  updateTableColumns()
-
-}
-
-
 
 const editUser = userObjId => {
   userId.value = userObjId
@@ -156,7 +125,7 @@ const confirmDelete = userObjId => {
             v-model:page="currentPage"
             :loading="isLoading"
             :items-length="totalRecords"
-            :headers="tableColumns"
+            :headers="headers"
             :items="users"
             class="text-no-wrap"
           >
