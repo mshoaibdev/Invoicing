@@ -21,6 +21,12 @@ export default function usePaymentMethods() {
       visible: true,
     },
     {
+      title: 'Mode',
+      key: 'mode',
+      sortable: false,
+      visible: true,
+    },
+    {
       title: 'Is Enabled',
       key: 'is_enabled',
       sortable: false,
