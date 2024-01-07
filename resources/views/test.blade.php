@@ -27,6 +27,10 @@
           sans-serif;
       "
     >
+
+    @php
+    $formatter = new NumberFormatter($invoice->customer->currency->code,  NumberFormatter::CURRENCY);
+  @endphp
       <table style="width: 100%;">
         <thead>
           <tr>
@@ -45,11 +49,13 @@
                     </h1>
                   </td>
                   <td style="text-align: right">
-                    <img
-                      src="https://res.cloudinary.com/dxsqw4dbf/image/upload/v1704476746/1704476734-trimmy-0_ytsrqv.png"
-                      alt="The Meta Mavericks"
-                      width="150"
-                    />
+                    @if ($invoice->company->logo_url)
+                        <img  src="{{ asset($invoice->company->logo_url) }}" alt="Company Logo" width="200"> 
+                    @else
+                        @if ($invoice->company)
+                            <h2 > {{ $invoice->company->name }}</h2>
+                        @endif
+                    @endif
                   </td>
                 </tr>
               </table>
@@ -70,12 +76,15 @@
                       "
                     >
                       <p style="margin: 0px">Invoice To:</p>
-                      <h2 style="margin: 10px 0">ABCD ABCD</h2>
+                      <h2 style="margin: 10px 0">{{ $invoice->customer->billing->name }}</h2>
                       <p style="margin: 0px; padding: 0px">
-                        Company name:<br />
-                        Phone: 000- 000-0000<br />
-                        Email: test@test.com<br />
-                        Address:
+                        Company name: {{ $invoice->customer->company_name  ?? ''}}<br />
+                        Phone: {{ $invoice->customer->billing->phone ?? '' }}<br />
+                        Email: {{ $invoice->customer->email ?? '' }}<br />
+                        Address: {{ $invoice->customer->billing->city ?? '' }}
+                        {{ $invoice->customer->billing->state  ?? ''}} 
+                        {{ $invoice->customer->billing->zip ?? '' }}, 
+                        {{ $invoice->customer->billing->country->name ?? ''}}
                       </p>
                     </div>
                   </td>
@@ -89,9 +98,9 @@
                       "
                     >
                       <p style="margin: 0px; padding: 0px">
-                        Date : 02 May, 2023
+                        Date : {{ $invoice->created_at_formatted }}
                       </p>
-                      <p style="margin: 0px; padding: 0px">Invoice #123456</p>
+                      <p style="margin: 0px; padding: 0px">Invoice {{ $invoice->invoice_id }}</p>
                       <p style="margin: 0px; padding: 0px">PO #</p>
                     </div>
                   </td>
@@ -159,71 +168,17 @@
                   </tr>
                 </thead>
                 <tbody>
+                  @foreach ($invoice->items as $item)
                   <tr>
-                    <td style="font-weight: 600; padding: 10px">1.</td>
+                    <td style="font-weight: 600; padding: 10px">{{ $loop->iteration }}</td>
                     <td style="font-weight: 600; padding: 10px">
-                      Bussiness Card Design
+                      {{ $item['title'] }}
                     </td>
-                    <td style="font-weight: 600; padding: 10px">$ 50.00</td>
-                    <td style="font-weight: 600; padding: 10px">3</td>
-                    <td style="font-weight: 600; padding: 10px">$ 150.00</td>
+                    <td style="font-weight: 600; padding: 10px"> {{ $formatter->formatCurrency($item['cost'], $invoice->customer->currency->code) }}</td>
+                    <td style="font-weight: 600; padding: 10px">{{$item['quantity']}}</td>
+                    <td style="font-weight: 600; padding: 10px"> {{ $formatter->formatCurrency($item['total'], $invoice->customer->currency->code) }}</td>
                   </tr>
-                  <tr>
-                    <td
-                      style="
-                        font-weight: 600;
-                        padding: 10px;
-                        background: #d9d9d9;
-                      "
-                    >
-                      2.
-                    </td>
-                    <td
-                      style="
-                        font-weight: 600;
-                        padding: 10px;
-                        background: #d9d9d9;
-                      "
-                    >
-                      Bussiness Card Design
-                    </td>
-                    <td
-                      style="
-                        font-weight: 600;
-                        padding: 10px;
-                        background: #d9d9d9;
-                      "
-                    >
-                      $ 50.00
-                    </td>
-                    <td
-                      style="
-                        font-weight: 600;
-                        padding: 10px;
-                        background: #d9d9d9;
-                      "
-                    >
-                      3
-                    </td>
-                    <td
-                      style="
-                        font-weight: 600;
-                        padding: 10px;
-                        background: #d9d9d9;
-                      "
-                    >
-                      $ 150.00
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="font-weight: 600; padding: 10px">1.</td>
-                    <td style="font-weight: 600; padding: 10px">
-                      Bussiness Card Design
-                    </td>
-                    <td style="font-weight: 600; padding: 10px">$ 50.00</td>
-                    <td style="font-weight: 600; padding: 10px">3</td>
-                    <td style="font-weight: 600; padding: 10px">$ 150.00</td>
-                  </tr>
+                  @endforeach
                 </tbody>
               </table>
 
@@ -248,25 +203,35 @@
                           <strong style="font-weight: 700">Sub total</strong>
                         </td>
                         <td>
-                          <strong style="font-weight: 700">: $ 610.00</strong>
+                          <strong style="font-weight: 700">: {{ $formatter->formatCurrency($invoice->subtotal, $invoice->customer->currency->code) }}</strong>
                         </td>
                       </tr>
-                      <tr>
+                      {{-- <tr>
                         <td>
                           <strong style="font-weight: 700">Discount</strong>
                         </td>
                         <td>
                           <strong style="font-weight: 700">: 0.00%</strong>
                         </td>
-                      </tr>
+                      </tr> --}}
                       <tr>
                         <td>
-                          <strong style="font-weight: 700">Tax</strong>
+                          <strong style="font-weight: 700">Tax ({{ $invoice->tax_percentage }}%)</strong>
                         </td>
                         <td>
-                          <strong style="font-weight: 700">: 0.00%</strong>
+                          <strong style="font-weight: 700">: {{ $formatter->formatCurrency($invoice->tax_amount, $invoice->customer->currency->code) }}</strong>
                         </td>
                       </tr>
+
+                      <tr>
+                        <td>
+                          <strong style="font-weight: 700">Vat ({{ $invoice->vat_percentage }}%)</strong>
+                        </td>
+                        <td>
+                          <strong style="font-weight: 700">: {{ $formatter->formatCurrency($invoice->vat_amount, $invoice->customer->currency->code) }}</strong>
+                        </td>
+                      </tr>
+
                     </table>
                   </td>
                 </tr>
@@ -323,7 +288,7 @@
                               text-align: right;
                             "
                           >
-                            $ 610.00
+                          {{ $formatter->formatCurrency($invoice->total, $invoice->customer->currency->code) }}
                           </td>
                         </table>
                       </div>
@@ -345,10 +310,7 @@
                         font-size: 14px;
                       "
                     >
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Commodi non suscipit sit ratione vitae laborum earum
-                      repellendus rem, nobis officia culpa harum consequatur
-                      tempora adipisci accusantium iste aperiam, maxime fuga.
+                    {!! $invoice->note !!}
                     </div>
                   </td>
                   <td
@@ -359,18 +321,25 @@
                       text-align: right;
                     "
                   >
-                    <a href="https://www.google.com">
+                    @if($invoice->payment_link !== '')
+                    <a href="{{ $invoice->payment_link }}">
                       <img
                         src="https://res.cloudinary.com/dxsqw4dbf/image/upload/v1704556360/Group_2_e5j6ic.png"
                         width="150"
                       />
                     </a>
+                    @endif
                     <br />
+                    @if($invoice->paymentMethod->name == "Authorized.net")
                     <img
                       src="https://res.cloudinary.com/dxsqw4dbf/image/upload/v1704476400/ghaatsjj5jxxbmjwutj6.png"
                       alt="Authorize.net"
                       width="100"
                     />
+                    @elseif($invoice->paymentMethod->name == "PayPal")
+                    <img
+                      src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg" alt="Paypal" width="100" />
+                      @endif
                   </td>
                 </tbody>
               </table>
@@ -387,24 +356,29 @@
               "
             >
               <p style="font-size: 14px; margin: 0 0 5px">
-                <strong>Meta Mavericks Inc</strong> 5380 OLD BULLARD RD STE 223
-                TYLER,TX 75703
+                <strong>{{ $invoice->company->name }}</strong>  {{ $invoice->company->address->address_street_1 ?? '' }}
+                {{ $invoice->company->address->city ?? '' }} 
+                {{ $invoice->company->address->state ?? '' }} 
+                {{ $invoice->company->address->zip ?? '' }} 
+                {{ $invoice->company->address->country->name ?? '' }}
               </p>
               <p style="font-size: 14px; margin: 0 0 5px">
                 <a
                   href="tel:2812153298"
                   style="color: #000; text-decoration: none"
-                  ><strong>(281) 215-3298</strong></a
+                  ><strong>{{ $invoice->company->address->phone ?? '' }}</strong></a
                 >
               </p>
+              @if($invoice->company->website)
               <p style="font-size: 14px; margin: 0 0 5px">
                 <a
-                  href="https://www.themetamavericks.com"
+                  href="{{ $invoice->company->website ?? '' }}"
                   style="color: #000; text-decoration: none"
                 >
-                  <strong>www.themetamavericks.com</strong>
+                  <strong>{{ $invoice->company->website ?? '' }}</strong>
                 </a>
               </p>
+              @endif
             </td>
           </tr>
         </tfoot>

@@ -149,6 +149,7 @@ const onSubmit = async () => {
           `items[${index}][description]`,
           items[index].description,
         )
+        formNewData.append(`items[${index}][title]`, items[index].title)
         formNewData.append(`items[${index}][cost]`, items[index].cost)
         formNewData.append(`items[${index}][total]`, items[index].total)
       }
@@ -158,7 +159,6 @@ const onSubmit = async () => {
         formNewData,
       )
       if (respResult.value.status === 200) {
-        resetFormData()
       }
     } else {
       toast.error("Form contains error, please check again")
@@ -172,6 +172,7 @@ const addItem = () => {
     id: invoiceData.value.items.length + 1,
     quantity: 0,
     description: "",
+    title: "",
     cost: 0,
     total: 0,
   })

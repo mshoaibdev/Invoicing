@@ -31,6 +31,10 @@ class Store extends FormRequest
                 Rule::unique('companies'),
                 'string'
             ],
+            'website' => [
+                'nullable',
+                'url'
+            ],
             'currency_id' => [
                 'required'
             ],
@@ -63,7 +67,6 @@ class Store extends FormRequest
                 'country_id',
             ])
             ->merge([
-                
                 'type' => 'company',
             ])
             ->toArray();

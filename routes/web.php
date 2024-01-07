@@ -18,19 +18,20 @@ use App\Http\Controllers\PaymentController;
 
 Route::get('/pdf', function () {
 
-    
-    // $invoice = Invoice::with([
-    //     'company' => [
-    //         'address',
-    //     ],
-    //     'customer' => [
-    //         'billing',
-    //         'currency',
-    //     ]
-    // ])->find(1000);
+
+    $invoice = Invoice::with([
+        'company' => [
+            'address',
+        ],
+        'paymentMethod',
+        'customer' => [
+            'billing',
+            'currency',
+        ]
+    ])->find(1101);
 
 
-    $pdfView = view('test')->render();
+    $pdfView = view('test', ['invoice' => $invoice])->render();
 
     $pdf = App::make('dompdf.wrapper');
     $pdf->loadHTML($pdfView)->setPaper('a4', 'portrait');

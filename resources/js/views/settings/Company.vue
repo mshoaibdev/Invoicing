@@ -9,7 +9,7 @@ const { updateCompany, errors, respResult, isLoading, currentCompany } = useComp
 
 const formData = ref({
   name: '',
-  last_name: '',
+  website: '',
   currency_id: 1,
   address: {
     phone: '',
@@ -199,6 +199,17 @@ const onSubmit = async() => {
                 <VTextField
                   v-model="formData.name"
                   label="Company Name"
+                  :rules="[requiredValidator]"
+                />
+              </VCol>
+
+              <VCol
+                md="6"
+                cols="12"
+              >
+                <VTextField
+                  v-model="formData.website"
+                  label="Website"
                   :rules="[requiredValidator]"
                 />
               </VCol>

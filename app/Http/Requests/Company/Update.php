@@ -34,6 +34,10 @@ class Update extends FormRequest
             'currency_id' => [
                 'required'
             ],
+            'website' => [
+                'nullable',
+                'url'
+            ],
             'logo' => [
                 'nullable',
                 'image',

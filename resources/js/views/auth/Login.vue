@@ -23,8 +23,8 @@ const { login, errors, respData, isLoading } = useAuth()
 const { setUser, setToken, setUserAbilities } = jwtService()
 
 const form = ref({
-  email: 'admin@admin.com',
-  password: 'password',
+  email: '',
+  password: '',
   remember: false,
 })
 
