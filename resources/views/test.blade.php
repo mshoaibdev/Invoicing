@@ -374,6 +374,8 @@
                 <a
                   href="{{ $invoice->company->website ?? '' }}"
                   style="color: #000; text-decoration: none"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <strong>{{ $invoice->company->website ?? '' }}</strong>
                 </a>
