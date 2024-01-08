@@ -2,6 +2,7 @@
 import useInvoices from "@/composables/invoices"
 import useCustomers from "@/composables/customers"
 import usePaymentMethods from '@/composables/paymentMethods'
+import useTaxTypes from '@/composables/taxTypes'
 
 import { requiredValidator } from "@validators"
 import { formatCurrency } from "@core/utils/formatters"
@@ -17,6 +18,7 @@ const {
 
 const { updateInvoice, respResult, isLoading: invoiceLoading, getInvoice, invoiceData: invoiceItem } = useInvoices()
 const { fetchPaymentMethodsList, paymentMethods, isLoading: paymentMethodsLoading } = usePaymentMethods()
+const { fetchTaxTypesList, taxTypes, isLoading: taxTypeLoading } = useTaxTypes()
 
 
 const route = useRoute()
@@ -25,6 +27,7 @@ const isSendInvoiceDialogVisible = ref(false)
 const refForm = ref()
 const currency = ref({})
 const selectedCustomer = ref({})
+const selectedTaxes = ref([])
 
 const invoiceData = ref({
   invoice_date: '',
@@ -35,8 +38,20 @@ onMounted(async() => {
   await fetchCustomersList()
   await getInvoice(invoiceId)
   await fetchPaymentMethodsList()
+  await fetchTaxTypesList()
   invoiceData.value = {
     ...invoiceItem.value,
+  }
+
+  if(invoiceData.value.taxes){
+    selectedTaxes.value = invoiceData.value.taxes.map(tax => {
+      return {
+        id: tax.tax_type.id,
+        name: tax.tax_type?.name,
+        tax_percentage: tax.tax_percentage,
+        tax_amount: tax.tax_amount,
+      }
+    })
   }
 
   if(invoiceData.value.customer_id){
@@ -67,8 +82,7 @@ const calculateTotal = () => {
   invoiceData.value.total = 0
   invoiceData.value.total =
     parseFloat(invoiceData.value.subtotal) +
-    parseFloat(invoiceData.value.tax_amount)+
-    parseFloat(invoiceData.value.vat_amount)
+    parseFloat(invoiceData.value.tax_amount)
 }
 
 const calculateSubTotal = () => {
@@ -82,27 +96,43 @@ const calculateSubTotal = () => {
 const calculateTax = () => {
   invoiceData.value.tax_amount = 0
 
-  const taxPercentage = parseInt(invoiceData.value.tax_percentage)
+  selectedTaxes.value.forEach(tax => {
+    invoiceData.value.tax_amount += parseFloat(tax.tax_amount)
+  })
+
+
+  calculateTotal()
+}
+
+
+const calculateTaxType = tax => {
+
+  const taxType = selectedTaxes.value.find(taxType => taxType.id === tax.id)
+
+  const taxPercentage = parseInt(tax.tax_percentage)
   if (taxPercentage > 0 && invoiceData.value.subtotal > 0) {
-    invoiceData.value.tax_amount = parseFloat(
+    taxType.tax_amount = parseFloat(
       (invoiceData.value.subtotal * taxPercentage) / 100,
     )
   }
+  calculateSubTotal()
+  calculateTax()
   calculateTotal()
 }
 
-const calculateVatTax = () => {
-  invoiceData.value.vat_amount = 0
+const calculateTaxAmount = () => {
 
-  const vatPercentage = parseInt(invoiceData.value.vat_percentage)
-  if (vatPercentage > 0 && invoiceData.value.subtotal > 0) {
-    invoiceData.value.vat_amount = parseFloat(
-      (invoiceData.value.subtotal * vatPercentage) / 100,
-    )
-  }
+  selectedTaxes.value.forEach(tax => {
+    const taxPercentage = parseInt(tax.tax_percentage)
+    if (taxPercentage > 0 && invoiceData.value.subtotal > 0) {
+      tax.tax_amount = parseFloat(
+        (invoiceData.value.subtotal * taxPercentage) / 100,
+      )
+    }
+  })
+
   calculateTotal()
 }
-
 
 const generateItemTotal = index => {
   const item = invoiceData.value.items[index]
@@ -110,17 +140,10 @@ const generateItemTotal = index => {
 
   item.total = parseInt(cost) * parseInt(quantity)
   calculateSubTotal()
+
+  calculateTaxAmount()
 }
 
-const resetFormData = () => {
-  invoiceData.value = {
-    ...invoiceItem.value,
-  }
-  nextTick(() => {
-    refForm.value?.reset()
-    refForm.value?.resetValidation()
-  })
-}
 
 
 const onSubmit = async () => {
@@ -134,20 +157,34 @@ const onSubmit = async () => {
       formNewData.append("invoice_date", invoiceData.value.invoice_date)
       formNewData.append("total", invoiceData.value.total)
       formNewData.append("subtotal", invoiceData.value.subtotal)
-      formNewData.append("tax_percentage", invoiceData.value.tax_percentage)
       formNewData.append("tax_amount", invoiceData.value.tax_amount)
-      formNewData.append("vat_amount", invoiceData.value.vat_amount)
-      formNewData.append("vat_percentage", invoiceData.value.vat_percentage)
       formNewData.append("note", invoiceData.value.note ?? "")
       formNewData.append("terms", invoiceData.value.terms ?? "")
       formNewData.append("payment_method_id", invoiceData.value.payment_method_id)
       formNewData.append("status", invoiceData.value.status)
 
+      if(selectedTaxes.value.length > 0){
+        for (let index = 0; index < selectedTaxes.value.length; index++) {
+          formNewData.append(
+            `tax_types[${index}][tax_type_id]`,
+            selectedTaxes.value[index].id,
+          )
+          formNewData.append(
+            `tax_types[${index}][tax_percentage]`,
+            selectedTaxes.value[index].tax_percentage,
+          )
+          formNewData.append(
+            `tax_types[${index}][tax_amount]`,
+            selectedTaxes.value[index].tax_amount,
+          )
+        }
+      }
+
       for (let index = 0; index < items.length; index++) {
         formNewData.append(`items[${index}][quantity]`, items[index].quantity)
         formNewData.append(
           `items[${index}][description]`,
-          items[index].description,
+          items[index].description ?? "",
         )
         formNewData.append(`items[${index}][title]`, items[index].title)
         formNewData.append(`items[${index}][cost]`, items[index].cost)
@@ -176,6 +213,24 @@ const addItem = () => {
     cost: 0,
     total: 0,
   })
+}
+
+
+const addTax = tax => {
+  selectedTaxes.value.push({
+    id: tax.id,
+    name: tax.name,
+    tax_percentage: 0,
+    tax_amount: 0,
+  })
+
+  calculateTax()
+}
+
+
+const removeTaxType = index => {
+  selectedTaxes.value.splice(index, 1)
+  calculateTax()
 }
 
 const removeProduct = id => {
@@ -344,9 +399,7 @@ const removeProduct = id => {
                   cols="12"
                   md="6"
                 >
-                  <span class="text-sm"> 
-                    Product Name
-                  </span>
+                  <span class="text-sm"> Product Name </span>
                 </VCol>
                 <VCol
                   cols="12"
@@ -370,7 +423,7 @@ const removeProduct = id => {
             </div>
             <div
               v-for="(product, index) in invoiceData.items"
-              :key="product.title"
+              :key="index"
               class="ma-sm-2 mb-2"
             >
               <VCard
@@ -385,10 +438,9 @@ const removeProduct = id => {
                       cols="12"
                       md="6"
                     >
-                      <VTextarea
+                      <VTextField
                         v-model="product.title"
                         :rules="[requiredValidator]"
-                        rows="1"
                         label="Title"
                       />
                     </VCol>
@@ -434,6 +486,7 @@ const removeProduct = id => {
                         }}</span>
                       </p>
                     </VCol>
+
                     <VCol
                       cols="12"
                       md="12"
@@ -455,7 +508,7 @@ const removeProduct = id => {
                     color="default"
                     variant="text"
                     :disabled="index === 0"
-                    @click="removeProduct(product.id)"
+                    @click="removeProduct"
                   >
                     <VIcon
                       size="20"
@@ -475,104 +528,156 @@ const removeProduct = id => {
 
           <VDivider />
 
-          <VCardText class="d-flex justify-space-between flex-wrap flex-column flex-sm-row ma-sm-2">
+          <VCardText class="d-flex justify-end flex-wrap flex-column">
             <VRow>
               <VCol
                 cols="12"
                 md="6"
               >
-                <VTextField
-                  v-model="invoiceData.vat_percentage"
-                  label="VAT Tax (%)"
-                  :rules="[requiredValidator]"
-                  type="number"
-                  min="0"
-                  max="100"
-                  @update:model-value="calculateVatTax"
+                <p class="font-weight-semibold mb-2 mt-2">
+                  Note:
+                </p>
+                <VTextarea
+                  v-model="invoiceData.note"
+                  clearable
+                  placeholder="Enter your note here..."
+                  clear-icon="tabler-circle-x"
                 />
               </VCol>
               <VCol
                 cols="12"
-                md="6"
+                md="4"
+                offset="2"
               >
-                <VTextField
-                  v-model="invoiceData.tax_percentage"
-                  label="Select Tax (%)"
-                  :rules="[requiredValidator]"
-                  type="number"
-                  min="0"
-                  max="100"
-                  @update:model-value="calculateTax"
-                />
+                <div class="d-flex justify-space-between gap-3">
+                  <p class="font-weight-bold mb-2">
+                    Sub Total:
+                  </p>
+
+                  
+                  <p class="text-body-1">
+                    {{
+                      formatCurrency(
+                        invoiceData.subtotal,
+                        currency.code ?? "USD"
+                      )
+                    }}
+                  </p>
+                </div>
+
+                <div v-if="selectedTaxes">
+                  <VRow
+                    v-for="(selectedTax, index) in selectedTaxes"
+                    :key="index"
+                  
+                    class="mt-3"
+                  >
+                    <VDivider />
+                    <VCol
+                      cols="12"
+                      md="6"
+                    >
+                      <p class="font-weight-bold mb-2">
+                        {{ selectedTax.name }} ({{ selectedTax.tax_percentage }}%)
+                      </p>
+                    </VCol>
+                    <VCol
+                      cols="12"
+                      md="6"
+                    >
+                      <VTextField
+                        v-model="selectedTax.tax_percentage"
+                        label="Enter Tax Percentage"
+                        :rules="[requiredValidator]"
+                        type="number"
+                        variant="underlined"
+                        min="0"
+                        max="100"
+                        @update:model-value="calculateTaxType(selectedTax)"
+                      />
+                    </VCol>
+
+                    <VCol
+                      cols="12"
+                      md="12"
+                    >
+                      <p class="text-body-1 text-end">
+                        {{
+                          formatCurrency(
+                            selectedTax.tax_amount,
+                            currency.code ?? "USD"
+                          )
+                        }}
+                        <VBtn
+                          icon
+                          size="x-small"
+                          color="default"
+                          variant="text"
+                          @click="removeTaxType(index)"
+                        >
+                          <VIcon
+                            size="20"
+                            icon="tabler-x"
+                          />
+                        </VBtn>
+                      </p>
+                    </VCol>
+                  </VRow>
+                  <VDivider />
+                </div>
+
+                <div class="d-flex justify-end gap-3">
+                  <VBtn
+                    color="primary"
+                    variant="plain"
+                    prepend-icon="tabler-plus"
+                    class="px-0"
+                  >
+                    Add Tax
+                    <VMenu
+                      activator="parent"
+                      offset-y
+                      width="200"
+                    >
+                      <VList>
+                        <VListItem
+                          v-for="(item, index) in taxTypes"
+                          :key="index"
+                          :value="index"
+                          :disabled="selectedTaxes.some(tax => tax.id === item.id)"
+                          @click="addTax(item)"
+                        >
+                          <VListItemTitle>{{ item.name }}</VListItemTitle>
+                          <VListItemSubtitle>{{ item.description }}</VListItemSubtitle>
+                        </VListItem>
+                      </VList>
+                    </VMenu>
+                  </VBtn>
+                </div>
+
+                <VDivider />
+
+
+                <div class="d-flex justify-space-between gap-3 mt-2">
+                  <h3 class="font-weight-bold mb-2">
+                    Total:
+                  </h3>
+                  <p class="text-body-1">
+                    {{
+                      formatCurrency(
+                        invoiceData.total,
+                        currency.code ?? "USD"
+                      )
+                    }}
+                  </p>
+                </div>
               </VCol>
             </VRow>
           </VCardText>
 
-          <!-- 👉 Total Amount -->
-          <VCardText class="d-flex justify-space-between flex-wrap flex-column flex-sm-row">
-            <div class="mx-sm-4 my-2" />
-
-            <div class="my-2 mx-sm-4">
-              <table>
-                <tr>
-                  <td class="text-end">
-                    <div class="me-5">
-                      <p class="mb-2">
-                        Subtotal:
-                      </p>
-                      <p class="mb-2">
-                        Tax:
-                      </p>
-                      <p class="mb-2">
-                        VAT:
-                      </p>
-                      <p class="mb-2">
-                        Total:
-                      </p>
-                    </div>
-                  </td>
-                  <td class="font-weight-semibold">
-                    <p class="mb-2">
-                      {{
-                        formatCurrency(
-                          invoiceData.subtotal,
-                          currency.code ?? "USD"
-                        )
-                      }}
-                    </p>
-                    <p class="mb-2">
-                      {{
-                        formatCurrency(
-                          invoiceData.tax_amount,
-                          currency.code ?? "USD"
-                        )
-                      }}
-                    </p>
-                    <p class="mb-2">
-                      {{
-                        formatCurrency(
-                          invoiceData.vat_amount,
-                          currency.code ?? "USD"
-                        )
-                      }}
-                    </p>
-                    <p class="mb-2">
-                      {{
-                        formatCurrency(
-                          invoiceData.total,
-                          currency.code ?? "USD"
-                        )
-                      }}
-                    </p>
-                  </td>
-                </tr>
-              </table>
-            </div>
-          </VCardText>
-
           <VDivider />
 
-          <VCardText class="mx-sm-4">
+          <VCardText>
             <p class="font-weight-semibold mb-2 mt-2">
               Terms and Conditions:
             </p>
@@ -580,18 +685,6 @@ const removeProduct = id => {
               v-model="invoiceData.terms"
               clearable
               placeholder="Enter your terms here..."
-              clear-icon="tabler-circle-x"
-            />
-          </VCardText>
-
-          <VCardText class="mx-sm-4">
-            <p class="font-weight-semibold mb-2 mt-2">
-              Note:
-            </p>
-            <VTextarea
-              v-model="invoiceData.note"
-              clearable
-              placeholder="Enter your note here..."
               clear-icon="tabler-circle-x"
             />
           </VCardText>

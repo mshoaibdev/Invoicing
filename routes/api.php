@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\SettingController;
+use App\Http\Controllers\Api\TaxTypeController;
 use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\Api\BootstrapController;
 use App\Http\Controllers\Api\CountriesController;
@@ -62,9 +63,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     // update customer status
     Route::post('/customers/status/{id}', [CustomersController::class, 'updateStatus'])->name('customers.status');
-    Route::post('/projects/status/{id}', [ProjectController::class, 'updateStatus'])->name('projects.status');
     Route::post('/customers/multiple/delete', [CustomersController::class, 'deleteMultiple'])->name('customers.delete');
-    Route::get('/calendar/events', [CalendarController::class, 'getCalendarEvents'])->name('calendar.events');
     Route::get('/bootstrap', BootstrapController::class);
 
     Route::get('/countries', CountriesController::class);
@@ -81,6 +80,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     // update payment method status
     Route::post('/payment-methods/status/{id}', [PaymentMethodController::class, 'updateStatus'])->name('payment-methods.status');
 
+    // fetch tax types
+    Route::get('/fetch-tax-types', [TaxTypeController::class, 'getTaxTypes'])->name('fetch-tax-types');
 
     Route::apiResources([
         'settings' => SettingController::class,
@@ -89,10 +90,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         'permissions' => PermissionController::class,
         'customers' => CustomersController::class,
         'invoices' => InvoiceController::class,
-        'projects' => ProjectController::class,
         'companies' => CompanyController::class,
         'payment-methods' => PaymentMethodController::class,
         'payments' => PaymentController::class,
+        'tax-types' => TaxTypeController::class,
     ]);
 
 });

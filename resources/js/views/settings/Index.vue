@@ -6,6 +6,8 @@ import Company from './Company.vue'
 import Roles from './Roles.vue'
 import Security from './Security.vue'
 import PaymentMethods from './PaymentMethods.vue'
+import TaxTypes from './TaxTypes.vue'
+
 import MailConfigurations from './MailConfigurations.vue'
 
 const route = useRoute()
@@ -58,6 +60,14 @@ if (ability.can('Read', 'payment-methods-list')) {
     title: 'Payment Methods',
     icon: 'tabler-credit-card',
     tab: 'payment-methods',
+  })
+}
+
+if (ability.can('Read', 'tax-types-list')) {
+  tabs.push( {
+    title: 'Tax Types',
+    icon: 'tabler-credit-card',
+    tab: 'tax-types',
   })
 }
 </script>
@@ -114,6 +124,10 @@ if (ability.can('Read', 'payment-methods-list')) {
 
           <VWindowItem value="security">
             <Security />
+          </VWindowItem>
+
+          <VWindowItem value="tax-types">
+            <TaxTypes />
           </VWindowItem>
 
           <VWindowItem value="roles">

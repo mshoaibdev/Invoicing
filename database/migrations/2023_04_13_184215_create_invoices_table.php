@@ -18,27 +18,20 @@ return new class extends Migration
             $table->date('invoice_date');
             $table->date('due_date');
             $table->decimal('tax_amount', 10)->nullable();
-            $table->integer('tax_percentage')->nullable()->default(0);
-            // vat
-            $table->integer('vat_percentage')->nullable()->default(0);
-            $table->decimal('vat_amount', 10)->nullable();
-
             $table->json('items');
             $table->decimal('total', 10);
             $table->decimal('subtotal', 10);
-
-            // due amount
-            $table->decimal('due_amount', 10)->nullable();
-            $table->decimal('paid_amount', 10)->nullable();
             $table->decimal('discount_amount', 10)->nullable();
             $table->decimal('discount_percentage', 10)->nullable();
-            // remaining amount
-
+            $table->decimal('pay_amount', 10)->nullable();
+            $table->decimal('due_amount', 10)->nullable();
+            $table->timestamp('sent_at')->nullable();
+            $table->timestamp('paid_date')->nullable()->after('due_date');
             $table->tinyInteger('is_sent')->default(0);
             $table->tinyInteger('is_viewed')->default(0);
             $table->tinyInteger('is_paid')->default(0);
-
-            $table->string('status', 50)->nullable()->default('Paid');
+            $table->tinyInteger('is_partial')->default(0);
+            $table->string('status', 50)->nullable()->default('Draft');
             $table->json('payment_response')->nullable();
             $table->string('invoice_link')->nullable();
             $table->text('note')->nullable();

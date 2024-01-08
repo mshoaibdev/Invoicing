@@ -32,17 +32,14 @@ class Update extends FormRequest
             'note' => ['nullable', 'string'],
             'terms' => ['nullable', 'string'],
             'status' => ['required', 'string'],
-            'vat_amount' => ['nullable', 'numeric'],
-            'vat_percentage' => ['nullable', 'numeric'],
             'tax_amount' => ['nullable', 'numeric'],
-            'tax_percentage' => ['nullable', 'numeric'],
+            'tax_types' => ['nullable', 'array'],
         ];
     }
 
     public function getInvoicePayload(): array
     {
         return collect($this->validated())
-           
             ->toArray();
     }
 }

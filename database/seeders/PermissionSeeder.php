@@ -51,6 +51,11 @@ class PermissionSeeder extends Seeder
             'payment-methods-edit',
             'payment-methods-delete',
 
+            'tax-types-list',
+            'tax-types-create',
+            'tax-types-edit',
+            'tax-types-delete',
+
             'account-settings',
 
 

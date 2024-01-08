@@ -60,6 +60,17 @@ const routes = [
     },
   },
 
+  {
+    path: '/settings/tax-types',
+    name: 'tax-types',
+    redirect: { name: 'settings', params: { tab: 'tax-types' } },
+    component: () => import('@/views/settings/Index.vue'),
+    meta: {
+      auth: true,
+      action: 'Read',
+      subject: 'All',
+    },
+  },
 
   
 ]

@@ -22,7 +22,7 @@ export const { themeConfig, layoutConfig } = defineThemeConfig({
     iconRenderer: VIcon,
   },
   navbar: {
-    type: NavbarType.Sticky,
+    type: NavbarType.Static,
     navbarBlur: true,
   },
   footer: { type: FooterType.Hidden },

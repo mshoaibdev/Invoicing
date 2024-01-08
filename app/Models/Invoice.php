@@ -19,7 +19,6 @@ class Invoice extends Model
         'invoice_date',
         'due_date',
         'tax_amount',
-        'tax_percentage',
         'items',
         'total',
         'subtotal',
@@ -31,8 +30,6 @@ class Invoice extends Model
         'payment_response',
         'invoice_link',
         'company_id',
-        'vat_amount',
-        'vat_percentage',
         'creator_id',
         'is_sent',
         'sent_at',
@@ -178,13 +175,6 @@ class Invoice extends Model
         });
     }
 
-
-    // created at
-    // public function getCreatedAtAttribute($value)
-    // {
-    //     return Carbon::parse($value)->format('d-m-Y');
-    // }
-
     protected function invoiceId(): Attribute
     {
         return Attribute::make(
@@ -192,21 +182,7 @@ class Invoice extends Model
         );
     }
 
-    // protected function dueDate(): Attribute
-    // {
-    //     return Attribute::make(
-    //         get: fn ($value) => Carbon::parse($value)->format('d-m-Y'),
-    //         set: fn ($value) => Carbon::parse($value)->format('Y-m-d'),
-    //     );
-    // }
-
-    // protected function invoiceDate(): Attribute
-    // {
-    //     return Attribute::make(
-    //         get: fn ($value) => Carbon::parse($value)->format('d-m-Y'),
-    //         set: fn ($value) => Carbon::parse($value)->format('Y-m-d'),
-    //     );
-    // }
+  
 
     public function scopeApplyFilters($query, Request $request)
     {
@@ -260,16 +236,30 @@ class Invoice extends Model
         return $this->belongsTo(User::class, 'creator_id');
     }
 
-
-
-
-
+    public function taxes()
+    {
+        return $this->morphMany(Tax::class, 'taxable');
+    }
 
 
 
     protected static function booted()
     {
         static::deleting(function ($item) {
+            $item->payments()->delete();
+
+            $item->taxes()->delete();
+
+            $item->deleteInvoicePdf();
         });
+    }
+
+    public function deleteInvoicePdf()
+    {
+        $path = storage_path("invoices/{$this->customer->uuid}/{$this->invoice_id}.pdf");
+        if (file_exists($path)) {
+            unlink($path);
+        }
+
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\PaymentMethod;
+namespace App\Http\Requests\TaxType;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -22,22 +22,12 @@ class Store extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'is_default' => ['required', 'boolean'],
-            'is_enabled' => ['required', 'boolean'],
-            'is_gateway' => ['required', 'boolean'],
-            'live_identifier' => ['nullable', 'max:255'],
-            'live_secret' => ['nullable','max:255'],
-            'sandbox_identifier' => ['nullable',  'max:255'],
-            'sandbox_secret' => ['nullable',  'max:255'],
-            'mode' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255', 'unique:tax_types,name,NULL,id,company_id,' . $this->header('company')],
             'description' => ['nullable', 'string', 'max:255'],
         ];
     }
 
-    // getPaymentMethodPayload
-
-    public function getPaymentMethodPayload(): array
+    public function getTaxTypePayload(): array
     {
         return collect($this->validated())
             ->merge([

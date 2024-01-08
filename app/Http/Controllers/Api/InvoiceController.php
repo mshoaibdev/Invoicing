@@ -13,7 +13,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Invoice\Store;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\Invoice\Update;
-use App\Http\Requests\InvoiceRequest;
 use App\Http\Resources\InvoiceResource;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 
@@ -48,6 +47,10 @@ class InvoiceController extends Controller
         $result = \DB::transaction(function () use ($request) {
             $invoice = Invoice::create($request->getInvoicePayload());
 
+            if ($request->tax_types) {
+                $invoice->taxes()->createMany($request->tax_types);
+            }
+
             $invoice->load([
                 'company' => [
                     'address' => [
@@ -75,8 +78,15 @@ class InvoiceController extends Controller
                 $this->sendInvoiceHandler($invoice, $invoice->customer->email, $subject, $body);
             }
 
+            return true;
+
         });
 
+        if (!$result) {
+            return response()->json([
+                'message' => 'Something went wrong.',
+            ], 500);
+        }
 
         return response()->json([
             'message' => 'Invoice created successfully.',
@@ -90,7 +100,7 @@ class InvoiceController extends Controller
      */
     public function show(Invoice $invoice)
     {
-        $invoice->load(['customer' => ['billing', 'currency']]);
+        $invoice->load(['taxes' => ['taxType'], 'customer' => ['billing', 'currency']]);
 
         return new InvoiceResource($invoice);
     }
@@ -102,6 +112,11 @@ class InvoiceController extends Controller
     {
 
         $invoice->update($request->getInvoicePayload());
+
+        $invoice->taxes()->delete();
+        if ($request->tax_types) {
+            $invoice->taxes()->createMany($request->tax_types);
+        }
 
         $invoice->load([
             'company' => [
