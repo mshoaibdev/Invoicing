@@ -28,7 +28,7 @@ Route::get('/pdf', function () {
             'billing',
             'currency',
         ]
-    ])->find(1101);
+    ])->find(1000);
 
 
     $pdfView = view('test', ['invoice' => $invoice])->render();
