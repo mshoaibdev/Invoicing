@@ -26,7 +26,7 @@ return new class extends Migration
             $table->decimal('pay_amount', 10)->nullable();
             $table->decimal('due_amount', 10)->nullable();
             $table->timestamp('sent_at')->nullable();
-            $table->timestamp('paid_date')->nullable()->after('due_date');
+            $table->timestamp('paid_date')->nullable();
             $table->tinyInteger('is_sent')->default(0);
             $table->tinyInteger('is_viewed')->default(0);
             $table->tinyInteger('is_paid')->default(0);
