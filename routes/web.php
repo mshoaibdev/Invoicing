@@ -16,32 +16,32 @@ use App\Http\Controllers\PaymentController;
 |
 */
 
-// Route::get('/pdf', function () {
+Route::get('/pdf', function () {
 
 
-//     $invoice = Invoice::with([
-//         'company' => [
-//             'address',
-//         ],
-//         'taxes' => [
-//             'taxType',
-//         ],
-//         'paymentMethod',
-//         'customer' => [
-//             'billing',
-//             'currency',
-//         ]
-//     ])->find(1001);
+    $invoice = Invoice::with([
+        'company' => [
+            'address',
+        ],
+        'taxes' => [
+            'taxType',
+        ],
+        'paymentMethod',
+        'customer' => [
+            'billing',
+            'currency',
+        ]
+    ])->find(1007);
 
 
-//     $pdfView = view('test', ['invoice' => $invoice])->render();
+    $pdfView = view('test', ['invoice' => $invoice])->render();
 
-//     $pdf = App::make('dompdf.wrapper');
-//     $pdf->loadHTML($pdfView)->setPaper('a4', 'portrait');
-//     return $pdf->stream();
-//     // $pdfContent = $pdf->output();
+    $pdf = App::make('dompdf.wrapper');
+    $pdf->loadHTML($pdfView)->setPaper('a4', 'portrait');
+    return $pdf->stream();
+    // $pdfContent = $pdf->output();
 
-// });
+});
 
 
 
