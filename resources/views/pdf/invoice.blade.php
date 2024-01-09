@@ -202,25 +202,20 @@
                         <strong style="font-weight: 700">: 0.00%</strong>
                       </td>
                     </tr> --}}
-                    <tr>
-                      <td>
-                        <strong style="font-weight: 700">Tax ({{ $invoice->tax_percentage }}%)</strong>
-                      </td>
-                      <td>
-                        <strong style="font-weight: 700">: {{ $formatter->formatCurrency($invoice->tax_amount,
-                          $invoice->customer->currency->code) }}</strong>
-                      </td>
-                    </tr>
 
-                    <tr>
-                      <td>
-                        <strong style="font-weight: 700">Vat ({{ $invoice->vat_percentage }}%)</strong>
-                      </td>
-                      <td>
-                        <strong style="font-weight: 700">: {{ $formatter->formatCurrency($invoice->vat_amount,
-                          $invoice->customer->currency->code) }}</strong>
-                      </td>
-                    </tr>
+                    @if($invoice->taxes->count() > 0)
+                      @foreach($invoice->taxes as $tax)
+                        <tr>
+                          <td>
+                            <strong style="font-weight: 700">{{ $tax->taxType->name }} ({{ $tax->tax_percentage }}%)</strong>
+                          </td>
+                          <td>
+                            <strong style="font-weight: 700">: {{ $formatter->formatCurrency($tax->tax_amount,
+                              $invoice->customer->currency->code) }}</strong>
+                          </td>
+                        </tr>
+                      @endforeach
+                    @endif
 
                   </table>
                 </td>

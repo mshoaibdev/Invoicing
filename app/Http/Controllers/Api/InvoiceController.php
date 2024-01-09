@@ -57,6 +57,9 @@ class InvoiceController extends Controller
                         'country',
                     ],
                 ],
+                'taxes' => [
+                    'taxType',
+                ],
                 'paymentMethod',
                 'customer' => [
                     'billing',
@@ -121,6 +124,9 @@ class InvoiceController extends Controller
         $invoice->load([
             'company' => [
                 'address',
+            ],
+            'taxes' => [
+                'taxType',
             ],
             'customer' => [
                 'billing',
@@ -274,7 +280,7 @@ class InvoiceController extends Controller
 
         $response = $provider->createInvoice($data);
 
-        dd($response);
+        // dd($response);
 
         // check for error key
         if (array_key_exists('error', $response)) {
