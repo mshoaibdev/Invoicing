@@ -1,429 +1,353 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Invoice - {{ $invoice->invoice_id }}</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Email Template</title>
+  <style>
+    * {
+      margin: 0px;
+      padding: 0px;
+      box-sizing: border-box;
+    }
 
-    <style type="text/css">
-        /* -- Base -- */
-        body {
-            font-family: "DejaVu Sans";
-        }
-
-        html {
-            margin: 0px;
-            padding: 0px;
-            margin-top: 50px;
-
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        hr {
-            margin: 0 30px 0 30px;
-            color: rgba(0, 0, 0, 0.2);
-            border: 0.5px solid #EAF1FB;
-        }
-
-        /* -- Header -- */
-
-        .header-bottom-divider {
-            color: rgba(0, 0, 0, 0.2);
-            top: 90px;
-            left: 0px;
-            width: 100%;
-            margin-left: 0%;
-
-        }
-
-        .header-container {
-            position: absolute;
-            width: 100%;
-            height: 90px;
-            left: 0px;
-            top: -50px;
-        }
-
-        .header-logo {
-            margin-top: 20px;
-            padding-bottom: 20px;
-            text-transform: capitalize;
-            color: #817AE3;
-
-        }
-
-        .header {
-            font-size: 20px;
-            color: rgba(0, 0, 0, 0.7);
-        }
-
-        .content-wrapper {
-            display: block;
-            margin-top: 0px;
-            padding-top: 16px;
-            padding-bottom: 20px;
-        }
-
-        .company-address-container {
-            padding-top: 15px;
-            padding-left: 30px;
-            float: left;
-            width: 30%;
-            margin-bottom: 2px;
-        }
-
-        .company-address-container h1 {
-            font-size: 15px;
-            line-height: 22px;
-            letter-spacing: 0.05em;
-            margin-bottom: 0px;
-            margin-top: 10px;
-        }
-
-        .company-address {
-            margin-top: 16px;
-            text-align: left;
-            font-size: 12px;
-            line-height: 15px;
-            color: #595959;
-            width: 280px;
-            word-wrap: break-word;
-        }
-
-        .invoice-details-container {
-            float: right;
-            padding: 10px 30px 0 0;
-            margin-top: 18px;
-        }
-
-        .attribute-label {
-            font-size: 12px;
-            line-height: 18px;
-            padding-right: 40px;
-            text-align: left;
-            color: #55547A;
-        }
-
-        .attribute-value {
-            font-size: 12px;
-            line-height: 18px;
-            text-align: right;
-        }
-
-        /* -- Shipping -- */
-
-        .shipping-address-container {
-            float: right;
-            padding-left: 40px;
-            width: 160px;
-        }
-
-        .shipping-address {
-            font-size: 12px;
-            line-height: 15px;
-            color: #595959;
-            padding: 45px 0px 0px 40px;
-            margin: 0px;
-            width: 160px;
-            word-wrap: break-word;
-        }
-
-        /* -- Billing -- */
-
-        .billing-address-container {
-            padding-top: 50px;
-            float: left;
-            padding-left: 30px;
-        }
-
-        .billing-address-label {
-            font-size: 12px;
-            line-height: 18px;
-            padding: 0px;
-            margin-top: 27px;
-            margin-bottom: 0px;
-        }
-
-        .billing-address-name {
-            max-width: 160px;
-            font-size: 15px;
-            line-height: 22px;
-            padding: 0px;
-            margin: 0px;
-        }
-
-        .billing-address {
-            font-size: 12px;
-            line-height: 15px;
-            color: #595959;
-            padding: 45px 0px 0px 30px;
-            margin: 0px;
-            width: 160px;
-            word-wrap: break-word;
-        }
-
-        /* -- Items Table -- */
-
-        .items-table {
-            margin-top: 35px;
-            padding: 0px 30px 10px 30px;
-            page-break-before: avoid;
-            page-break-after: auto;
-        }
-
-        .items-table hr {
-            height: 0.1px;
-        }
-
-        .item-table-heading {
-            font-size: 13.5;
-            text-align: center;
-            color: rgba(0, 0, 0, 0.85);
-            padding: 5px;
-            color: #55547A;
-        }
-
-        tr.item-table-heading-row th {
-            border-bottom: 0.620315px solid #E8E8E8;
-            font-size: 12px;
-            line-height: 18px;
-        }
-
-        tr.item-row td {
-            font-size: 12px;
-            line-height: 18px;
-        }
-
-        .item-cell {
-            font-size: 13;
-            text-align: center;
-            padding: 5px;
-            padding-top: 10px;
-            color: #040405;
-        }
-
-        .item-description {
-            color: #595959;
-            font-size: 9px;
-            line-height: 12px;
-        }
-
-        /* -- Total Display Table -- */
-
-        .total-display-container {
-            padding: 0 25px;
-        }
-
-        .total-display-table {
-            border-top: none;
-            page-break-inside: avoid;
-            page-break-before: auto;
-            page-break-after: auto;
-            margin-top: 20px;
-            float: right;
-            width: auto;
-        }
-
-        .total-table-attribute-label {
-            font-size: 13px;
-            color: #55547A;
-            text-align: left;
-            padding-left: 10px;
-        }
-
-        .total-table-attribute-value {
-            font-weight: bold;
-            text-align: right;
-            font-size: 13px;
-            color: #040405;
-            padding-right: 10px;
-            padding-top: 2px;
-            padding-bottom: 2px;
-        }
-
-        .total-border-left {
-            border: 1px solid #E8E8E8 !important;
-            border-right: 0px !important;
-            padding-top: 0px;
-            padding: 8px !important;
-        }
-
-        .total-border-right {
-            border: 1px solid #E8E8E8 !important;
-            border-left: 0px !important;
-            padding-top: 0px;
-            padding: 8px !important;
-        }
-
-        /* -- Notes -- */
-
-        .notes {
-            font-size: 12px;
-            color: #595959;
-            margin-top: 15px;
-            margin-left: 30px;
-            width: 442px;
-            text-align: left;
-            page-break-inside: avoid;
-        }
-
-        .notes-label {
-            font-size: 15px;
-            line-height: 22px;
-            letter-spacing: 0.05em;
-            color: #040405;
-            width: 108px;
-            white-space: nowrap;
-            height: 19.87px;
-            padding-bottom: 10px;
-        }
-
-        /* -- Helpers -- */
-
-        .text-primary {
-            color: #5851DB;
-        }
-
-
-        table .text-left {
-            text-align: left;
-        }
-
-        table .text-right {
-            text-align: right;
-        }
-
-        .border-0 {
-            border: none;
-        }
-
-        .py-2 {
-            padding-top: 2px;
-            padding-bottom: 2px;
-        }
-
-        .py-8 {
-            padding-top: 8px;
-            padding-bottom: 8px;
-        }
-
-        .py-3 {
-            padding: 3px 0;
-        }
-
-        .pr-20 {
-            padding-right: 20px;
-        }
-
-        .pr-10 {
-            padding-right: 10px;
-        }
-
-        .pl-20 {
-            padding-left: 20px;
-        }
-
-        .pl-10 {
-            padding-left: 10px;
-        }
-
-        .pl-0 {
-            padding-left: 0;
-        }
-
-    </style>
+    footer {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+    }
+  </style>
 </head>
 
-<body>
-    <div class="header-container">
-        <table width="100%">
-            <tr>
-                <td class="text-center">
-                    @if ($invoice->company->logo_url)
-                        <img class="header-logo" style="height:50px" src="{{ asset($invoice->company->logo_url) }}" alt="Company Logo">
-                    @else
-                        @if ($invoice->company)
-                            <h2 class="header-logo"> {{ $invoice->company->name }}</h2>
-                        @endif
-                    @endif
-                </td>
-            </tr>
-        </table>
-        <hr class="header-bottom-divider" style="border: 0.620315px solid #E8E8E8;" />
-    </div>
+<body style="margin: 0px; background: #f4f4f4">
+  <div style="
+        position: relative;
+        padding: 30px 20px 80px;
+        margin: auto;
+        background-image: url('https://res.cloudinary.com/dxsqw4dbf/image/upload/v1704477555/2_qqyzic.png'),
+          url('https://res.cloudinary.com/dxsqw4dbf/image/upload/v1704477555/1_ezkhhy.png');
+        background-repeat: no-repeat, no-repeat;
+        background-position: top left, bottom right;
+        background-size: 40%, 40%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS',
+          sans-serif;
+      ">
+    <img src="https://res.cloudinary.com/dxsqw4dbf/image/upload/v1704477555/2_qqyzic.png"
+      style="position: absolute; top: 0; left: 0; width: 45%;">
+    <img src="https://res.cloudinary.com/dxsqw4dbf/image/upload/v1704477555/1_ezkhhy.png"
+      style="position: absolute; bottom: 0; right: 0; width: 45%;">
 
     @php
-    $formatter = new NumberFormatter($invoice->customer->currency->code,  NumberFormatter::CURRENCY);
-  @endphp
-    <div class="content-wrapper">
-        <div style="padding-top: 30px">
-            <div class="company-address-container company-address">
-              {{ $invoice->company->name }} <br>
-              {{ $invoice->company->address->address_street_1 ?? '' }} <br>
-              {{ $invoice->company->address->city ?? '' }} 
-              {{ $invoice->company->address->state ?? '' }} 
-              {{ $invoice->company->address->zip ?? '' }} <br>
-              {{ $invoice->company->address->country->name ?? '' }} 
-            </div>
+    $formatter = new NumberFormatter($invoice->customer->currency->code, NumberFormatter::CURRENCY);
+    @endphp
+    <header>
+      <table style="width: 100%; margin-bottom: 20px">
+        <tr>
+          <td>
+            <h1 style="
+                  font-family: Georgia, 'Times New Roman', Times, serif;
+                  font-size: 46px;
+                  font-weight: 400;
+                ">
+              INVOICE
+            </h1>
+          </td>
+          <td style="text-align: right">
+            @if ($invoice->company->logo_url)
+            <img src="{{ asset($invoice->company->logo_url) }}" alt="Company Logo" width="200">
+            @else
+            @if ($invoice->company)
+            <h2> {{ $invoice->company->name }}</h2>
+            @endif
+            @endif
+          </td>
+        </tr>
+      </table>
+    </header>
+    <table style="width: 100%;">
+      <tbody>
+        <tr>
+          <td>
+            <table style="width: 100%">
+              <tr>
+                <td style="vertical-align: bottom">
+                  <div style="
+                        border: 2px dotted #333;
+                        border-radius: 15px;
+                        padding: 20px;
+                      ">
+                    <p style="margin: 0px">Invoice To:</p>
+                    <h2 style="margin: 10px 0">{{ $invoice->customer->billing->name }}</h2>
+                    <p style="margin: 0px; padding: 0px">
+                      Company name: {{ $invoice->customer->company_name ?? ''}}<br />
+                      Phone: {{ $invoice->customer->billing->phone ?? '' }}<br />
+                      Email: {{ $invoice->customer->email ?? '' }}<br />
+                      Address: {{ $invoice->customer->billing->city ?? '' }}
+                      {{ $invoice->customer->billing->state ?? ''}}
+                      {{ $invoice->customer->billing->zip ?? '' }},
+                      {{ $invoice->customer->billing->country->name ?? ''}}
+                    </p>
+                  </div>
+                </td>
+                <td style="width: 15%"></td>
+                <td style="vertical-align: bottom; width: 32.5%">
+                  <div style="
+                        border: 2px dotted #333;
+                        border-radius: 15px;
+                        padding: 20px;
+                      ">
+                    <p style="margin: 0px; padding: 0px">
+                      Date : {{ $invoice->created_at_formatted }}
+                    </p>
+                    <p style="margin: 0px; padding: 0px">Invoice {{ $invoice->invoice_id }}</p>
+                    <p style="margin: 0px; padding: 0px">PO #</p>
+                  </div>
+                </td>
+              </tr>
+            </table>
+            <table style="
+                  width: 100%;
+                  border-collapse: collapse;
+                  margin: 10px 0 20px;
+                ">
+              <thead>
+                <tr>
+                  <th style="
+                        text-align: left;
+                        background: #000;
+                        padding: 10px;
+                        color: #fff;
+                      ">
+                    SL.
+                  </th>
+                  <th style="
+                        text-align: left;
+                        background: #000;
+                        padding: 10px;
+                        color: #fff;
+                      ">
+                    Item Description
+                  </th>
+                  <th style="
+                        text-align: left;
+                        background: #000;
+                        padding: 10px;
+                        color: #fff;
+                      ">
+                    Price
+                  </th>
+                  <th style="
+                        text-align: left;
+                        background: #000;
+                        padding: 10px;
+                        color: #fff;
+                      ">
+                    Qty.
+                  </th>
+                  <th style="
+                        text-align: left;
+                        background: #000;
+                        padding: 10px;
+                        color: #fff;
+                      ">
+                    Total
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach ($invoice->items as $item)
+                <tr>
+                  <td style="font-weight: 600; padding: 10px">{{ $loop->iteration }}</td>
+                  <td style="font-weight: 600; padding: 10px">
+                    {{ $item['title'] }}
+                  </td>
+                  <td style="font-weight: 600; padding: 10px"> {{ $formatter->formatCurrency($item['cost'],
+                    $invoice->customer->currency->code) }}</td>
+                  <td style="font-weight: 600; padding: 10px">{{$item['quantity']}}</td>
+                  <td style="font-weight: 600; padding: 10px"> {{ $formatter->formatCurrency($item['total'],
+                    $invoice->customer->currency->code) }}</td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
 
-            <div class="invoice-details-container">
-                <table>
+            <table style="
+                  margin: 40px 0 20px;
+                  width: 100%;
+                  font-family: 'Trebuchet MS', 'Lucida Sans Unicode',
+                    'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+                ">
+              <tr>
+                <td style="vertical-align: top">
+                  <strong style="font-weight: 700; font-size: 18px">Thank you for your bussiness</strong>
+                </td>
+                <td style="vertical-align: top; width: 30%">
+                  <table style="width: 100%; margin-left: auto">
                     <tr>
-                        <td class="attribute-label">
-                          Invoice Number
+                      <td>
+                        <strong style="font-weight: 700">Sub total</strong>
+                      </td>
+                      <td>
+                        <strong style="font-weight: 700">: {{ $formatter->formatCurrency($invoice->subtotal,
+                          $invoice->customer->currency->code) }}</strong>
+                      </td>
+                    </tr>
+                    {{-- <tr>
+                      <td>
+                        <strong style="font-weight: 700">Discount</strong>
+                      </td>
+                      <td>
+                        <strong style="font-weight: 700">: 0.00%</strong>
+                      </td>
+                    </tr> --}}
+                    <tr>
+                      <td>
+                        <strong style="font-weight: 700">Tax ({{ $invoice->tax_percentage }}%)</strong>
+                      </td>
+                      <td>
+                        <strong style="font-weight: 700">: {{ $formatter->formatCurrency($invoice->tax_amount,
+                          $invoice->customer->currency->code) }}</strong>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>
+                        <strong style="font-weight: 700">Vat ({{ $invoice->vat_percentage }}%)</strong>
+                      </td>
+                      <td>
+                        <strong style="font-weight: 700">: {{ $formatter->formatCurrency($invoice->vat_amount,
+                          $invoice->customer->currency->code) }}</strong>
+                      </td>
+                    </tr>
+
+                  </table>
+                </td>
+              </tr>
+            </table>
+
+            <table style="width: 100%">
+              <thead>
+                <tr>
+                  <th>
+                    <div style="
+                          padding: 8px 30px;
+                          box-sizing: border-box;
+                          text-align: left;
+                          background: #000;
+                          color: #fff;
+                          font-size: 20px;
+                          font-weight: 700;
+                          border-radius: 35px;
+                        ">
+                      Notes
+                    </div>
+                  </th>
+                  <th style="width: 10%"></th>
+                  <th>
+                    <div style="
+                          margin-left: auto;
+                          padding: 8px 30px;
+                          box-sizing: border-box;
+                          text-align: center;
+                          background: #000;
+                          color: #fff;
+                          font-size: 20px;
+                          font-weight: 700;
+                          border-radius: 35px;
+                        ">
+                      <table style="width: 100%">
+                        <td style="
+                              padding: 0px;
+                              line-height: 1.2;
+                              text-align: left;
+                            ">
+                          Total
                         </td>
-                        <td class="attribute-value"> &nbsp;{{ $invoice->invoice_id }}</td>
-                    </tr>
-                    <tr>
-                        <td class="attribute-label">Created Date</td>
-                        <td class="attribute-value"> &nbsp;{{ $invoice->created_at_formatted }}</td>
-                    </tr>
-                    <tr>
-                        <td class="attribute-label">Due Date</td>
-                        <td class="attribute-value"> &nbsp;{{ $invoice->due_date_formatted }}</td>
-                    </tr>
-                </table>
-            </div>
+                        <td style="
+                              padding: 0px;
+                              line-height: 1.2;
+                              text-align: right;
+                            ">
+                          {{ $formatter->formatCurrency($invoice->total, $invoice->customer->currency->code) }}
+                        </td>
+                      </table>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+            </table>
 
-            <div style="clear: both;"></div>
-        </div>
-
-        <div class="billing-address-container billing-address">
-                <b>Bill to,</b> <br>
-
-                <h3 style="">{{ $invoice->customer->billing->name }}</h3> <br>
-                {{ $invoice->customer->billing->address_street_1  ?? ''}} <br>
-                {{ $invoice->customer->billing->city ?? '' }}
-                {{ $invoice->customer->billing->state  ?? ''}} 
-                {{ $invoice->customer->billing->zip ?? '' }} <br>
-                {{ $invoice->customer->billing->country->name ?? ''}} 
-        </div>
-
-        {{-- <div class="shipping-address-container shipping-address" @if ($billing_address !== '</br>') style="float:left;" @else style="display:block; float:left: padding-left: 0px;" @endif>
-            @if ($shipping_address)
-                <b>@lang('pdf_ship_to')</b> <br>
-
-                {!! $shipping_address !!}
-            @endif
-        </div> --}}
-
-        <div style="position: relative; clear: both;">
-            @include('pdf.partials.table', ['invoice' => $invoice, 'formatter' => $formatter])
-        </div>
-
-        <div class="notes">
-            @if ($invoice->note)
-                <div class="notes-label">
-                   Notes
-                </div>
-
-                {!! $invoice->note !!}
-            @endif
-        </div>
-    </div>
+            <table style="width: 100%; margin-bottom: 20px">
+              <tbody>
+                <td style="vertical-align: top; padding: 20px 5px; width: 50%">
+                  <div style="
+                        border: 2px dotted #333;
+                        border-radius: 15px;
+                        padding: 15px 20px;
+                        font-size: 14px;
+                        min-height: 200px;
+                      ">
+                    {!! $invoice->note !!}
+                  </div>
+                </td>
+                <td style="
+                      vertical-align: top;
+                      padding: 20px 5px;
+                      width: 50%;
+                      text-align: right;
+                    ">
+                  @if($invoice->payment_link !== '')
+                  <div style="position: relative; display:inline-block;">
+                    <a href="{{ $invoice->payment_link }}"
+                      style="position:absolute;top:0;height:70px;left:0;right:0;"></a>
+                    <img src="https://res.cloudinary.com/dxsqw4dbf/image/upload/v1704556360/Group_2_e5j6ic.png"
+                      width="150" style="display:inline-block;" />
+                  </div>
+                  @endif
+                  <br />
+                  @if($invoice->paymentMethod->name == "Authorized.net")
+                  <img src="https://res.cloudinary.com/dxsqw4dbf/image/upload/v1704476400/ghaatsjj5jxxbmjwutj6.png"
+                    alt="Authorize.net" width="100" />
+                  @elseif($invoice->paymentMethod->name == "PayPal")
+                  <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg" alt="Paypal"
+                    width="100" />
+                  @endif
+                </td>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <footer>
+      <div style="
+              text-align: center;
+              border-top: 1px solid #d9d9d9;
+              padding: 20px 0 0;
+            ">
+        <p style="font-size: 14px; margin: 0 0 5px">
+          <strong>{{ $invoice->company->name }}</strong> {{ $invoice->company->address->address_street_1 ?? '' }}
+          {{ $invoice->company->address->city ?? '' }}
+          {{ $invoice->company->address->state ?? '' }}
+          {{ $invoice->company->address->zip ?? '' }}
+          {{ $invoice->company->address->country->name ?? '' }}
+        </p>
+        <p style="font-size: 14px; margin: 0 0 5px">
+          <a href="tel:2812153298" style="color: #000; text-decoration: none"><strong>{{
+              $invoice->company->address->phone ?? '' }}</strong></a>
+        </p>
+        @if($invoice->company->website)
+        <p style="font-size: 14px; margin: 0 0 5px">
+          <a href="{{ $invoice->company->website ?? '' }}" style="color: #000; text-decoration: none" target="_blank"
+            rel="noopener noreferrer">
+            <strong>{{ $invoice->company->website ?? '' }}</strong>
+          </a>
+        </p>
+        @endif
+      </div>
+    </footer>
 </body>
 
 </html>

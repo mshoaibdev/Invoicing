@@ -204,8 +204,9 @@ class InvoiceController extends Controller
         $items = [];
         foreach ($invoice->items as $product) {
             $items[] = [
-                'name' => $product['description'],
+                'name' => $product['title'],
                 'category' => 'DIGITAL_GOODS',
+                'description' => $product['description'],
                 'unit_amount' => [
                     'currency_code' => $currencyCode,
                     'value' => $product['total'],
@@ -273,6 +274,7 @@ class InvoiceController extends Controller
 
         $response = $provider->createInvoice($data);
 
+        dd($response);
 
         // check for error key
         if (array_key_exists('error', $response)) {
