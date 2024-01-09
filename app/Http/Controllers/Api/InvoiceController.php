@@ -207,12 +207,23 @@ class InvoiceController extends Controller
             throw new \Exception($resp['error']['error_description']);
         }
 
+        $tax = $invoice->taxes->first();
+
         $items = [];
         foreach ($invoice->items as $product) {
+            $taxesArr = [];
+            if ($tax) {
+                $taxesArr = [
+                    'name' => $tax->taxType->name,
+                    'percent' => $tax->tax_percentage,
+                ];
+            }
+
             $items[] = [
                 'name' => $product['title'],
                 'category' => 'DIGITAL_GOODS',
                 'description' => $product['description'],
+                'tax' => $taxesArr,
                 'unit_amount' => [
                     'currency_code' => $currencyCode,
                     'value' => $product['total'],
@@ -285,9 +296,7 @@ class InvoiceController extends Controller
         // check for error key
         if (array_key_exists('error', $response)) {
 
-            return response()->json([
-                'message' => $response['error']['message'],
-            ], 500);
+            throw new \Exception($resp['error']['message']);
         }
 
         $invoice->update([
@@ -366,10 +375,9 @@ class InvoiceController extends Controller
                 $paypalResponse = $this->sendPaypalInvoice($invoice, $invoice->customer->currency->code);
 
                 if (is_array($paypalResponse) && array_key_exists('error', $paypalResponse)) {
-                    return response()->json([
-                        'message' => json_decode($paypalResponse['error'], true)['details'][0]['description'],
-                    ], 500);
+                    throw new \Exception(json_decode($paypalResponse['error'], true)['details'][0]['description']);
                 }
+
                 $payPalLink = json_decode($paypalResponse, true)['href'];
             }
 

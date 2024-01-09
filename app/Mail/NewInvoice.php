@@ -60,9 +60,15 @@ class NewInvoice extends Mailable
      */
     public function attachments(): array
     {
+        $filePath = 'invoices/' . $this->invoice->customer->uuid . '/' . $this->invoice->invoice_id . '.pdf';
+
+        if (!\Storage::exists($filePath)) {
+            return [];
+        }
+
         return [
 
-            Attachment::fromStorage('invoices/'. $this->invoice->customer->uuid .'/' . $this->invoice->invoice_id . '.pdf')
+            Attachment::fromStorage($filePath)
                 ->as($this->invoice->invoice_id . '.pdf')
                 ->withMime('application/pdf'),
         ];
