@@ -306,8 +306,8 @@
                   <img src="https://res.cloudinary.com/dxsqw4dbf/image/upload/v1704476400/ghaatsjj5jxxbmjwutj6.png"
                     alt="Authorize.net" width="100" />
                   @elseif($invoice->paymentMethod->name == "PayPal")
-                  <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg" alt="Paypal"
-                    width="100" />
+                  <img src="{{ asset('assets/images/paypal-logo.png') }}" alt="Paypal"
+                  width="150" />
                   @endif
                 </td>
               </tbody>
